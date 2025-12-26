@@ -21,8 +21,11 @@ Create a multiplatform (Android & Windows) vocabulary notebook application that 
 - [ ] Configure KMP project with `androidApp` and `desktopApp` targets.
 - [ ] Setup Koin for dependency injection.
 - [ ] Setup SQLDelight for database.
+https://kotlinlang.org/docs/multiplatform/multiplatform-ktor-sqldelight.html#create-an-application-data-model
 - [ ] Setup Ktor for network requests.
 - [ ] Setup Glance for Android widget.
+- [ ] Setup Google Sign-in for Android and Desktop.
+- [ ] Setup Google Drive for Android and Desktop.
 
 ### 2. Data Layer
 #### Models

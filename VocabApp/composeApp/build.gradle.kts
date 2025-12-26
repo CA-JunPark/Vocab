@@ -2,6 +2,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
@@ -18,15 +20,20 @@ kotlin {
     
     jvm()
 
-    var koinVersion = "4.1.1"
+    var koinVersion = "4.1.0"
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation("io.insert-koin:koin-androidx-compose:${koinVersion}")
             // or for multiplatform
             implementation("io.insert-koin:koin-compose:${koinVersion}")
+            implementation(libs.ktor.client.android)
+            implementation(libs.android.driver)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -39,6 +46,14 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("io.insert-koin:koin-compose:${koinVersion}")
             implementation("io.insert-koin:koin-compose-viewmodel:${koinVersion}")
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.runtime)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+            implementation("app.cash.sqldelight:sqlite-driver:2.2.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -46,6 +61,8 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.androidx.room.common.jvm)
+
         }
     }
 }
@@ -89,6 +106,14 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "personal.jp.vocabapp"
             packageVersion = "1.0.0"
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("WordDatabase") {
+            packageName.set("db")
         }
     }
 }

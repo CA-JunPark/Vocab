@@ -1,0 +1,23 @@
+import kotlin.Boolean;
+
+CREATE TABLE Word (
+    name TEXT NOT NULL,
+    meaningKr TEXT NOT NULL,
+    example TEXT NOT NULL,
+    antonymEn TEXT NOT NULL,
+    tags TEXT NOT NULL,
+    createdTime TEXT NOT NULL,
+    modifiedTime TEXT NOT NULL,
+    isDeleted INTEGER AS Boolean DEFAULT 0
+);
+
+CREATE INDEX name ON Word(name);
+
+insertWord:
+INSERT INTO Word(name, meaningKr, example, antonymEn, tags, createdTime, modifiedTime, isDeleted)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAllWordsInfo:
+SELECT Word.*
+FROM Word;
+
