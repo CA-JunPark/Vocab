@@ -18,10 +18,11 @@ Create a multiplatform (Android & Windows) vocabulary notebook application that 
 - **TTS**: Android TTS (Text-to-Speech), not in desktop
 
 ### 1. Project Setup & Core Architecture
-- [ ] Configure KMP project with `androidApp` and `desktopApp` targets.
-- [ ] Setup Koin for dependency injection.
-- [ ] Setup SQLDelight for database.
+- [-] Configure KMP project with `androidApp` and `desktopApp` targets.
+- [-] Setup Koin for dependency injection.
+- [-] Setup SQLDelight for database.
 https://kotlinlang.org/docs/multiplatform/multiplatform-ktor-sqldelight.html#create-an-application-data-model
+https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_1
 - [ ] Setup Ktor for network requests.
 - [ ] Setup Glance for Android widget.
 - [ ] Setup Google Sign-in for Android and Desktop.
