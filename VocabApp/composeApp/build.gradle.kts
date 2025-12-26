@@ -17,11 +17,16 @@ kotlin {
     }
     
     jvm()
-    
+
+    var koinVersion = "4.1.1"
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.insert-koin:koin-androidx-compose:${koinVersion}")
+            // or for multiplatform
+            implementation("io.insert-koin:koin-compose:${koinVersion}")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -32,6 +37,8 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("io.insert-koin:koin-compose:${koinVersion}")
+            implementation("io.insert-koin:koin-compose-viewmodel:${koinVersion}")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

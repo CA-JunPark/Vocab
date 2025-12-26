@@ -1,16 +1,16 @@
 # Task List
 
 ## 1. Project Setup & Core Architecture
-- [/] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
+- [ ] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
 - [ ] Setup Koin for dependency injection <!-- id: 1 -->
 - [ ] Setup SQLDelight for database <!-- id: 2 -->
 - [ ] Setup Ktor for network requests <!-- id: 3 -->
 - [ ] Setup Glance for Android widget <!-- id: 4 -->
 
 ## 2. Data Layer
-### Models
-- [ ] Define `Word`, `Definition`, `Example`, `Opposite` data classes <!-- id: 43 -->
-- [ ] Add `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted` fields <!-- id: 44 -->
+### Model
+- [ ] Define `Word` class <!-- id: 43 -->
+- [ ] Add `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted` fields <!-- id: 44 -->
 
 ### Storage (SQLDelight)
 - [ ] Create database and tables <!-- id: 5 -->
@@ -78,3 +78,6 @@
 - [ ] Google Sign-in integration (KMPAuth) <!-- id: 40 -->
 - [ ] Token management (SharedPreferences/Keychain) <!-- id: 41 -->
 - [ ] Testing & Bug Fixes <!-- id: 42 -->
+
+## 6. Debugging
+- [ ] How to handle adding same word
