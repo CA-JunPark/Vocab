@@ -6,8 +6,10 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import db.WordDatabase
 
 
-actual class DriverFactory(private val context: Context) {
-    actual fun createDriver(): SqlDriver {
-        return AndroidSqliteDriver(WordDatabase.Schema, context, "word.db")
-    }
+class AndroidDriverFactory(private val context: Context): DriverFactory{
+    override fun createDriver(): SqlDriver = AndroidSqliteDriver(WordDatabase.Schema, context, "word.db")
+}
+
+actual fun getDriverFactory(context: Any): DriverFactory {
+    return AndroidDriverFactory(context as Context)
 }

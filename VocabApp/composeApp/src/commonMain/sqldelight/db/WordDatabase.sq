@@ -1,23 +1,46 @@
+-- ./gradlew generateSqlDelightInterfac on Terminal to apply
+
 import kotlin.Boolean;
 
 CREATE TABLE Word (
-    name TEXT NOT NULL,
+    name TEXT PRIMARY KEY NOT NULL,
     meaningKr TEXT NOT NULL,
     example TEXT NOT NULL,
     antonymEn TEXT NOT NULL,
-    tags TEXT NOT NULL,
-    createdTime TEXT NOT NULL,
-    modifiedTime TEXT NOT NULL,
+    tags TEXT DEFAULT NULL,
+    createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     isDeleted INTEGER AS Boolean DEFAULT 0
 );
 
 CREATE INDEX name ON Word(name);
 
 insertWord:
-INSERT INTO Word(name, meaningKr, example, antonymEn, tags, createdTime, modifiedTime, isDeleted)
-VALUES(?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime)
+VALUES(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 selectAllWordsInfo:
 SELECT Word.*
 FROM Word;
 
+selectWord:
+SELECT * FROM Word
+WHERE name = ?
+LIMIT 1;
+
+deletedWord:
+UPDATE Word
+SET isDeleted = 1, modifiedTime = CURRENT_TIMESTAMP
+WHERE name = ?;
+
+updateWord:
+UPDATE Word
+SET meaningKr = ?, example = ?, antonymEn = ?,
+    tags = ?, modifiedTime = CURRENT_TIMESTAMP
+WHERE name = ?;
+
+countWords:
+SELECT COUNT(*) FROM Word;
+
+deleteAllWords:
+DELETE FROM Word;

@@ -1,11 +1,19 @@
 package personal.jp.vocabapp.di
 
+// Logic for Service
+// It only cares what to do with the data
+// ex) validate the format of the data
+
+import db.Word as Word
+
 interface WordService {
     fun getWordOrNull(name: String): Word?
     fun getAllWords(): List<Word>
     fun addWord(word: Word): Boolean
     fun updateWord(word: Word): Boolean
     fun deleteWord(name: String): Boolean
+    fun countWords(): Int
+    fun deleteAllWords(): Boolean
 }
 
 class WordServiceImpl(
@@ -20,8 +28,11 @@ class WordServiceImpl(
     }
 
     override fun addWord(word: Word): Boolean {
+        // check duplicates
+        wordRepo.findWordOrNull(word.name)?.let {
+            return false
+        }
         return wordRepo.addWord(word)
-
     }
 
     override fun updateWord(word: Word): Boolean {
@@ -30,5 +41,13 @@ class WordServiceImpl(
 
     override fun deleteWord(name: String): Boolean {
         return wordRepo.deleteWord(name)
+    }
+
+    override fun countWords(): Int {
+        return wordRepo.countWords()
+    }
+
+    override fun deleteAllWords(): Boolean {
+        return wordRepo.deleteAllWords()
     }
 }

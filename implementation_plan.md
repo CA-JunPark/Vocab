@@ -18,11 +18,15 @@ Create a multiplatform (Android & Windows) vocabulary notebook application that 
 - **TTS**: Android TTS (Text-to-Speech), not in desktop
 
 ### 1. Project Setup & Core Architecture
-- [-] Configure KMP project with `androidApp` and `desktopApp` targets.
-- [-] Setup Koin for dependency injection.
-- [-] Setup SQLDelight for database.
+- [x] Configure KMP project with `androidApp` and `desktopApp` targets.
+- [x] Setup Koin for dependency injection.
+- [x] Setup SQLDelight for database.
 https://kotlinlang.org/docs/multiplatform/multiplatform-ktor-sqldelight.html#create-an-application-data-model
 https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_1
+- [ ] Link SQLDelight to Koin.
+    - [x] DB to Repository
+    - [x] Repository to Services 
+    - [ ] Services to ViewModels
 - [ ] Setup Ktor for network requests.
 - [ ] Setup Glance for Android widget.
 - [ ] Setup Google Sign-in for Android and Desktop.
@@ -40,9 +44,9 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
 - `isDeleted`: Boolean to indicate if the word is deleted.
 
 #### Storage (`SQLDelight`)
-- [ ] create database
-- [ ] create table
-- [ ] create columns for Word, Definition, Example, Opposite, tags, CreatedTime, LastModifiedTime
+- [x] create database
+- [x] create table
+- [ ] create columns for Word, Definition, Example, Opposite, tags, CreatedTime, LastModifiedTime, isDeleted
 - [ ] `insertWord(word: Word)`: insert a word
     - set CreatedTime to current time
     - set LastModifiedTime to current time
@@ -130,3 +134,4 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
 ### 6. Google Drive Integration Details
 - **Google Login**: Use `Google Sign-in` for Android and `Google Sign-in` for Desktop. Save the token in `SharedPreferences` for Android and `Keychain` for Desktop. The token expires in 14 days.
 - **Kotlin Multiplatform Authentication Library**: https://github.com/mirzemehdi/KMPAuth
+- **DB Exceptions**: Add Exception handling for DB operations.

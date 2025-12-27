@@ -13,31 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import app.cash.sqldelight.db.SqlDriver
-import db.WordDatabase
+import db.Word
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import personal.jp.vocabapp.di.WordViewModel
 import personal.jp.vocabapp.di.appModule
-import personal.jp.vocabapp.sql.DriverFactory
 
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun App() {
-    KoinApplication(application = {
-        modules(appModule)
-    }){
-        MyScreen()
-    }
+fun App(data: List<Word> = emptyList()) {
+    MyScreen(data=data)
 }
 
 @Composable
-fun MyScreen(viewModel: WordViewModel = koinViewModel()) {
+fun MyScreen(data: List<Word> = emptyList()) {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -52,14 +46,13 @@ fun MyScreen(viewModel: WordViewModel = koinViewModel()) {
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
-                var koinMessage = viewModel.sayHello("Koin")
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
                     Text("Compose: $greeting")
-                    Text("Koin: $koinMessage")
+                    Text("Koin: $data")
                 }
             }
         }

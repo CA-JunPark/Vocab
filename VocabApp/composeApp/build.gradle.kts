@@ -54,6 +54,9 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
             implementation("app.cash.sqldelight:sqlite-driver:2.2.1")
+            implementation(libs.kermit) //logger
+            // Logger.d { "This is a debug log" }
+            // Logger.e(throwable) { "Something went wrong" }
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -62,7 +65,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.androidx.room.common.jvm)
-
+            implementation("org.slf4j:slf4j-nop:2.0.9")
         }
     }
 }
