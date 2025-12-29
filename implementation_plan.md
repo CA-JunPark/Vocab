@@ -40,12 +40,14 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
 - [ ] Setup Glance for Android widget.
 
 ### 2. Data Layer
-#### Models
-- `Word`: Main data class.
+#### Model
+- `Word`
+- `name`: word (primary key)
 - `meaningKr`: Translation and examples.
 - `example`: Example sentence.
 - `oppositeEn`: Antonym and translation.
-- `tags`: tags for the word.
+- `tags`: tags for the word JSON string 
+    - example '["verb", "academic"]'
 - `created`: Timestamp of when the word was created.
 - `modified`: Timestamp of when the word was last modified.
 - `isDeleted`: Boolean to indicate if the word is deleted.

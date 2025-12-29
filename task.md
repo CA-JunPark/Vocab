@@ -12,7 +12,7 @@
 ## 2. Data Layer
 ### Model
 - [ ] Define `Word` class <!-- id: 43 -->
-- [ ] Add `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
+- [ ] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
 
 ### Storage (SQLDelight)
 - [ ] Create database and tables <!-- id: 5 -->
