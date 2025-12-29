@@ -4,25 +4,27 @@
 - [ ] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
 - [ ] Setup Koin for dependency injection <!-- id: 1 -->
 - [ ] Setup SQLDelight for database <!-- id: 2 -->
-- [ ] Setup Ktor for network requests <!-- id: 3 -->
+- [ ] Setup Ktor for network requests and proxy server <!-- id: 3 -->
+- [ ] Setup Google Sign-in for Android and Desktop <!-- id: 67 -->
+- [ ] Setup Turso for cloud storage <!-- id: 68 -->
 - [ ] Setup Glance for Android widget <!-- id: 4 -->
 
 ## 2. Data Layer
 ### Model
 - [ ] Define `Word` class <!-- id: 43 -->
-- [ ] Add `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted` fields <!-- id: 44 -->
+- [ ] Add `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
 
 ### Storage (SQLDelight)
 - [ ] Create database and tables <!-- id: 5 -->
-- [ ] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted` <!-- id: 7 -->
+- [ ] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced` <!-- id: 7 -->
 - [ ] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime) <!-- id: 45 -->
 - [ ] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime) <!-- id: 46 -->
 - [ ] Implement `updateWord(word: Word)` (update LastModifiedTime) <!-- id: 47 -->
 - [ ] Implement `syncDB()` logic <!-- id: 48 -->
-    - [ ] Handle new words (insert) <!-- id: 49 -->
-    - [ ] Handle deleted words (check LastModifiedTime) <!-- id: 50 -->
-    - [ ] Handle existing words (newer LastModifiedTime wins) <!-- id: 51 -->
-    - [ ] Update and upload local DB <!-- id: 52 -->
+    - [ ] Get all `synced=false` words <!-- id: 49 -->
+    - [ ] Batch update remote DB (check `modified` to determine win) <!-- id: 50 -->
+    - [ ] Update all `synced=true` if success <!-- id: 51 -->
+    - [ ] Batch update local DB from remote <!-- id: 52 -->
     - [ ] Show sync results (deleted, updated, added) <!-- id: 53 -->
 
 ### API Services
@@ -30,10 +32,8 @@
     - [ ] Function `enrichWord(word: String): EnrichedWordData` <!-- id: 10 -->
     - [ ] Prompt engineering for strict JSON response <!-- id: 11 -->
     - [ ] Implement `resultvlidation(JSON)` to validate and parse response <!-- id: 54 -->
-- [ ] Implement `DriveService` <!-- id: 12 -->
-    - [ ] `uploadLocalDB(file: .db)` <!-- id: 13 -->
-    - [ ] `downloadRemoteDB(): .db` <!-- id: 14 -->
-    - [ ] `updateLocalDB(file: .db)` <!-- id: 55 -->
+- [ ] Implement `TursoService` <!-- id: 12 -->
+    - [ ] `syncDB()`: sync localDB and remoteDB <!-- id: 13 -->
 
 ## 3. UI Layer (Compose Multiplatform)
 ### Design System

@@ -1,7 +1,7 @@
 # Vocabulary Notebook Application - Implementation Plan
 
 ## Goal Description
-Create a multiplatform (Android & Windows) vocabulary notebook application that leverages Google Gemini for automated content generation (translations, examples, antonyms) and Google Drive for data backup/sync. The app will use a local SQLite database for storage.
+Create a multiplatform (Android & Windows) vocabulary notebook application that leverages Google Gemini for automated content generation (translations, examples, antonyms) and Google Drive for data backup/sync. The app will use a local SQLite database for storage and Turso for cloud storage.
 
 ## Tech Stack
 - **Language**: Kotlin
@@ -13,7 +13,9 @@ Create a multiplatform (Android & Windows) vocabulary notebook application that 
 - **Dependency Injection**: Koin (for maintainable, testable, and loosely coupled applications)
 - **Asynchronous Processing**: Kotlin Coroutines & Flow (for non-blocking, reactive programming)
 - **Network**: Ktor Client (for Content Negotiation, Logging)
-- **Database**: SQLDelight (for SQLite)
+- **Server**: Google Cloud Run (for Proxy Server)
+- **ID**: Google Sign-in (for Authentication JWT Token)
+- **DB**: SQLDelight (Local SQLite), Turso (Cloud DB)
 - **Android Widget**: Jetpack Glance 
 - **TTS**: Android TTS (Text-to-Speech), not in desktop
 
@@ -27,49 +29,29 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
     - [x] DB to Repository
     - [x] Repository to Services 
     - [ ] Services to ViewModels
-- [ ] Setup Ktor for network requests.
-- [ ] Setup Glance for Android widget.
+- [ ] Setup Ktor for proxy server.
 - [ ] Setup Google Sign-in for Android and Desktop.
-- [ ] Setup Google Drive for Android and Desktop.
+- [ ] Setup Turso for cloud storage.
+    - [ ] sync local DB and remote DB
+- [ ] Setup Gemini for content generation.
+    - [ ] GeminiService
+    - [ ] Prompt engineering for strict JSON response.
+    - [ ] Result validation (JSON).
+- [ ] Setup Glance for Android widget.
 
 ### 2. Data Layer
 #### Models
 - `Word`: Main data class.
-- `Definition`: Translation and examples.
-- `Example`: Example sentence.
-- `Opposite`: Antonym and translation.
+- `meaningKr`: Translation and examples.
+- `example`: Example sentence.
+- `oppositeEn`: Antonym and translation.
 - `tags`: tags for the word.
-- `CreatedTime`: Timestamp of when the word was created.
-- `LastModifiedTime`: Timestamp of when the word was last modified.
+- `created`: Timestamp of when the word was created.
+- `modified`: Timestamp of when the word was last modified.
 - `isDeleted`: Boolean to indicate if the word is deleted.
+- `synced`: Boolean to indicate if the word is synced to the cloud.
 
-#### Storage (`SQLDelight`)
-- [x] create database
-- [x] create table
-- [ ] create columns for Word, Definition, Example, Opposite, tags, CreatedTime, LastModifiedTime, isDeleted
-- [ ] `insertWord(word: Word)`: insert a word
-    - set CreatedTime to current time
-    - set LastModifiedTime to current time
-- [ ] `deleteWord(word: Word)`: delete a word
-    - set isDeleted to true
-    - set LastModifiedTime to current time
-- [ ] `updateWord(word: Word)`: update a word
-    - set LastModifiedTime to current time
-- [ ] `syncDB()`: sync localDB and remoteDB
-    - for each word in (remoteDB + localDB)
-        - if new word, insert
-        - if deleted word
-            - delete if LastModifiedTime is older and isDeleted is true
-        - if existing word
-            - word with the newer LastModifiedTime wins
-        - updateLocalDB()
-        - uploadLocalDB()
-        - show result of sync 
-            - deleted words
-            - updated words
-            - added words
-
-#### API Services
+#### API 
 - [ ] `GeminiService`:
     - Function `enrichWord(word: String): EnrichedWordData`
     - Prompt engineering to get strict JSON response from Gemini.
@@ -77,12 +59,28 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
         - Validate JSON response from Gemini.
         - If valid, return EnrichedWordData.
         - If invalid, return error message.
-- [ ] `DriveService`:
-    - `uploadLocalDB(file: .db)`
-        - 
-    - `downloadRemoteDB(): .db`
-    - `updateLocalDB(file: .db)`
-            
+- [ ] `TursoService`:
+    - Function `syncDB()`: sync localDB and remoteDB
+
+#### Storage (`SQLDelight` & `Turso`)
+- [x] create database
+- [x] create table
+- [ ] create columns for Word, meaningKr, example, oppositeEn, tags, created, modified, isDeleted, synced
+- [ ] `insertWord(word: Word)`: insert a word
+    - set created to current time
+    - set modified to current time
+- [ ] `deleteWord(word: Word)`: delete a word
+    - set isDeleted to true
+    - set modified to current time
+- [ ] `updateWord(word: Word)`: update a word
+    - set modified to current time
+- [ ] `syncDB()`: sync localDB and remoteDB
+    - last write wins strategy
+        - get all `synced=false` words
+        - batch update remoteDB (check `modified` to determine which is newer)
+        - update all `synced=true` if success
+            - batch update localDB
+        - show sync result (deleted, updated, added)
 
 ### 3. UI Layer (Compose Multiplatform)
 #### Design System
@@ -130,8 +128,3 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
     - Click intents to open App (main list screen) or specific Word Detail Modal.
     - Floating Action Button (+) to add.
         - Add new word to DB.
-    
-### 6. Google Drive Integration Details
-- **Google Login**: Use `Google Sign-in` for Android and `Google Sign-in` for Desktop. Save the token in `SharedPreferences` for Android and `Keychain` for Desktop. The token expires in 14 days.
-- **Kotlin Multiplatform Authentication Library**: https://github.com/mirzemehdi/KMPAuth
-- **DB Exceptions**: Add Exception handling for DB operations.

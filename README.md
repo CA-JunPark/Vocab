@@ -23,9 +23,9 @@ If the word in the list is clicked, display the Korean translation and example s
 9. Save time when word is added.
 10. Allow the user to sort words by alphabetically or added time.
 11. Allow the user to sort words by alphabetically or added time in reverse order.
-12. Use Google Drive API to backup the words.
-13. Use Google Drive API to restore the words.
-14. Use Google Drive API to sync the words.
+12. Use Turso (Cloud DB) to backup the words.
+13. Use Turso (Cloud DB) to restore the words.
+14. Use Turso (Cloud DB) to sync the words between local and remote databases.
 15. If user is using Android, allow the user to use widget to add a word. 
 16. The widget will show the random few words that has been added.
 17. If widget is clicked, it will open the app.
@@ -36,5 +36,6 @@ Tech Specs:
 2. Use SQLDelight to store the words.
 3. Target platform: Android, Windows
 4. Gemini API
-5. Google Drive API
+5. Turso (Cloud DB)
+6. Google Cloud Run (Proxy Server)
 
