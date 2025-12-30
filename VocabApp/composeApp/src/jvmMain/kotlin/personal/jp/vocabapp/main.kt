@@ -13,41 +13,21 @@ import personal.jp.vocabapp.di.appModule
 import personal.jp.vocabapp.sql.getDriverFactory
 
 fun main() = application {
+
     KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
     KMAuthInitializer.initClientSecret(
         clientSecret = Secrets.WEB_CLIENT_SECRET,
     )
-    val googleAuthManager = KMAuthGoogle.googleAuthManager
+    KMAuthGoogle.googleAuthManager
 
-    val koinApp = startKoin{
+    startKoin{
         modules(appModule(getDriverFactory()))
     }
-
-    val service: WordServiceImpl = koinApp.koin.get()
-
-    val data = testDB(service)
 
     Window(
         onCloseRequest = ::exitApplication,
         title = "VocabApp",
     ) {
-        App(data=data)
+        App()
     }
-}
-
-//TODO Remove later
-fun testDB(service: WordServiceImpl): List<Word>{
-
-
-    val word:Word = Word("Potato", "감자", "test", "test",
-        "test", "null", "null", false)
-
-    Logger.d { "This is a debug log" }
-    service.deleteAllWords()
-    if(!service.addWord(word)){
-        println("Insert failed")
-    }
-
-    val allWords = service.getAllWords()
-    return allWords
 }

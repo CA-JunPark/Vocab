@@ -32,19 +32,15 @@ class MainActivity : ComponentActivity() {
         )
         KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
 
-        val googleAuthManager = KMAuthGoogle.googleAuthManager
+        KMAuthGoogle.googleAuthManager
 
-        val koinApp = startKoin{
+        startKoin{
             androidContext(this@MainActivity)
             modules(appModule(getDriverFactory(this@MainActivity)))
         }
-        
-        val service: WordServiceImpl = koinApp.koin.get()
-
-        val data = testDB(service)
 
         setContent {
-            App(data=data)
+            App()
         }
     }
 }
@@ -53,20 +49,4 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppAndroidPreview() {
     App()
-}
-
-//TODO Remove later
-fun testDB(service: WordServiceImpl) : List<Word> {
-    val word:Word = Word("Potato", "감자", "test", "test",
-        "test", "null", "null", false)
-
-    Logger.d { "This is a debug log" }
-//    service.deleteAllWords()
-    if(!service.addWord(word)){
-        println("Insert failed")
-    }
-
-    val allWords = service.getAllWords()
-
-    return allWords
 }

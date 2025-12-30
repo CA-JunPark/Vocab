@@ -13,15 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.sunildhiman90.kmauth.google.KMAuthGoogle
 import com.sunildhiman90.kmauth.google.compose.GoogleSignInButton
 import db.Word
-import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinApplication
-import personal.jp.vocabapp.di.WordViewModel
-import personal.jp.vocabapp.di.appModule
+import org.koin.compose.koinInject
+import personal.jp.vocabapp.di.WordServiceImpl
 
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
@@ -29,7 +26,13 @@ import vocabapp.composeapp.generated.resources.compose_multiplatform
 @Composable
 @Preview
 fun App(data: List<Word> = emptyList()) {
-    MyScreen(data=data)
+    val service: WordServiceImpl = koinInject()
+
+    // Use a StateFlow or ProduceState to handle the async/database data
+    val words by produceState<List<Word>>(initialValue = emptyList(), service) {
+        value = service.getAllWords()
+    }
+    MyScreen(data=words)
 }
 
 @Composable
