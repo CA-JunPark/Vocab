@@ -25,7 +25,7 @@ import vocabapp.composeapp.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
-fun App(data: List<Word> = emptyList()) {
+fun App() {
     val service: WordServiceImpl = koinInject()
 
     // Use a StateFlow or ProduceState to handle the async/database data

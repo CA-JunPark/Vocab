@@ -7,7 +7,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import personal.jp.vocabapp.sql.DriverFactory
 
-fun appModule(driverFactory: DriverFactory) = module{
+fun wordModule(driverFactory: DriverFactory) = module{
     single { WordDatabase(driverFactory.createDriver()) }
     singleOf(::WordRepoImpl) { bind<WordRepo>() }
     singleOf(::WordServiceImpl) { bind<WordService>() }
