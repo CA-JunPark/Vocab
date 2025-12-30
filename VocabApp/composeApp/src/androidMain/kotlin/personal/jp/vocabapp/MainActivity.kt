@@ -1,5 +1,6 @@
 package personal.jp.vocabapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,10 @@ import personal.jp.vocabapp.di.WordServiceImpl
 import personal.jp.vocabapp.di.appModule
 import personal.jp.vocabapp.sql.DriverFactory
 import co.touchlab.kermit.Logger
+import com.sunildhiman90.kmauth.core.KMAuthConfig
+import com.sunildhiman90.kmauth.core.KMAuthInitializer
+import com.sunildhiman90.kmauth.core.KMAuthPlatformContext
+import com.sunildhiman90.kmauth.google.KMAuthGoogle
 import personal.jp.vocabapp.sql.getDriverFactory
 
 class MainActivity : ComponentActivity() {
@@ -22,11 +27,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        KMAuthInitializer.initContext(
+            kmAuthPlatformContext = KMAuthPlatformContext(this)
+        )
+        KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
+
+        val googleAuthManager = KMAuthGoogle.googleAuthManager
+
         val koinApp = startKoin{
             androidContext(this@MainActivity)
             modules(appModule(getDriverFactory(this@MainActivity)))
         }
-
+        
         val service: WordServiceImpl = koinApp.koin.get()
 
         val data = testDB(service)

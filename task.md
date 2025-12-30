@@ -1,25 +1,26 @@
 # Task List
 
 ## 1. Project Setup & Core Architecture
-- [ ] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
-- [ ] Setup Koin for dependency injection <!-- id: 1 -->
-- [ ] Setup SQLDelight for database <!-- id: 2 -->
+- [x] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
+- [x] Setup Koin for dependency injection <!-- id: 1 -->
+- [x] Setup SQLDelight for database <!-- id: 2 -->
+- [x] Setup Google Sign-in for Android and Desktop <!-- id: 67 -->
+    https://klibs.io/project/sunildhiman90/KotlinMultiplatformAuth
 - [ ] Setup Ktor for network requests and proxy server <!-- id: 3 -->
-- [ ] Setup Google Sign-in for Android and Desktop <!-- id: 67 -->
 - [ ] Setup Turso for cloud storage <!-- id: 68 -->
 - [ ] Setup Glance for Android widget <!-- id: 4 -->
 
 ## 2. Data Layer
 ### Model
-- [ ] Define `Word` class <!-- id: 43 -->
-- [ ] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
+- [x] Define `Word` class <!-- id: 43 -->
+- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
 
 ### Storage (SQLDelight)
-- [ ] Create database and tables <!-- id: 5 -->
-- [ ] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced` <!-- id: 7 -->
-- [ ] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime) <!-- id: 45 -->
-- [ ] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime) <!-- id: 46 -->
-- [ ] Implement `updateWord(word: Word)` (update LastModifiedTime) <!-- id: 47 -->
+- [x] Create database and tables <!-- id: 5 -->
+- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced` <!-- id: 7 -->
+- [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime) <!-- id: 45 -->
+- [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime) <!-- id: 46 -->
+- [x] Implement `updateWord(word: Word)` (update LastModifiedTime) <!-- id: 47 -->
 - [ ] Implement `syncDB()` logic <!-- id: 48 -->
     - [ ] Get all `synced=false` words <!-- id: 49 -->
     - [ ] Batch update remote DB (check `modified` to determine win) <!-- id: 50 -->
@@ -28,6 +29,7 @@
     - [ ] Show sync results (deleted, updated, added) <!-- id: 53 -->
 
 ### API Services
+- [x] Implement `GoogleSignInService` <!-- id: 67 -->
 - [ ] Implement `GeminiService` <!-- id: 9 -->
     - [ ] Function `enrichWord(word: String): EnrichedWordData` <!-- id: 10 -->
     - [ ] Prompt engineering for strict JSON response <!-- id: 11 -->

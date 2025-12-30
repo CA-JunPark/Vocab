@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.sunildhiman90.kmauth.google.KMAuthGoogle
+import com.sunildhiman90.kmauth.google.compose.GoogleSignInButton
 import db.Word
 import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.painterResource
@@ -41,6 +43,16 @@ fun MyScreen(data: List<Word> = emptyList()) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            GoogleSignInButton(modifier = Modifier) { user, error ->
+                if (error != null) {
+                    println("GoogleSignInButton: Error in google Sign In: $error")
+                }
+                if (user != null) {
+                    println("GoogleSignInButton: Login Successful")
+                    println("User Info: ${user.name}, ${user.email}, ${user.profilePicUrl}")
+                }
+            }
+
             Button(onClick = { showContent = !showContent }) {
                 Text("Click meee!")
             }

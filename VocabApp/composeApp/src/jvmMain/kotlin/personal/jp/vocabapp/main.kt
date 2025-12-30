@@ -2,18 +2,23 @@ package personal.jp.vocabapp
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import app.cash.sqldelight.db.SqlDriver
 import co.touchlab.kermit.Logger
+import com.sunildhiman90.kmauth.core.KMAuthConfig
+import com.sunildhiman90.kmauth.core.KMAuthInitializer
+import com.sunildhiman90.kmauth.google.KMAuthGoogle
 import db.Word
-import db.WordDatabase
-import org.koin.core.Koin
 import org.koin.core.context.startKoin
-import personal.jp.vocabapp.di.WordRepo
 import personal.jp.vocabapp.di.WordServiceImpl
 import personal.jp.vocabapp.di.appModule
 import personal.jp.vocabapp.sql.getDriverFactory
 
 fun main() = application {
+    KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
+    KMAuthInitializer.initClientSecret(
+        clientSecret = Secrets.WEB_CLIENT_SECRET,
+    )
+    val googleAuthManager = KMAuthGoogle.googleAuthManager
+
     val koinApp = startKoin{
         modules(appModule(getDriverFactory()))
     }

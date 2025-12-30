@@ -57,6 +57,8 @@ kotlin {
             implementation(libs.kermit) //logger
             // Logger.d { "This is a debug log" }
             // Logger.e(throwable) { "Something went wrong" }
+            implementation("io.github.sunildhiman90:kmauth-google:0.3.3")
+            implementation("io.github.sunildhiman90:kmauth-google-compose:0.3.3")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
