@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.androidx.room.common.jvm)
             implementation("org.slf4j:slf4j-nop:2.0.9")
+            implementation(libs.ktor.client.java)
         }
     }
 }

@@ -19,9 +19,11 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import personal.jp.vocabapp.di.WordServiceImpl
-
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 
 @Composable
 @Preview

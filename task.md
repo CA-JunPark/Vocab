@@ -81,5 +81,5 @@
 - [ ] Token management (SharedPreferences/Keychain) <!-- id: 41 -->
 - [ ] Testing & Bug Fixes <!-- id: 42 -->
 
-## 6. Debugging
+## 6. Debugging & Polish
 - [ ] How to handle adding same word
