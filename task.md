@@ -6,7 +6,9 @@
 - [x] Setup SQLDelight for database <!-- id: 2 -->
 - [x] Setup Google Sign-in for Android and Desktop <!-- id: 67 -->
     https://klibs.io/project/sunildhiman90/KotlinMultiplatformAuth
-- [ ] Setup Ktor for network requests and proxy server <!-- id: 3 -->
+- [x] Setup Ktor for network requests and proxy server <!-- id: 3 -->
+- [x] Setup Google Cloud Run for proxy server <!-- id: 69 -->
+    - need to add Auth Header to requests 
 - [ ] Setup Turso for cloud storage <!-- id: 68 -->
 - [ ] Setup Glance for Android widget <!-- id: 4 -->
 

@@ -27,6 +27,10 @@ import personal.jp.vocabapp.sql.getDriverFactory
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
 
 // Android
 class MainActivity : ComponentActivity() {
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             App()
+//            GreetingScreen()
         }
 
     }
@@ -60,8 +65,11 @@ fun AppAndroidPreview() {
 }
 
 class Greet {
-    private val client = HttpClient()
-
+    val client = HttpClient {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
     suspend fun greet(): String {
         return try {
             val response = client.get("https://ktor.io/docs/")
@@ -70,7 +78,21 @@ class Greet {
             "Error: ${e.message}"
         }
     }
+    suspend fun backend(): String{
+        return try {
+            val response: Data = client.get("${Secrets.BACKEND_API}/").body()
+            response.message
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "Error: ${e.message}"
+        }
+    }
 }
+
+@Serializable
+data class Data(
+    val message:String = "No"
+)
 class MainViewModel : ViewModel() {
     private val greeter = Greet()
 
@@ -81,7 +103,7 @@ class MainViewModel : ViewModel() {
     fun fetchGreeting() {
         // 'launch' starts the coroutine without blocking the main thread
         viewModelScope.launch {
-            val result = greeter.greet()
+            val result = greeter.backend()
             _greetingText.value = result // UI updates automatically
         }
     }

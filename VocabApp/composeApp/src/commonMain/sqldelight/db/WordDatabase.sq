@@ -10,14 +10,15 @@ CREATE TABLE Word (
     tags TEXT DEFAULT NULL,
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    isDeleted INTEGER AS Boolean DEFAULT 0
+    isDeleted INTEGER AS Boolean DEFAULT 0,
+    synced INTEGER AS Boolean DEFAULT 0
 );
 
 CREATE INDEX name ON Word(name);
 
 insertWord:
-INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime)
-VALUES(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, synced)
+VALUES(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
 
 selectAllWordsInfo:
 SELECT Word.*
