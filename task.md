@@ -1,87 +1,92 @@
 # Task List
 
 ## 1. Project Setup & Core Architecture
-- [x] Configure KMP project with `androidApp` and `desktopApp` targets <!-- id: 0 -->
-- [x] Setup Koin for dependency injection <!-- id: 1 -->
-- [x] Setup SQLDelight for database <!-- id: 2 -->
-- [x] Setup Google Sign-in for Android and Desktop <!-- id: 67 -->
-    https://klibs.io/project/sunildhiman90/KotlinMultiplatformAuth
-- [x] Setup Ktor for network requests and proxy server <!-- id: 3 -->
-- [x] Setup Google Cloud Run for proxy server <!-- id: 69 -->
-    - need to add Auth Header to requests 
-- [ ] Setup Turso for cloud storage <!-- id: 68 -->
-- [ ] Setup Glance for Android widget <!-- id: 4 -->
+- [x] Configure KMP project with `androidApp` and `desktopApp` targets
+- [x] Setup Koin for dependency injection
+- [x] Setup SQLDelight for database
+- [ ] Setup Google OAuth2/OpenID Connect(OIDC) for Android and Desktop
+    https://github.com/kalinjul/kotlin-multiplatform-oidc?tab=readme-ov-file
+- [x] Setup Ktor for network requests and proxy server
+- [x] Setup Google Cloud Run for proxy server
+    - [ ] need to add Auth Header to requests 
+- [ ] Setup Turso for cloud storage
+- [ ] Setup Gemini
+- [ ] Connect Google Cloud Run to Turso and Gemini
+    - [ ] assign url
+    - [ ] 
+- [ ] Setup Glance for Android widget
 
 ## 2. Data Layer
 ### Model
-- [x] Define `Word` class <!-- id: 43 -->
-- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields <!-- id: 44 -->
+- [x] Define `Word` class
+- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields
 
 ### Storage (SQLDelight)
-- [x] Create database and tables <!-- id: 5 -->
-- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced` <!-- id: 7 -->
-- [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime) <!-- id: 45 -->
-- [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime) <!-- id: 46 -->
-- [x] Implement `updateWord(word: Word)` (update LastModifiedTime) <!-- id: 47 -->
-- [ ] Implement `syncDB()` logic <!-- id: 48 -->
-    - [ ] Get all `synced=false` words <!-- id: 49 -->
-    - [ ] Batch update remote DB (check `modified` to determine win) <!-- id: 50 -->
-    - [ ] Update all `synced=true` if success <!-- id: 51 -->
-    - [ ] Batch update local DB from remote <!-- id: 52 -->
-    - [ ] Show sync results (deleted, updated, added) <!-- id: 53 -->
+- [x] Create database and tables
+- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced`
+- [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime)
+- [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime)
+- [x] Implement `updateWord(word: Word)` (update LastModifiedTime)
+- [ ] Implement `syncDB()` logic
+    - [ ] Get all `synced=false` words
+    - [ ] Batch update remote DB (check `modified` to determine win)
+    - [ ] Update all `synced=true` if success
+    - [ ] Batch update local DB from remote
+    - [ ] Show sync results (deleted, updated, added)
 
 ### API Services
-- [x] Implement `GoogleSignInService` <!-- id: 67 -->
-- [ ] Implement `GeminiService` <!-- id: 9 -->
-    - [ ] Function `enrichWord(word: String): EnrichedWordData` <!-- id: 10 -->
-    - [ ] Prompt engineering for strict JSON response <!-- id: 11 -->
-    - [ ] Implement `resultvlidation(JSON)` to validate and parse response <!-- id: 54 -->
-- [ ] Implement `TursoService` <!-- id: 12 -->
-    - [ ] `syncDB()`: sync localDB and remoteDB <!-- id: 13 -->
+- [x] Implement `GoogleSignInService`
+- [ ] Implement `GeminiService`
+    - [ ] Prompt Engineering
+    - [ ] Function `enrichWord(word: String): Word`
+    - [ ] Prompt engineering for strict JSON response
+    - [ ] Implement `resultValidation(JSON)` to validate and parse response
+- [ ] Implement `TursoService`
+    - [ ] `syncDB()`: sync localDB and remoteDB
 
 ## 3. UI Layer (Compose Multiplatform)
 ### Design System
-- [ ] Define Typography, Colors (Material 3), and Theme <!-- id: 18 -->
+- [ ] Define Typography, Colors (Material 3), and Theme
 
 ### Screens
-- [ ] **Main List Screen** <!-- id: 19 -->
-    - [ ] List of words with popular translation <!-- id: 20 -->
-    - [ ] Search bar <!-- id: 21 -->
-    - [ ] Sort options (Alphabetical, Asc/Desc, tags) <!-- id: 22 -->
-    - [ ] FAB to add <!-- id: 23 -->
-    - [ ] Settings button <!-- id: 24 -->
-- [ ] **Word Detail Screen** (Modal) <!-- id: 25 -->
-    - [ ] Show translation, examples, opposites, tags <!-- id: 26 -->
-    - [ ] TTS button (Android only) <!-- id: 56 -->
-    - [ ] ESC to close (Desktop only) <!-- id: 57 -->
-- [ ] **Add Screen** (Modal) <!-- id: 27 -->
-    - [ ] Input field for word <!-- id: 28 -->
-    - [ ] Tags input field <!-- id: 58 -->
-    - [ ] ESC to close (Desktop only) <!-- id: 59 -->
-- [ ] **Edit Screen** (Modal) <!-- id: 60 -->
-    - [ ] Input field for word <!-- id: 61 -->
-    - [ ] Manual edit fields for translations/examples <!-- id: 30 -->
-    - [ ] Tags input field <!-- id: 62 -->
-    - [ ] FAB (Save) <!-- id: 63 -->
-    - [ ] ESC to close (Desktop only) <!-- id: 64 -->
-- [ ] **Settings Screen** <!-- id: 31 -->
-    - [ ] Google Login button <!-- id: 32 -->
-    - [ ] Account info display <!-- id: 33 -->
-    - [ ] Manual Sync button <!-- id: 34 -->
-    - [ ] Tag list <!-- id: 65 -->
-    - [ ] ESC to close (Desktop only) <!-- id: 66 -->
+- [ ] **Main List Screen**
+    - [ ] List of words with popular translation
+    - [ ] Search bar
+    - [ ] Sort options (Alphabetical, Asc/Desc, tags)
+    - [ ] FAB to add
+    - [ ] Settings button
+- [ ] **Word Detail Screen** (Modal)
+    - [ ] Show translation, examples, opposites, tags
+    - [ ] TTS button (Android only)
+    - [ ] ESC to close (Desktop only)
+- [ ] **Add Screen** (Modal)
+    - [ ] Input field for word
+    - [ ] Tags input field
+    - [ ] ESC to close (Desktop only)
+- [ ] **Edit Screen** (Modal)
+    - [ ] Input field for word
+    - [ ] Manual edit fields for translations/examples
+    - [ ] Tags input field
+    - [ ] FAB (Save)
+    - [ ] ESC to close (Desktop only)
+- [ ] **Settings Screen**
+    - [ ] Google Login button
+    - [ ] Account info display
+    - [ ] Manual Sync button
+    - [ ] Tag list
+    - [ ] ESC to close (Desktop only)
 
 ## 4. Android Specific Features
-- [ ] **Widget (Glance)** <!-- id: 35 -->
-    - [ ] `VocabWidget` display logic (random subset) <!-- id: 36 -->
-    - [ ] `VocabWidgetReceiver` for updates <!-- id: 37 -->
-    - [ ] Click intents (Open App/Detail) <!-- id: 38 -->
-    - [ ] FAB (+) to add new word to DB <!-- id: 39 -->
+- [ ] **Widget (Glance)**
+    - [ ] `VocabWidget` display logic (random subset)
+    - [ ] `VocabWidgetReceiver` for updates
+    - [ ] Click intents (Open App/Detail)
+    - [ ] FAB (+) to add new word to DB
 
 ## 5. Integration & Polish
-- [ ] Google Sign-in integration (KMPAuth) <!-- id: 40 -->
-- [ ] Token management (SharedPreferences/Keychain) <!-- id: 41 -->
-- [ ] Testing & Bug Fixes <!-- id: 42 -->
+- [ ] Google Sign-in integration (KMPAuth)
+- [ ] Token management (SharedPreferences/Keychain)
+- [ ] Testing & Bug Fixes
 
 ## 6. Debugging & Polish
 - [ ] How to handle adding same word

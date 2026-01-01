@@ -7,6 +7,7 @@ import com.sunildhiman90.kmauth.core.KMAuthInitializer
 import com.sunildhiman90.kmauth.google.KMAuthGoogle
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -16,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
+import personal.jp.vocabapp.di.apiModule
 import personal.jp.vocabapp.di.wordModule
 import personal.jp.vocabapp.sql.getDriverFactory
 
@@ -29,14 +31,9 @@ fun main() = application {
     KMAuthGoogle.googleAuthManager
 
     startKoin{
-        modules(wordModule(getDriverFactory()))
+        modules(wordModule(getDriverFactory()), apiModule())
     }
 
-    val g = Greet()
-    runBlocking {
-        println(g.greet())
-        println(g.backend())
-    }
     Window(
         onCloseRequest = ::exitApplication,
         title = "VocabApp",
@@ -44,49 +41,3 @@ fun main() = application {
         App()
     }
 }
-
-class Greet {
-//    val jsonInstance = Json {
-//        ignoreUnknownKeys = true
-//        isLenient = true
-//        encodeDefaults = true
-//        coerceInputValues = false
-//        explicitNulls = false
-//    }
-
-    val client = HttpClient {
-        install(ContentNegotiation) {
-            json()
-        }
-    }
-
-    suspend fun greet(): String {
-        return try {
-            val response = client.get("https://ktor.io/docs/"){
-                headers {
-                    // TODO add Google Token
-                    append("Authorization", "Bearer {your_token_here}")
-                    append("Accept", "application/json")
-                }
-            }
-            response.bodyAsText()
-        } catch (e: Exception) {
-            "Error: ${e.message}"
-        }
-    }
-
-    suspend fun backend(): String{
-        return try {
-            val response: Data = client.get("${Secrets.BACKEND_API}/").body()
-            response.message
-        } catch (e: Exception) {
-            e.printStackTrace()
-            "Error: ${e.message}"
-        }
-    }
-}
-
-@Serializable
-data class Data(
-    val message:String = "No"
-)

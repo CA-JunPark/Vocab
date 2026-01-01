@@ -24,11 +24,13 @@ import vocabapp.composeapp.generated.resources.compose_multiplatform
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import personal.jp.vocabapp.di.UserSession
 
 @Composable
 @Preview
 fun App() {
     val service: WordServiceImpl = koinInject()
+    val userSession = koinInject<UserSession>()
 
     // Use a StateFlow or ProduceState to handle the async/database data
     val words by produceState<List<Word>>(initialValue = emptyList(), service) {

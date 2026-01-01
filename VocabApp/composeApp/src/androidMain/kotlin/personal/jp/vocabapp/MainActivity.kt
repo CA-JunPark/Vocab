@@ -31,6 +31,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import personal.jp.vocabapp.di.apiModule
 
 // Android
 class MainActivity : ComponentActivity() {
@@ -47,12 +48,11 @@ class MainActivity : ComponentActivity() {
 
         startKoin{
             androidContext(this@MainActivity)
-            modules(wordModule(getDriverFactory(this@MainActivity)))
+            modules(wordModule(getDriverFactory(this@MainActivity)), apiModule())
         }
 
         setContent {
             App()
-//            GreetingScreen()
         }
 
     }
@@ -62,60 +62,4 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppAndroidPreview() {
     App()
-}
-
-class Greet {
-    val client = HttpClient {
-        install(ContentNegotiation) {
-            json()
-        }
-    }
-    suspend fun greet(): String {
-        return try {
-            val response = client.get("https://ktor.io/docs/")
-            response.bodyAsText()
-        } catch (e: Exception) {
-            "Error: ${e.message}"
-        }
-    }
-    suspend fun backend(): String{
-        return try {
-            val response: Data = client.get("${Secrets.BACKEND_API}/").body()
-            response.message
-        } catch (e: Exception) {
-            e.printStackTrace()
-            "Error: ${e.message}"
-        }
-    }
-}
-
-@Serializable
-data class Data(
-    val message:String = "No"
-)
-class MainViewModel : ViewModel() {
-    private val greeter = Greet()
-
-    // Use a State to hold the result for Compose
-    private val _greetingText = mutableStateOf("Loading...")
-    val greetingText: State<String> = _greetingText
-
-    fun fetchGreeting() {
-        // 'launch' starts the coroutine without blocking the main thread
-        viewModelScope.launch {
-            val result = greeter.backend()
-            _greetingText.value = result // UI updates automatically
-        }
-    }
-}
-
-@Composable
-fun GreetingScreen(viewModel: MainViewModel = viewModel()) {
-    // This runs ONCE when the Composable enters the screen
-    LaunchedEffect(Unit) {
-        viewModel.fetchGreeting()
-    }
-
-    val text by viewModel.greetingText
-    Text(text = text)
 }
