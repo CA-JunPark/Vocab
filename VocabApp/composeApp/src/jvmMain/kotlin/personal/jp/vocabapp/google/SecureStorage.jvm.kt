@@ -9,8 +9,8 @@ import java.util.prefs.Preferences
 
 
 
-actual class SecureStorage actual constructor(pref: Preferences) {
-    val pref = pref
+actual class SecureStorage actual constructor() {
+    private val pref: Preferences = Preferences.userRoot().node("com/vocab/secure")
     actual fun saveToken(key: String, token: String) {
         try {
             // Encrypt the string using Windows DPAPI

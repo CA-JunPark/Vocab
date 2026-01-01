@@ -17,6 +17,5 @@ val authModule = module {
     single { AuthFlowManager() }
     single { authClient()}
     single { AuthRepository(get(), get(), get(), getPlatform(), get()) }
-    single<Preferences> { Preferences.userRoot().node("com/vocab/secure")}
-    single { SecureStorage(get()) }
+    single { SecureStorage() }
 }
