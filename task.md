@@ -7,7 +7,7 @@
 - [ ] Setup Google OAuth2 for Android and Desktop
     - [x] JVM 
         - [x] get access and refresh token
-        - [ ] save token to secure storage
+        - [x] save token to secure storage
     - [x] Android
         - [x] get access and refresh token
         - [ ] save token to secure storage

@@ -39,10 +39,9 @@ class AuthRepository(
     private val loginHandler: LoginHandler,
     private val authFlowManager: AuthFlowManager,
     private val httpClient: HttpClient,
-    private val platform: Platform
+    private val platform: Platform,
+    private val secureStorage: SecureStorage
 ) {
-    private val _accessTokenPreview = MutableStateFlow<String?>(null)
-    val accessTokenPreview: StateFlow<String?> = _accessTokenPreview
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     init {
@@ -108,8 +107,10 @@ class AuthRepository(
     }
 
     private fun saveTokens(response: TokenResponse) {
-        val preview = response.accessToken.take(10)
-        val re = response.refreshToken?.take(10)
-        _accessTokenPreview.value = preview+re
+        // store in secure storage
+        secureStorage.saveToken("access_token", response.accessToken)
+        response.refreshToken?.let {
+            secureStorage.saveToken("refresh_token", it)
+        }
     }
 }

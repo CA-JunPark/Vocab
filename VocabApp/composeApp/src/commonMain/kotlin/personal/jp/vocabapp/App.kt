@@ -27,6 +27,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.GoogleProfile
+import personal.jp.vocabapp.google.SecureStorage
 import personal.jp.vocabapp.google.authClient
 
 @Composable
@@ -43,7 +44,7 @@ fun App() {
 @Composable
 fun MyScreen(data: List<Word> = emptyList()) {
     val authRepository: AuthRepository = koinInject()
-    val tokenPreview by authRepository.accessTokenPreview.collectAsState()
+    val secureStorage: SecureStorage = koinInject()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -56,7 +57,6 @@ fun MyScreen(data: List<Word> = emptyList()) {
             Button(onClick = { authRepository.startLogin() }) {
                 Text("Login with Google.")
             }
-            Text("Token: ${tokenPreview ?: "Not Logged In"}")
             Button(onClick = { showContent = !showContent }) {
                 Text("Click meee!")
             }
@@ -70,6 +70,12 @@ fun MyScreen(data: List<Word> = emptyList()) {
                     Text("Compose: $greeting")
                     Text("Koin: $data")
                 }
+            }
+            Button(onClick = {println(secureStorage.getToken("access_token"))}){
+                Text("Check Tokens")
+            }
+            Button(onClick = {println(secureStorage.deleteToken("access_token"))}){
+                Text("Check Tokens")
             }
         }
     }

@@ -74,8 +74,9 @@ kotlin {
             implementation(libs.androidx.room.common.jvm)
             implementation("org.slf4j:slf4j-nop:2.0.9")
             implementation(libs.ktor.client.java)
-            implementation(libs.ktor.server.core) // Replace with latest version
+            implementation(libs.ktor.server.core)
             implementation(libs.ktor.server.netty)
+            implementation("net.java.dev.jna:jna-platform:5.14.0")
         }
     }
 }

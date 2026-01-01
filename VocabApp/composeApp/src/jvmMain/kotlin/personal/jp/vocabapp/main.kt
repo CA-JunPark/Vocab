@@ -44,19 +44,3 @@ fun main() = application {
         App()
     }
 }
-
-suspend fun checkAuthStatus(client: HttpClient): Result<GoogleProfile> {
-    return try {
-        // This endpoint requires a valid Bearer token
-        val response = client.get("https://www.googleapis.com/oauth2/v2/userinfo")
-        val responseText = response.bodyAsText()
-        println("Google API Response: $responseText")
-        if (response.status.value == 200) {
-            Result.success(response.body())
-        } else {
-            Result.failure(Exception("Auth failed with status: ${response.status}"))
-        }
-    } catch (e: Exception) {
-        Result.failure(e)
-    }
-}
