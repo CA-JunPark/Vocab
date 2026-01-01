@@ -16,28 +16,50 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import personal.jp.vocabapp.di.apiModule
+import personal.jp.vocabapp.di.commonModule
+import personal.jp.vocabapp.di.platformModule
 import personal.jp.vocabapp.di.wordModule
+import personal.jp.vocabapp.google.AuthRepository
+import personal.jp.vocabapp.google.GoogleProfile
+import personal.jp.vocabapp.google.authClient
 import personal.jp.vocabapp.sql.getDriverFactory
+import kotlin.text.append
 
 // JVM
 fun main() = application {
 
-    KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
-    KMAuthInitializer.initClientSecret(
-        clientSecret = Secrets.WEB_CLIENT_SECRET,
-    )
-    KMAuthGoogle.googleAuthManager
-
     startKoin{
-        modules(wordModule(getDriverFactory()), apiModule())
+        modules(wordModule(getDriverFactory()), apiModule(),
+            platformModule, commonModule)
     }
+//    val authClient = authClient()
+//    runBlocking {
+//        checkAuthStatus(authClient)
+//    }
 
     Window(
         onCloseRequest = ::exitApplication,
         title = "VocabApp",
     ) {
         App()
+    }
+}
+
+suspend fun checkAuthStatus(client: HttpClient): Result<GoogleProfile> {
+    return try {
+        // This endpoint requires a valid Bearer token
+        val response = client.get("https://www.googleapis.com/oauth2/v2/userinfo")
+        val responseText = response.bodyAsText()
+        println("Google API Response: $responseText")
+        if (response.status.value == 200) {
+            Result.success(response.body())
+        } else {
+            Result.failure(Exception("Auth failed with status: ${response.status}"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 }

@@ -4,8 +4,13 @@
 - [x] Configure KMP project with `androidApp` and `desktopApp` targets
 - [x] Setup Koin for dependency injection
 - [x] Setup SQLDelight for database
-- [ ] Setup Google OAuth2/OpenID Connect(OIDC) for Android and Desktop
-    https://github.com/kalinjul/kotlin-multiplatform-oidc?tab=readme-ov-file
+- [ ] Setup Google OAuth2 for Android and Desktop
+    - [x] JVM 
+        - [x] get access and refresh token
+        - [ ] save token to secure storage
+    - [ ] Android
+        - [ ] get access and refresh token
+        - [ ] save token to secure storage
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
     - [ ] need to add Auth Header to requests 

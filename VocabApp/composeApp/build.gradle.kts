@@ -34,6 +34,7 @@ kotlin {
             implementation("io.insert-koin:koin-compose:${koinVersion}")
             implementation(libs.ktor.client.android)
             implementation(libs.android.driver)
+            implementation(libs.androidx.browser)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -54,6 +55,7 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
+            implementation(libs.ktor.client.auth)
             implementation("app.cash.sqldelight:sqlite-driver:2.2.1")
             implementation(libs.kermit) //logger
             // Logger.d { "This is a debug log" }
@@ -70,6 +72,8 @@ kotlin {
             implementation(libs.androidx.room.common.jvm)
             implementation("org.slf4j:slf4j-nop:2.0.9")
             implementation(libs.ktor.client.java)
+            implementation(libs.ktor.server.core) // Replace with latest version
+            implementation(libs.ktor.server.netty)
         }
     }
 }

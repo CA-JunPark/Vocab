@@ -22,15 +22,17 @@ import personal.jp.vocabapp.di.WordServiceImpl
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import personal.jp.vocabapp.di.UserSession
+import personal.jp.vocabapp.google.AuthRepository
+import personal.jp.vocabapp.google.GoogleProfile
+import personal.jp.vocabapp.google.authClient
 
 @Composable
 @Preview
 fun App() {
     val service: WordServiceImpl = koinInject()
-    val userSession = koinInject<UserSession>()
 
     // Use a StateFlow or ProduceState to handle the async/database data
     val words by produceState<List<Word>>(initialValue = emptyList(), service) {
@@ -50,16 +52,19 @@ fun MyScreen(data: List<Word> = emptyList()) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            GoogleSignInButton(modifier = Modifier) { user, error ->
-                if (error != null) {
-                    println("GoogleSignInButton: Error in google Sign In: $error")
-                }
-                if (user != null) {
-                    println("GoogleSignInButton: Login Successful")
-                    println("User Info: ${user.name}, ${user.email}, ${user.profilePicUrl}")
-                }
+//            GoogleSignInButton(modifier = Modifier) { user, error ->
+//                if (error != null) {
+//                    println("GoogleSignInButton: Error in google Sign In: $error")
+//                }
+//                if (user != null) {
+//                    println("GoogleSignInButton: Login Successful")
+//                    println("User Info: ${user.name}, ${user.email}, ${user.profilePicUrl}")
+//                }
+//            }
+            val authRepository: AuthRepository = koinInject()
+            Button(onClick = { authRepository.startLogin() }) {
+                Text("Login with Google")
             }
-
             Button(onClick = { showContent = !showContent }) {
                 Text("Click meee!")
             }
@@ -77,3 +82,4 @@ fun MyScreen(data: List<Word> = emptyList()) {
         }
     }
 }
+

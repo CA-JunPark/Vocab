@@ -1,5 +1,7 @@
 package personal.jp.vocabapp
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +34,8 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.di.apiModule
+import personal.jp.vocabapp.di.commonModule
+import personal.jp.vocabapp.di.platformModule
 
 // Android
 class MainActivity : ComponentActivity() {
@@ -39,16 +43,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        KMAuthInitializer.initContext(
-            kmAuthPlatformContext = KMAuthPlatformContext(this)
-        )
-        KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
-
-        KMAuthGoogle.googleAuthManager
+//        KMAuthInitializer.initContext(
+//            kmAuthPlatformContext = KMAuthPlatformContext(this)
+//        )
+//        KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
+//
+//        KMAuthGoogle.googleAuthManager
 
         startKoin{
             androidContext(this@MainActivity)
-            modules(wordModule(getDriverFactory(this@MainActivity)), apiModule())
+            modules(wordModule(getDriverFactory(this@MainActivity)), apiModule(),
+                platformModule, commonModule)
         }
 
         setContent {
@@ -56,6 +61,17 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        val data: Uri? = intent?.data
+//        if (data != null && data.scheme == packageName) {
+//            val code = data.getQueryParameter("code")
+//            if (code != null) {
+//                // Pass this code back to your ViewModel or LoginHandler logic
+//                handleGoogleCode(code)
+//            }
+//        }
+//    }
 }
 
 @Preview
