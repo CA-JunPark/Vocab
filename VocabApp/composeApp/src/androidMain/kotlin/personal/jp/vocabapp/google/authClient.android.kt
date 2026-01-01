@@ -31,8 +31,7 @@ actual fun authClient(): HttpClient {
                         setBody(FormDataContent(Parameters.build {
                             append("grant_type", "refresh_token")
                             append("refresh_token", oldTokens?.refreshToken ?: "")
-                            append("client_id", Secrets.WEB_CLIENT_ID)
-                             append("client_secret", Secrets.WEB_CLIENT_SECRET)
+                            append("client_id", Secrets.ANDROID_CLIENT_ID)
                         }))
                     }
 

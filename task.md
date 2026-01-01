@@ -8,8 +8,8 @@
     - [x] JVM 
         - [x] get access and refresh token
         - [ ] save token to secure storage
-    - [ ] Android
-        - [ ] get access and refresh token
+    - [x] Android
+        - [x] get access and refresh token
         - [ ] save token to secure storage
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server

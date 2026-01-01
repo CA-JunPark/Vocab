@@ -19,8 +19,8 @@ import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import personal.jp.vocabapp.di.apiModule
-import personal.jp.vocabapp.di.commonModule
-import personal.jp.vocabapp.di.platformModule
+import personal.jp.vocabapp.di.authModule
+import personal.jp.vocabapp.di.loginModule
 import personal.jp.vocabapp.di.wordModule
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.GoogleProfile
@@ -33,12 +33,9 @@ fun main() = application {
 
     startKoin{
         modules(wordModule(getDriverFactory()), apiModule(),
-            platformModule, commonModule)
+            loginModule, authModule
+        )
     }
-//    val authClient = authClient()
-//    runBlocking {
-//        checkAuthStatus(authClient)
-//    }
 
     Window(
         onCloseRequest = ::exitApplication,

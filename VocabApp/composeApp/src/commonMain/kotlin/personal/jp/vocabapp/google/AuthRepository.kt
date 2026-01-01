@@ -10,9 +10,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import personal.jp.vocabapp.Platform
 import personal.jp.vocabapp.Secrets
 
 interface LoginHandler {
@@ -35,18 +38,25 @@ class AuthFlowManager {
 class AuthRepository(
     private val loginHandler: LoginHandler,
     private val authFlowManager: AuthFlowManager,
-    private val httpClient: HttpClient // The non-auth client used for the exchange
+    private val httpClient: HttpClient,
+    private val platform: Platform
 ) {
+    private val _accessTokenPreview = MutableStateFlow<String?>(null)
+    val accessTokenPreview: StateFlow<String?> = _accessTokenPreview
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     init {
+        println("!!! AuthRepository: Initializing and collecting flow...")
         // Listen for codes arriving from either JVM or Android
         authFlowManager.authCode
-            .onEach { code -> exchangeCodeForToken(code) }
+            .onEach { code ->
+                println("!!! AuthRepository: Flow received code: $code")
+                exchangeCodeForToken(code)
+            }
             .launchIn(scope)
     }
 
-    fun startLogin() {
+    fun startLogin(){
         loginHandler.login { code ->
             // This callback is used primarily by JVM (Netty)
             authFlowManager.onCodeReceived(code)
@@ -54,6 +64,16 @@ class AuthRepository(
     }
 
     private suspend fun exchangeCodeForToken(code: String) {
+        if (platform.name.contains("JVM")){
+            exchangeCodeForTokenJVM(code)
+        }
+        else{
+            exchangeCodeForTokenAndroid(code)
+
+        }
+    }
+
+    private suspend fun exchangeCodeForTokenJVM(code: String) {
         try {
             val response: TokenResponse = httpClient.post("https://oauth2.googleapis.com/token") {
                 setBody(FormDataContent(Parameters.build {
@@ -65,16 +85,31 @@ class AuthRepository(
                 }))
             }.body()
 
-            saveTokens(response.accessToken, response.refreshToken)
+            saveTokens(response)
+        } catch (e: Exception) {
+            println("Exchange failed: ${e.message}")
+        }
+    }
+    private suspend fun exchangeCodeForTokenAndroid(code: String) {
+        try {
+            val response: TokenResponse = httpClient.post("https://oauth2.googleapis.com/token") {
+                setBody(FormDataContent(Parameters.build {
+                    append("grant_type", "authorization_code")
+                    append("code", code)
+                    append("client_id", Secrets.ANDROID_CLIENT_ID)
+                    append("redirect_uri", "personal.jp.vocabapp:/oauth2redirect")
+                }))
+            }.body()
+
+            saveTokens(response)
         } catch (e: Exception) {
             println("Exchange failed: ${e.message}")
         }
     }
 
-    private fun saveTokens(access: String, refresh: String?) {
-        // TODO Use multiplatform-settings to store the tokens
-        println(access.slice(0..10))
-        println(refresh?.slice(0..10))
-        println("Tokens saved successfully!")
+    private fun saveTokens(response: TokenResponse) {
+        val preview = response.accessToken.take(10)
+        val re = response.refreshToken?.take(10)
+        _accessTokenPreview.value = preview+re
     }
 }

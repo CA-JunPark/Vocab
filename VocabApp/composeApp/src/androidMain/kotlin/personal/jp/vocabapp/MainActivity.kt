@@ -33,45 +33,48 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import org.koin.android.ext.android.inject
+import org.koin.core.context.GlobalContext
 import personal.jp.vocabapp.di.apiModule
-import personal.jp.vocabapp.di.commonModule
-import personal.jp.vocabapp.di.platformModule
+import personal.jp.vocabapp.di.authModule
+import personal.jp.vocabapp.di.loginModule
+import personal.jp.vocabapp.google.AuthFlowManager
+import personal.jp.vocabapp.google.AuthRepository
 
 // Android
 class MainActivity : ComponentActivity() {
+    private val authFlowManager: AuthFlowManager by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-//        KMAuthInitializer.initContext(
-//            kmAuthPlatformContext = KMAuthPlatformContext(this)
-//        )
-//        KMAuthInitializer.initialize(KMAuthConfig.forGoogle(webClientId = Secrets.WEB_CLIENT_ID))
-//
-//        KMAuthGoogle.googleAuthManager
 
-        startKoin{
-            androidContext(this@MainActivity)
-            modules(wordModule(getDriverFactory(this@MainActivity)), apiModule(),
-                platformModule, commonModule)
+        if (GlobalContext.getOrNull() == null) {
+            startKoin{
+                androidContext(this@MainActivity)
+                modules(wordModule(getDriverFactory(this@MainActivity)), apiModule(),
+                    loginModule, authModule)
+            }
         }
 
         setContent {
             App()
         }
-
+        handleIntent(intent)
     }
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        val data: Uri? = intent?.data
-//        if (data != null && data.scheme == packageName) {
-//            val code = data.getQueryParameter("code")
-//            if (code != null) {
-//                // Pass this code back to your ViewModel or LoginHandler logic
-//                handleGoogleCode(code)
-//            }
-//        }
-//    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        val data: Uri? = intent?.data
+
+        if (data != null && data.scheme == "personal.jp.vocabapp") {
+            val code = data.getQueryParameter("code")
+            code?.let { authFlowManager.onCodeReceived(it) }
+        }
+    }
 }
 
 @Preview

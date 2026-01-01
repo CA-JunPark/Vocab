@@ -34,7 +34,6 @@ import personal.jp.vocabapp.google.authClient
 fun App() {
     val service: WordServiceImpl = koinInject()
 
-    // Use a StateFlow or ProduceState to handle the async/database data
     val words by produceState<List<Word>>(initialValue = emptyList(), service) {
         value = service.getAllWords()
     }
@@ -43,6 +42,8 @@ fun App() {
 
 @Composable
 fun MyScreen(data: List<Word> = emptyList()) {
+    val authRepository: AuthRepository = koinInject()
+    val tokenPreview by authRepository.accessTokenPreview.collectAsState()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -52,19 +53,10 @@ fun MyScreen(data: List<Word> = emptyList()) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            GoogleSignInButton(modifier = Modifier) { user, error ->
-//                if (error != null) {
-//                    println("GoogleSignInButton: Error in google Sign In: $error")
-//                }
-//                if (user != null) {
-//                    println("GoogleSignInButton: Login Successful")
-//                    println("User Info: ${user.name}, ${user.email}, ${user.profilePicUrl}")
-//                }
-//            }
-            val authRepository: AuthRepository = koinInject()
             Button(onClick = { authRepository.startLogin() }) {
-                Text("Login with Google")
+                Text("Login with Google.")
             }
+            Text("Token: ${tokenPreview ?: "Not Logged In"}")
             Button(onClick = { showContent = !showContent }) {
                 Text("Click meee!")
             }

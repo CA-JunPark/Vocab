@@ -5,6 +5,6 @@ import org.koin.dsl.module
 import personal.jp.vocabapp.google.JvmLoginHandler
 import personal.jp.vocabapp.google.LoginHandler
 
-actual val platformModule = module {
+actual val loginModule = module {
     single<LoginHandler> { JvmLoginHandler() }
 }
