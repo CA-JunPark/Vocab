@@ -21,6 +21,7 @@ import personal.jp.vocabapp.sql.WordServiceImpl
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
 import kotlinx.coroutines.launch
+import personal.jp.vocabapp.google.ACCESS_TOKEN
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 
@@ -66,13 +67,13 @@ fun MyScreen() {
                 }
             }
             Button(onClick = {scope.launch {
-                val token = secureStorage.getToken("access_token")
+                val token = secureStorage.getToken(ACCESS_TOKEN)
                 println("Token is: $token")
             }}){
                 Text("Check Tokens")
             }
             Button(onClick = {scope.launch {
-                secureStorage.deleteToken("access_token")
+                secureStorage.deleteToken(ACCESS_TOKEN)
                 println("Token deleted")
             }}){
                 Text("Check Tokens")

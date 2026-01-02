@@ -37,10 +37,10 @@ actual class SecureStorage actual constructor(
         }
     }
 
-    actual suspend fun getToken(key: String): String? {
+    actual suspend fun getToken(key: String): String {
         try {
             // Get Base64 string from DataStore
-            val base64Token = dataStore.data.map { it[stringPreferencesKey(key)] }.first() ?: return null
+            val base64Token = dataStore.data.map { it[stringPreferencesKey(key)] }.first() ?: return ""
 
             // Decode and Decrypt with DPAPI
             val encryptedBytes = Base64.getDecoder().decode(base64Token)
@@ -55,7 +55,7 @@ actual class SecureStorage actual constructor(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return null
+        return "Fail"
     }
 
     actual suspend fun deleteToken(key: String) {

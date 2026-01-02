@@ -25,8 +25,5 @@ class AndroidLoginHandler(private val context: Context) : LoginHandler {
         val builder = CustomTabsIntent.Builder()
         val customTabsIntent = builder.build()
         customTabsIntent.launchUrl(context, authUrl.toUri())
-
-        // Note: 'onCodeReceived' can't be called directly here.
-        // You must catch the result in your Activity's onNewIntent or via a Deep Link.
     }
 }

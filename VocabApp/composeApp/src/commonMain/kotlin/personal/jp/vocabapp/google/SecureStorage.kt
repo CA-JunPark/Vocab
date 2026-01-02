@@ -7,7 +7,7 @@ import okio.Path.Companion.toPath
 
 expect class SecureStorage(dataStore: DataStore<Preferences>, context: Any? = null) {
     suspend fun saveToken(key: String, token: String,)
-    suspend fun getToken(key: String): String?
+    suspend fun getToken(key: String): String
     suspend fun deleteToken(key: String)
 
 }
@@ -18,3 +18,6 @@ fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     )
 
 expect fun createDataStorage(context: Any? = null): DataStore<Preferences>
+
+const val ACCESS_TOKEN : String = "accessToken"
+const val REFRESH_TOKEN : String = "refreshToken"

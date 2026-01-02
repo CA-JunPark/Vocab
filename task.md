@@ -13,12 +13,14 @@
         - [x] save token to secure storage (AndroidKeyStore + Google Tink + DataStore)
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
-    - [ ] need to add Auth Header to requests 
+    - [x] need to add Auth Header to requests 
+        - [x] get tokens from secure storage
+    - [ ] need to check refreshing works
 - [ ] Setup Turso for cloud storage
 - [ ] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
     - [ ] assign url
-    - [ ] 
+    - [ ] need to check refreshing works
 - [ ] Setup Glance for Android widget
 
 ## 2. Data Layer
@@ -60,6 +62,7 @@
     - [ ] Sort options (Alphabetical, Asc/Desc, tags)
     - [ ] FAB to add
     - [ ] Settings button
+    - [ ] Login Status Display
 - [ ] **Word Detail Screen** (Modal)
     - [ ] Show translation, examples, opposites, tags
     - [ ] TTS button (Android only)

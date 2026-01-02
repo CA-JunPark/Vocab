@@ -10,8 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -79,7 +77,7 @@ class AuthRepository(
                     append("grant_type", "authorization_code")
                     append("code", code)
                     append("client_id", Secrets.WEB_CLIENT_ID)
-                    append("client_secret", Secrets.WEB_CLIENT_SECRET) // Needed for JVM
+                    append("client_secret", Secrets.WEB_CLIENT_SECRET)
                     append("redirect_uri", "http://localhost:8080/callback")
                 }))
             }.body()
@@ -107,11 +105,10 @@ class AuthRepository(
     }
 
     private suspend fun saveTokens(response: TokenResponse) {
-        println("Save")
         // store in secure storage
-        secureStorage.saveToken("access_token", response.accessToken)
+        secureStorage.saveToken(ACCESS_TOKEN, response.accessToken)
         response.refreshToken?.let {
-            secureStorage.saveToken("refresh_token", it)
+            secureStorage.saveToken(REFRESH_TOKEN, it)
         }
     }
 }

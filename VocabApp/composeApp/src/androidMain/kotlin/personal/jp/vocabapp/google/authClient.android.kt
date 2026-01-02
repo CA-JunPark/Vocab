@@ -14,16 +14,21 @@ import io.ktor.http.Parameters
 import io.ktor.serialization.kotlinx.json.json
 import personal.jp.vocabapp.Secrets
 
-actual fun authClient(): HttpClient {
+actual fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO){
         install(ContentNegotiation) { json() }
         install(Auth) {
             bearer {
                 loadTokens {
-                    // Fetch tokens from local storage (Settings/SQLDelight)
-                    BearerTokens("accessToken", "refreshToken")
+                    // fetch tokens from secureStorage
+                    BearerTokens(secureStorage.getToken(ACCESS_TOKEN),
+                        secureStorage.getToken(REFRESH_TOKEN))
                 }
                 refreshTokens {
+                    val currentRefreshToken = oldTokens?.refreshToken
+                    if (currentRefreshToken.isNullOrBlank()) {
+                        return@refreshTokens null // Signals Ktor to let the original 401 pass through
+                    }
                     // This block runs automatically when a 401 Unauthorized is received
                     val response = client.post("https://oauth2.googleapis.com/token") {
                         // Refresh calls do not need the Bearer token themselves
@@ -37,13 +42,19 @@ actual fun authClient(): HttpClient {
 
                     if (response.status.value == 200) {
                         val newToken: TokenResponse = response.body()
-                        // Save the new tokens to your local storage here
-                        BearerTokens(
+                        secureStorage.saveToken(ACCESS_TOKEN, newToken.accessToken)
+                        if (newToken.refreshToken != null) {
+                            // save new one if it exists
+                            secureStorage.saveToken(REFRESH_TOKEN, newToken.refreshToken)
+                        }
+                        return@refreshTokens BearerTokens(
                             accessToken = newToken.accessToken,
                             refreshToken = newToken.refreshToken ?: oldTokens?.refreshToken!!
                         )
                     } else {
-                        null // Forces user to re-login
+                        secureStorage.deleteToken(ACCESS_TOKEN)
+                        secureStorage.deleteToken(REFRESH_TOKEN)
+                        return@refreshTokens null
                     }
                 }
             }

@@ -23,7 +23,6 @@ import personal.jp.vocabapp.di.authModule
 import personal.jp.vocabapp.di.platformModule
 import personal.jp.vocabapp.di.wordModule
 import personal.jp.vocabapp.google.AuthRepository
-import personal.jp.vocabapp.google.GoogleProfile
 import personal.jp.vocabapp.google.authClient
 import personal.jp.vocabapp.sql.getDriverFactory
 import kotlin.text.append

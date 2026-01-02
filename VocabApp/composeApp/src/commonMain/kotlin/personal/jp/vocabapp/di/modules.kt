@@ -24,7 +24,7 @@ expect val platformModule: Module
 
 val authModule = module {
     single { AuthFlowManager() }
-    single { authClient()}
+    single { authClient(get())}
     single { AuthRepository(get(), get(), get(), getPlatform(), get()) }
 }
 
