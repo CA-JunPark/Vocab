@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.androidx.browser)
             implementation("androidx.credentials:credentials:1.6.0-rc01")
             implementation("androidx.credentials:credentials-play-services-auth:1.6.0-rc01")
+            implementation(libs.tink.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

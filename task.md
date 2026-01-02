@@ -7,10 +7,10 @@
 - [ ] Setup Google OAuth2 for Android and Desktop
     - [x] JVM 
         - [x] get access and refresh token
-        - [x] save token to secure storage
+        - [x] save token to secure storage (DPAPI + DataStore)
     - [x] Android
         - [x] get access and refresh token
-        - [ ] save token to secure storage
+        - [x] save token to secure storage (AndroidKeyStore + Google Tink + DataStore)
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
     - [ ] need to add Auth Header to requests 

@@ -26,7 +26,6 @@ val authModule = module {
     single { AuthFlowManager() }
     single { authClient()}
     single { AuthRepository(get(), get(), get(), getPlatform(), get()) }
-    single { SecureStorage(get()) }
 }
 
 fun wordModule(driverFactory: DriverFactory) = module{
