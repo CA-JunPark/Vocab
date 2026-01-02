@@ -14,6 +14,8 @@ interface WordService {
     fun deleteWord(name: String): Boolean
     fun countWords(): Int
     fun deleteAllWords(): Boolean
+    fun selectUnsyncedWord(): List<Word>
+    fun setSync(name: String): Boolean
 }
 
 class WordServiceImpl(
@@ -49,5 +51,14 @@ class WordServiceImpl(
 
     override fun deleteAllWords(): Boolean {
         return wordRepo.deleteAllWords()
+    }
+
+    override fun selectUnsyncedWord(): List<Word> {
+        return wordRepo.selectUnsyncedWord()
+    }
+
+    override fun setSync(name: String): Boolean {
+        return wordRepo.setSync(name)
+
     }
 }

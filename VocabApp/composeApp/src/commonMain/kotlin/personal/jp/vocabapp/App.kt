@@ -14,6 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import db.Word
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -24,6 +27,8 @@ import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.ACCESS_TOKEN
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
+import kotlinx.serialization.Serializable
+import personal.jp.vocabapp.sql.SerializableWord
 
 @Composable
 @Preview
@@ -41,6 +46,7 @@ fun MyScreen() {
     val authRepository: AuthRepository = koinInject()
     val secureStorage: SecureStorage = koinInject()
     val scope = rememberCoroutineScope()
+    val client: HttpClient = koinInject()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -76,9 +82,45 @@ fun MyScreen() {
                 secureStorage.deleteToken(ACCESS_TOKEN)
                 println("Token deleted")
             }}){
-                Text("Check Tokens")
+                Text("Clear Tokens")
             }
+
+            Button(onClick = {scope.launch {
+                println("Backend Test")
+//                var words : List<Word> = backendPull(client)
+
+                println(backendPull(client))
+            }}){
+                Text("Local hello")
+            }
+
         }
+    }
+}
+
+suspend fun backend(client: HttpClient, api:String = ""): String{
+    return try {
+        val response: Data = client.get("${Secrets.LOCAL}/" + api).body()
+        response.message
+    } catch (e: Exception) {
+        e.printStackTrace()
+        "Error: ${e.message}"
+    }
+}
+
+@Serializable
+data class Data(
+    val message:String = "No"
+)
+
+suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<SerializableWord>? {
+    return try {
+        // Specify the type inside the body<...> brackets
+        val response = client.get("${Secrets.LOCAL}/$api")
+        return response.body<List<SerializableWord>>()
+    } catch (e: Exception) {
+        println("Serialization Error: ${e.message}")
+        null
     }
 }
 

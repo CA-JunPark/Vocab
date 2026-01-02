@@ -5,13 +5,13 @@ import kotlin.Boolean;
 CREATE TABLE Word (
     name TEXT PRIMARY KEY NOT NULL,
     meaningKr TEXT NOT NULL,
-    example TEXT NOT NULL,
-    antonymEn TEXT NOT NULL,
+    example TEXT,
+    antonymEn TEXT,
     tags TEXT DEFAULT NULL,
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    isDeleted INTEGER AS Boolean DEFAULT 0,
-    synced INTEGER AS Boolean DEFAULT 0
+    isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
+    synced INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 CREATE INDEX name ON Word(name);
@@ -31,13 +31,13 @@ LIMIT 1;
 
 deletedWord:
 UPDATE Word
-SET isDeleted = 1, modifiedTime = CURRENT_TIMESTAMP
+SET isDeleted = 1, modifiedTime = CURRENT_TIMESTAMP, synced = 0
 WHERE name = ?;
 
 updateWord:
 UPDATE Word
 SET meaningKr = ?, example = ?, antonymEn = ?,
-    tags = ?, modifiedTime = CURRENT_TIMESTAMP
+    tags = ?, modifiedTime = CURRENT_TIMESTAMP, synced = 0
 WHERE name = ?;
 
 countWords:
@@ -45,3 +45,10 @@ SELECT COUNT(*) FROM Word;
 
 deleteAllWords:
 DELETE FROM Word;
+
+selectUnsyncedWord:
+SELECT * FROM Word
+WHERE synced = 0;
+
+setSync:
+UPDATE Word SET synced = 1 WHERE name = ?;

@@ -12,11 +12,20 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.Parameters
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import personal.jp.vocabapp.Secrets
 
 actual fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO){
-        install(ContentNegotiation) { json() }
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                    isLenient = true
+                }
+            )
+        }
         install(Auth) {
             bearer {
                 loadTokens {

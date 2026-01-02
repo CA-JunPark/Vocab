@@ -15,12 +15,17 @@
 - [x] Setup Google Cloud Run for proxy server
     - [x] need to add Auth Header to requests 
         - [x] get tokens from secure storage
-    - [ ] need to check refreshing works
+    - [ ] need to check refreshing token works
 - [ ] Setup Turso for cloud storage
+    - [x] pull words from remote DB
+    - [ ] push words to remote DB
+    - [ ] modify sync field of each word that is being synced
 - [ ] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
-    - [ ] assign url
-    - [ ] need to check refreshing works
+    - [x] assign url
+    - [ ] turso
+    - [ ] gemini
+    - [ ] need to check refreshing token works
 - [ ] Setup Glance for Android widget
 
 ## 2. Data Layer
