@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.di
+package personal.jp.vocabapp.sql
 
 // Data Repository
 // CRUD concepts

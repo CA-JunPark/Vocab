@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.di
+package personal.jp.vocabapp.sql
 
 // Logic for Service
 // It only cares what to do with the data

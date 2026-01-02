@@ -13,32 +13,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.sunildhiman90.kmauth.google.compose.GoogleSignInButton
 import db.Word
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
-import personal.jp.vocabapp.di.WordServiceImpl
+import personal.jp.vocabapp.sql.WordServiceImpl
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.compose_multiplatform
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.AuthRepository
-import personal.jp.vocabapp.google.GoogleProfile
 import personal.jp.vocabapp.google.SecureStorage
-import personal.jp.vocabapp.google.authClient
 
 @Composable
 @Preview
 fun App() {
-    val service: WordServiceImpl = koinInject()
+//    val service: WordServiceImpl = koinInject()
 
-    val words by produceState<List<Word>>(initialValue = emptyList(), service) {
-        value = service.getAllWords()
-    }
+//    val words by produceState<List<Word>>(initialValue = emptyList(), service) {
+//        value = service.getAllWords()
+//    }
     MyScreen()
 }
 

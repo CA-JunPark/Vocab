@@ -13,6 +13,11 @@ import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import personal.jp.vocabapp.sql.DriverFactory
+import personal.jp.vocabapp.sql.WordRepo
+import personal.jp.vocabapp.sql.WordRepoImpl
+import personal.jp.vocabapp.sql.WordService
+import personal.jp.vocabapp.sql.WordServiceImpl
+import personal.jp.vocabapp.sql.WordViewModel
 
 
 expect val platformModule: Module
