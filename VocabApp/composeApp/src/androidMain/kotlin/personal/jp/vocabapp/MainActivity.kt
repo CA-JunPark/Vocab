@@ -37,7 +37,7 @@ import org.koin.android.ext.android.inject
 import org.koin.core.context.GlobalContext
 import personal.jp.vocabapp.di.apiModule
 import personal.jp.vocabapp.di.authModule
-import personal.jp.vocabapp.di.loginModule
+import personal.jp.vocabapp.di.platformModule
 import personal.jp.vocabapp.google.AuthFlowManager
 import personal.jp.vocabapp.google.AuthRepository
 
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
             startKoin{
                 androidContext(this@MainActivity)
                 modules(wordModule(getDriverFactory(this@MainActivity)), apiModule(),
-                    loginModule, authModule)
+                    platformModule, authModule)
             }
         }
 

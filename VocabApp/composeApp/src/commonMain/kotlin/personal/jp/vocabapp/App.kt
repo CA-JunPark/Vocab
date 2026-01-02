@@ -25,6 +25,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.GoogleProfile
 import personal.jp.vocabapp.google.SecureStorage
@@ -38,13 +39,14 @@ fun App() {
     val words by produceState<List<Word>>(initialValue = emptyList(), service) {
         value = service.getAllWords()
     }
-    MyScreen(data=words)
+    MyScreen()
 }
 
 @Composable
-fun MyScreen(data: List<Word> = emptyList()) {
+fun MyScreen() {
     val authRepository: AuthRepository = koinInject()
     val secureStorage: SecureStorage = koinInject()
+    val scope = rememberCoroutineScope()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -68,13 +70,18 @@ fun MyScreen(data: List<Word> = emptyList()) {
                 ) {
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
                     Text("Compose: $greeting")
-                    Text("Koin: $data")
                 }
             }
-            Button(onClick = {println(secureStorage.getToken("access_token"))}){
+            Button(onClick = {scope.launch {
+                val token = secureStorage.getToken("access_token")
+                println("Token is: $token")
+            }}){
                 Text("Check Tokens")
             }
-            Button(onClick = {println(secureStorage.deleteToken("access_token"))}){
+            Button(onClick = {scope.launch {
+                secureStorage.deleteToken("access_token")
+                println("Token deleted")
+            }}){
                 Text("Check Tokens")
             }
         }

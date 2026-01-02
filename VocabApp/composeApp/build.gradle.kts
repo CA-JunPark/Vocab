@@ -64,6 +64,10 @@ kotlin {
             // Logger.e(throwable) { "Something went wrong" }
             implementation("io.github.sunildhiman90:kmauth-google:0.3.3")
             implementation("io.github.sunildhiman90:kmauth-google-compose:0.3.3")
+            // DataStore library
+            implementation(libs.androidx.datastore)
+            // The Preferences DataStore library
+            implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

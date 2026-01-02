@@ -106,7 +106,7 @@ class AuthRepository(
         }
     }
 
-    private fun saveTokens(response: TokenResponse) {
+    private suspend fun saveTokens(response: TokenResponse) {
         // store in secure storage
         secureStorage.saveToken("access_token", response.accessToken)
         response.refreshToken?.let {

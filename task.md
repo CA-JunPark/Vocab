@@ -88,10 +88,9 @@
     - [ ] Click intents (Open App/Detail)
     - [ ] FAB (+) to add new word to DB
 
-## 5. Integration & Polish
+## 5. Integration & Polish & Debugging
 - [ ] Google Sign-in integration (KMPAuth)
 - [ ] Token management (SharedPreferences/Keychain)
 - [ ] Testing & Bug Fixes
-
-## 6. Debugging & Polish
 - [ ] How to handle adding same word
+- [ ] setWord function that does not need all fields
