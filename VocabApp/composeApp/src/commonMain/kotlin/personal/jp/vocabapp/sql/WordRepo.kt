@@ -46,11 +46,10 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
                 example = word.example,
                 antonymEn = word.antonymEn,
                 tags = word.tags,
-                isDeleted = word.isDeleted
             )
-            true // Return true if the insert operation completes without an exception
+            true
         } catch (e: Exception) {
-            false // Return false if any exception occurs (e.g., constraint violation)
+            false
         }
     }
 

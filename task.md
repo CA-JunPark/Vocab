@@ -18,7 +18,14 @@
     - [ ] need to check refreshing token works
 - [ ] Setup Turso for cloud storage
     - [x] pull words from remote DB
-    - [ ] push words to remote DB
+    - [x] push words to remote DB
+    - [ ] Sync words to remote DB 
+        - push from front
+        - pull from back
+        - compare at server
+        - last write wins
+        - return names of words that are synced
+        - update all `synced=true` if success
     - [ ] modify sync field of each word that is being synced
 - [ ] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
@@ -101,4 +108,4 @@
 - [ ] Token management (SharedPreferences/Keychain)
 - [ ] Testing & Bug Fixes
 - [ ] How to handle adding same word
-- [ ] setWord function that does not need all fields
+- [x] createWord function that does not need all fields

@@ -6,8 +6,8 @@ CREATE TABLE Word (
     name TEXT PRIMARY KEY NOT NULL,
     meaningKr TEXT NOT NULL,
     example TEXT,
-    antonymEn TEXT,
-    tags TEXT DEFAULT NULL,
+    antonymEn TEXT DEFAULT "",
+    tags TEXT DEFAULT "",
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
@@ -18,10 +18,10 @@ CREATE INDEX name ON Word(name);
 
 insertWord:
 INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, synced)
-VALUES(?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
+VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
 
 selectAllWordsInfo:
-SELECT Word.*
+SELECT *
 FROM Word;
 
 selectWord:

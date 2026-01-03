@@ -17,6 +17,10 @@ import db.Word
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -29,15 +33,12 @@ import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.sql.SerializableWord
+import personal.jp.vocabapp.sql.createWord
+import personal.jp.vocabapp.sql.toSerializable
 
 @Composable
 @Preview
 fun App() {
-//    val service: WordServiceImpl = koinInject()
-
-//    val words by produceState<List<Word>>(initialValue = emptyList(), service) {
-//        value = service.getAllWords()
-//    }
     MyScreen()
 }
 
@@ -47,6 +48,9 @@ fun MyScreen() {
     val secureStorage: SecureStorage = koinInject()
     val scope = rememberCoroutineScope()
     val client: HttpClient = koinInject()
+    val service: WordServiceImpl = koinInject()
+
+
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -86,12 +90,43 @@ fun MyScreen() {
             }
 
             Button(onClick = {scope.launch {
-                println("Backend Test")
-//                var words : List<Word> = backendPull(client)
-
+                println("DB Pull")
                 println(backendPull(client))
             }}){
-                Text("Local hello")
+                Text("DB pull")
+            }
+            Button(onClick = {scope.launch {
+                service.deleteAllWords()
+                println("Add word")
+                println("Count: ${service.countWords()}")
+                try{
+                    service.addWord(
+                        createWord(
+                            name = "potato",
+                            meaningKr = "감자",
+                            example = "I had potato",
+                        )
+                    )
+                    service.addWord(
+                        createWord(
+                            name = "Sweet potato",
+                            meaningKr = "고구마",
+                            example = "I had sweet potato",
+                        )
+                    )
+                } catch (e: Exception){
+                    println("Error: ${e.message}")
+                }
+                println("Count: ${service.countWords()}")
+            }}){
+                Text("Add Word")
+            }
+            Button(onClick = {scope.launch {
+                println("DB Push ALL")
+                val words = toSerializable(service.getAllWords())
+                println(backendPush(client, words))
+            }}){
+                Text("DB push")
             }
 
         }
@@ -124,3 +159,26 @@ suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<
     }
 }
 
+suspend fun backendPush(
+    client: HttpClient,
+    tasks: List<SerializableWord>,
+    api: String = "sync/push"
+): Data {
+    println("tasks $tasks")
+    return try {
+        val response = client.post("${Secrets.LOCAL}/$api") {
+            // Set content type so the server knows it's JSON
+            contentType(ContentType.Application.Json)
+            // Ktor automatically serializes the list because of ContentNegotiation
+            setBody(tasks)
+        }
+
+        // Directly return the deserialized body
+        response.body<Data>()
+    } catch (e: Exception) {
+        // Log the actual error for better debugging
+        println("Network or Serialization Error: ${e.message}")
+        // Return a default object or handle error state
+        Data()
+    }
+}
