@@ -20,6 +20,7 @@
     - [x] pull words from remote DB
     - [x] push words to remote DB
     - [ ] Sync words to remote DB 
+        - check internet is available
         - push from front
         - pull from back
         - compare at server

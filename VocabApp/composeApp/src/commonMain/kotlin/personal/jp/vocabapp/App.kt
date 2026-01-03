@@ -32,6 +32,7 @@ import personal.jp.vocabapp.google.ACCESS_TOKEN
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
+import personal.jp.vocabapp.internet.isNetworkAvailable
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.toSerializable
@@ -49,7 +50,8 @@ fun MyScreen() {
     val scope = rememberCoroutineScope()
     val client: HttpClient = koinInject()
     val service: WordServiceImpl = koinInject()
-
+    val isNetworkAvailable: Boolean = koinInject()
+    println("isNetworkAvailable: $isNetworkAvailable")
 
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
