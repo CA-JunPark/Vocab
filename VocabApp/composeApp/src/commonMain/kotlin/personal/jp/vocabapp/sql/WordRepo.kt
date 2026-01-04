@@ -46,9 +46,11 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
                 example = word.example,
                 antonymEn = word.antonymEn,
                 tags = word.tags,
+                note = word.note
             )
             true
         } catch (e: Exception) {
+            println("Error: ${e.message}")
             false
         }
     }
@@ -64,8 +66,8 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
 
     override fun updateWord(word: Word): Boolean {
         return try{
-            _queries.updateWord(word.meaningKr, word.example, word.antonymEn, word.tags,
-                                word.name)
+            _queries.updateWord(word.meaningKr, word.example, word.antonymEn, word.tags, word.note,
+                                word.name,)
             true
         } catch (e: Exception){
             false

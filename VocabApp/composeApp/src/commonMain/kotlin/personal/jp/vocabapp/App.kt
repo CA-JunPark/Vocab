@@ -35,6 +35,7 @@ import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.internet.isNetworkAvailable
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
+import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.toSerializable
 
 @Composable
@@ -130,6 +131,13 @@ fun MyScreen() {
             }}){
                 Text("DB push")
             }
+            Button(onClick = {scope.launch {
+                println("Sync")
+                println(sync(client, service))
+            }}){
+                Text("Sync")
+            }
+
 
         }
     }
@@ -152,7 +160,6 @@ data class Data(
 
 suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<SerializableWord>? {
     return try {
-        // Specify the type inside the body<...> brackets
         val response = client.get("${Secrets.LOCAL}/$api")
         return response.body<List<SerializableWord>>()
     } catch (e: Exception) {
@@ -174,7 +181,6 @@ suspend fun backendPush(
             // Ktor automatically serializes the list because of ContentNegotiation
             setBody(tasks)
         }
-
         // Directly return the deserialized body
         response.body<Data>()
     } catch (e: Exception) {

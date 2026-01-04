@@ -1,23 +1,34 @@
 package personal.jp.vocabapp.sql
 
+import androidx.compose.runtime.Composable
 import db.Word
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
+import personal.jp.vocabapp.Data
+import personal.jp.vocabapp.Secrets
 
 @Serializable
-public data class SerializableWord(
-    public val name: String,
-    public val meaningKr: String,
-    public val example: String?,
-    public val antonymEn: String?,
-    public val tags: String?,
-    public val createdTime: String,
-    public val modifiedTime: String,
-    public val isDeleted: Boolean,
-    public val synced: Boolean,
+data class SerializableWord(
+    val name: String,
+    val meaningKr: String,
+    val example: String?,
+    val antonymEn: String?,
+    val tags: String?,
+    val createdTime: String,
+    val modifiedTime: String,
+    val isDeleted: Boolean,
+    val synced: Boolean,
+    val note: String? = ""
 )
 
 fun toSerializable(words:List<Word>): List<SerializableWord> {
-    println("toSerializable $words")
     return words.map{
         SerializableWord(
             name = it.name,
@@ -28,12 +39,13 @@ fun toSerializable(words:List<Word>): List<SerializableWord> {
             createdTime = it.createdTime,
             modifiedTime = it.modifiedTime,
             isDeleted = it.isDeleted,
-            synced = it.synced
+            synced = it.synced,
+            note = it.note
         )
     }
 }
 
-fun createWord(name: String, meaningKr: String, example: String?, antonymEn: String? = "", tags: String? = ""): Word{
+fun createWord(name: String, meaningKr: String, example: String?, antonymEn: String? = "", tags: String? = "", note: String? = ""): Word{
     return Word(
         name = name,
         meaningKr = meaningKr,
@@ -44,6 +56,34 @@ fun createWord(name: String, meaningKr: String, example: String?, antonymEn: Str
         createdTime = "",
         modifiedTime = "",
         isDeleted = false,
-        synced = false
+        synced = false,
+        note = note
     )
 }
+
+@Serializable
+data class SyncedWordsList(
+    val syncedWords: List<String>,
+)
+suspend fun sync(client: HttpClient, wordService: WordService){
+    try{
+        // get synced=false Words
+        val words = toSerializable(wordService.selectUnsyncedWord())
+        // post words to server
+        val response = client.post("${Secrets.LOCAL}/sync") {
+            contentType(ContentType.Application.Json)
+            // Ktor automatically serializes the list because of ContentNegotiation
+            setBody(words)
+        }
+        // get result List<String> of Words.names that are successfully synced
+        val syncedWordsList : SyncedWordsList = response.body<SyncedWordsList>()
+        // set synced = True for words in syncedWordList
+        syncedWordsList.syncedWords.forEach{
+            wordService.setSync(it)
+        }
+    } catch (e: Exception){
+        println("${e.message}")
+    }
+
+}
+

@@ -11,14 +11,15 @@ CREATE TABLE Word (
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
-    synced INTEGER AS Boolean NOT NULL DEFAULT 0
+    synced INTEGER AS Boolean NOT NULL DEFAULT 0,
+    note TEXT
 );
 
 CREATE INDEX name ON Word(name);
 
 insertWord:
-INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, synced)
-VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0);
+INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, synced, note)
+VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,?);
 
 selectAllWordsInfo:
 SELECT *
@@ -37,7 +38,7 @@ WHERE name = ?;
 updateWord:
 UPDATE Word
 SET meaningKr = ?, example = ?, antonymEn = ?,
-    tags = ?, modifiedTime = CURRENT_TIMESTAMP, synced = 0
+    tags = ?, modifiedTime = CURRENT_TIMESTAMP, synced = 0, note = ?
 WHERE name = ?;
 
 countWords:

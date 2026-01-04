@@ -20,12 +20,12 @@
     - [x] pull words from remote DB
     - [x] push words to remote DB
     - [ ] Sync words to remote DB 
-        - check internet is available
-        - push from front
-        - pull from back
-        - compare at server
-        - last write wins
-        - return names of words that are synced
+        - [x]check internet is available 
+        - [ ] push from front
+        - [ ] pull from back
+        - [ ] compare at server
+        - [ ] last write wins
+        - [ ] return names of words that are synced
         - update all `synced=true` if success
     - [ ] modify sync field of each word that is being synced
 - [ ] Setup Gemini
@@ -39,11 +39,11 @@
 ## 2. Data Layer
 ### Model
 - [x] Define `Word` class
-- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced` fields
+- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced`, `note` fields
 
 ### Storage (SQLDelight)
 - [x] Create database and tables
-- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced`
+- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced`, `note`
 - [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime)
 - [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime)
 - [x] Implement `updateWord(word: Word)` (update LastModifiedTime)
