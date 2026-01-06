@@ -53,7 +53,7 @@ fun MyScreen() {
     val client: HttpClient = koinInject()
     val service: WordServiceImpl = koinInject()
     val isNetworkAvailable: Boolean = koinInject()
-    val syncManager : KeyDataManager = koinInject()
+    val keyDataManager : KeyDataManager = koinInject()
 
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
@@ -134,13 +134,13 @@ fun MyScreen() {
             }
             Button(onClick = {scope.launch {
                 println("Sync")
-                println(sync(client, service))
+                println(sync(client, service, keyDataManager))
             }}){
                 Text("Sync")
             }
             Button(onClick = {scope.launch {
-                syncManager.saveLastSync()
-                println(syncManager.getLastSync())
+                keyDataManager.saveLastSync()
+                println(keyDataManager.getLastSync())
             }}){
                 Text("saveLastSync")
             }

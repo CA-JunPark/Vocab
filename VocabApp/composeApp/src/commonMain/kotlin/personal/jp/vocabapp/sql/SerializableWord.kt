@@ -45,12 +45,13 @@ fun toSerializable(words:List<Word>): List<SerializableWord> {
     }
 }
 
-fun createWord(name: String, meaningKr: String, example: String?, antonymEn: String? = "", tags: String? = "", note: String? = ""): Word{
+fun createWord(name: String, meaningKr: String,
+               example: String? = "", antonymEn: String? = "", tags: String? = "", note: String? = ""): Word{
     return Word(
         name = name,
         meaningKr = meaningKr,
-        example = example,
         // default values
+        example = example,
         antonymEn = antonymEn,
         tags = tags,
         createdTime = "",
@@ -63,13 +64,13 @@ fun createWord(name: String, meaningKr: String, example: String?, antonymEn: Str
 
 @Serializable
 data class SyncedWordsList(
-    val syncedWords: List<String>,
+    // response data for sync
+    val syncedWords: List<String>
 )
-suspend fun sync(client: HttpClient, wordService: WordService){
+suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager){
     try{
         // get synced=false Words
         val words = toSerializable(wordService.selectUnsyncedWord())
-        println("count " + words.count())
         // post words to server
         val response = client.post("${Secrets.LOCAL}/sync") {
             contentType(ContentType.Application.Json)
@@ -82,9 +83,8 @@ suspend fun sync(client: HttpClient, wordService: WordService){
         syncedWordsList.syncedWords.forEach{
             wordService.setSync(it)
         }
-
         // update lastSyncedTime
-
+        keyDataManager.saveLastSync()
     } catch (e: Exception){
         println("${e.message}")
     }
