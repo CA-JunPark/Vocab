@@ -69,6 +69,7 @@ suspend fun sync(client: HttpClient, wordService: WordService){
     try{
         // get synced=false Words
         val words = toSerializable(wordService.selectUnsyncedWord())
+        println("count " + words.count())
         // post words to server
         val response = client.post("${Secrets.LOCAL}/sync") {
             contentType(ContentType.Application.Json)
@@ -81,6 +82,9 @@ suspend fun sync(client: HttpClient, wordService: WordService){
         syncedWordsList.syncedWords.forEach{
             wordService.setSync(it)
         }
+
+        // update lastSyncedTime
+
     } catch (e: Exception){
         println("${e.message}")
     }

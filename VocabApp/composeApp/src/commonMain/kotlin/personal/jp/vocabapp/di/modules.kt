@@ -1,11 +1,11 @@
 package personal.jp.vocabapp.di
 
+import com.russhwolf.settings.Settings
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import personal.jp.vocabapp.getPlatform
 import personal.jp.vocabapp.google.AuthFlowManager
 import personal.jp.vocabapp.google.AuthRepository
-import personal.jp.vocabapp.google.SecureStorage
 import personal.jp.vocabapp.google.authClient
 
 import db.WordDatabase
@@ -13,6 +13,7 @@ import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import personal.jp.vocabapp.sql.DriverFactory
+import personal.jp.vocabapp.sql.KeyDataManager
 import personal.jp.vocabapp.sql.WordRepo
 import personal.jp.vocabapp.sql.WordRepoImpl
 import personal.jp.vocabapp.sql.WordService
@@ -36,6 +37,6 @@ fun wordModule(driverFactory: DriverFactory) = module{
 }
 
 fun apiModule() = module{
-
+    single { KeyDataManager(Settings()) }
 }
 

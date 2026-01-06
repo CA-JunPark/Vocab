@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import okio.Path.Companion.toPath
 
 expect class SecureStorage(dataStore: DataStore<Preferences>, context: Any? = null) {
-    suspend fun saveToken(key: String, token: String,)
+    suspend fun saveToken(key: String, token: String)
     suspend fun getToken(key: String): String
     suspend fun deleteToken(key: String)
 

@@ -32,15 +32,19 @@ import personal.jp.vocabapp.google.ACCESS_TOKEN
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
-import personal.jp.vocabapp.internet.isNetworkAvailable
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.toSerializable
+import com.russhwolf.settings.Settings
+import personal.jp.vocabapp.sql.KeyDataManager
 
 @Composable
 @Preview
 fun App() {
+    val syncManager : KeyDataManager = koinInject()
+    syncManager.saveLastSync()
+    println(syncManager.getLastSync())
     MyScreen()
 }
 
@@ -52,7 +56,6 @@ fun MyScreen() {
     val client: HttpClient = koinInject()
     val service: WordServiceImpl = koinInject()
     val isNetworkAvailable: Boolean = koinInject()
-    println("isNetworkAvailable: $isNetworkAvailable")
 
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }

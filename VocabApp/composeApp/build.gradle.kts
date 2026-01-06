@@ -61,14 +61,16 @@ kotlin {
             implementation(libs.ktor.client.auth)
             implementation("app.cash.sqldelight:sqlite-driver:2.2.1")
             implementation(libs.kermit) //logger
-            // Logger.d { "This is a debug log" }
-            // Logger.e(throwable) { "Something went wrong" }
+                // Logger.d { "This is a debug log" }
+                // Logger.e(throwable) { "Something went wrong" }
             implementation("io.github.sunildhiman90:kmauth-google:0.3.3")
             implementation("io.github.sunildhiman90:kmauth-google-compose:0.3.3")
             // DataStore library
             implementation(libs.androidx.datastore)
             // The Preferences DataStore library
             implementation(libs.androidx.datastore.preferences)
+            implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
