@@ -69,7 +69,6 @@ kotlin {
             implementation(libs.androidx.datastore)
             // The Preferences DataStore library
             implementation(libs.androidx.datastore.preferences)
-            implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
         }
         commonTest.dependencies {

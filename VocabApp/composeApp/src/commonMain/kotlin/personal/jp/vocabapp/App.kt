@@ -42,9 +42,7 @@ import personal.jp.vocabapp.sql.KeyDataManager
 @Composable
 @Preview
 fun App() {
-    val syncManager : KeyDataManager = koinInject()
-    syncManager.saveLastSync()
-    println(syncManager.getLastSync())
+
     MyScreen()
 }
 
@@ -56,6 +54,7 @@ fun MyScreen() {
     val client: HttpClient = koinInject()
     val service: WordServiceImpl = koinInject()
     val isNetworkAvailable: Boolean = koinInject()
+    val syncManager : KeyDataManager = koinInject()
 
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
@@ -140,7 +139,12 @@ fun MyScreen() {
             }}){
                 Text("Sync")
             }
-
+            Button(onClick = {scope.launch {
+                syncManager.saveLastSync()
+                println(syncManager.getLastSync())
+            }}){
+                Text("saveLastSync")
+            }
 
         }
     }

@@ -42,3 +42,5 @@ Secrets.kt
 *.db
 
 tokens
+
+vocab.preferences_pb

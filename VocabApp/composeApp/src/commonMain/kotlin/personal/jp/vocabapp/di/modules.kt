@@ -37,6 +37,6 @@ fun wordModule(driverFactory: DriverFactory) = module{
 }
 
 fun apiModule() = module{
-    single { KeyDataManager(Settings()) }
+    single { KeyDataManager(get()) }
 }
 

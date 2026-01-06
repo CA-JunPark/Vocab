@@ -1,18 +1,43 @@
 package personal.jp.vocabapp.sql
-import com.russhwolf.settings.Settings
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.io.IOException
 
-class KeyDataManager(private val settings: Settings) {
+class KeyDataManager(private val dataStore: DataStore<Preferences>) {
     // Save the time
-    fun saveLastSync() {
-        settings.putString("lastSyncedTime", getSqlTimestamp())
+    suspend fun saveLastSync() {
+        val currentTime = getSqlTimestamp()
+        dataStore.edit { settings ->
+            settings[stringPreferencesKey("lastSyncedTime")] = getSqlTimestamp()
+        }
     }
 
+
     // Retrieve the time (default to 0 if not found)
-    fun getLastSync(): String {
-        return settings.getString("lastSyncedTime", "")
+    suspend fun getLastSync(): String {
+        val token = dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[stringPreferencesKey("lastSyncedTime")]
+            }
+            .first() ?: return ""
+
+        return token
     }
 
     fun getSqlTimestamp(): String {
