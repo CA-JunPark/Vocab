@@ -21,7 +21,6 @@ class KeyDataManager(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-
     // Retrieve the time (default to 0 if not found)
     suspend fun getLastSync(): String {
         val token = dataStore.data

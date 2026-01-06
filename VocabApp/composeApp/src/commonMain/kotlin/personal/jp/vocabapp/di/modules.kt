@@ -1,6 +1,5 @@
 package personal.jp.vocabapp.di
 
-import com.russhwolf.settings.Settings
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import personal.jp.vocabapp.getPlatform

@@ -36,7 +36,6 @@ import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.toSerializable
-import com.russhwolf.settings.Settings
 import personal.jp.vocabapp.sql.KeyDataManager
 
 @Composable
