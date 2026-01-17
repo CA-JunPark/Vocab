@@ -47,9 +47,9 @@ class KeyDataManager(private val dataStore: DataStore<Preferences>) {
         return buildString {
             append(dateTime.year)
             append("-")
-            append(dateTime.monthNumber.toString().padStart(2, '0'))
+            append(dateTime.month.toString().padStart(2, '0'))
             append("-")
-            append(dateTime.dayOfMonth.toString().padStart(2, '0'))
+            append(dateTime.day.toString().padStart(2, '0'))
             append(" ")
             append(dateTime.hour.toString().padStart(2, '0'))
             append(":")
