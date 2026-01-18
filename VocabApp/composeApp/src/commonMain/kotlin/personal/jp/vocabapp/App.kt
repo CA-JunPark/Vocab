@@ -134,7 +134,9 @@ fun MyScreen() {
             }
             Button(onClick = {scope.launch {
                 println("Sync")
-                println(sync(client, service, keyDataManager))
+                sync(client, service, keyDataManager)
+                println("Count: ${service.countWords()}")
+                println("Words:" + service.getAllWords())
             }}){
                 Text("Sync")
             }

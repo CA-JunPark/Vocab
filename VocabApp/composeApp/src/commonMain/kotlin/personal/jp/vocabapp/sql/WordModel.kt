@@ -12,5 +12,5 @@ data class WordModel(
     val createdTime: String? = null,
     val modifiedTime: String? = null,
     val isDeleted: Boolean = false,
-    val synced: Boolean = false
+    val syncedTime: String? = null
 )

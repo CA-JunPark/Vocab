@@ -1,17 +1,13 @@
 package personal.jp.vocabapp.sql
 
-import androidx.compose.runtime.Composable
 import db.Word
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
-import org.koin.compose.koinInject
-import personal.jp.vocabapp.Data
 import personal.jp.vocabapp.Secrets
 
 @Serializable
@@ -24,7 +20,7 @@ data class SerializableWord(
     val createdTime: String,
     val modifiedTime: String,
     val isDeleted: Boolean,
-    val synced: Boolean,
+    val syncedTime: String?,
     val note: String? = ""
 )
 
@@ -39,7 +35,24 @@ fun toSerializable(words:List<Word>): List<SerializableWord> {
             createdTime = it.createdTime,
             modifiedTime = it.modifiedTime,
             isDeleted = it.isDeleted,
-            synced = it.synced,
+            syncedTime = it.syncedTime,
+            note = it.note
+        )
+    }
+}
+
+fun fromSerializable(words:List<SerializableWord>): List<Word> {
+    return words.map {
+        Word(
+            name = it.name,
+            meaningKr = it.meaningKr,
+            example = it.example,
+            antonymEn = it.antonymEn,
+            tags = it.tags,
+            createdTime = it.createdTime,
+            modifiedTime = it.modifiedTime,
+            isDeleted = it.isDeleted,
+            syncedTime = it.syncedTime,
             note = it.note
         )
     }
@@ -57,34 +70,52 @@ fun createWord(name: String, meaningKr: String,
         createdTime = "",
         modifiedTime = "",
         isDeleted = false,
-        synced = false,
+        syncedTime = null,
         note = note
     )
 }
 
 @Serializable
-data class SyncedWordsList(
-    // response data for sync
-    val syncedWords: List<String>
+data class SyncRequest(
+    val lastSyncTime: String,
+    val localChanges: List<SerializableWord> // These are the words where syncedTime IS NULL
 )
+
+@Serializable
+data class SyncResponse(
+    val wordsToUpdate: List<SerializableWord>,
+    val serverTime: String
+)
+
+
 suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager){
     try{
-        // get synced=false Words
-        val words = toSerializable(wordService.selectUnsyncedWord())
-        // post words to server
+        val lastSyncedTime = keyDataManager.getLastSync()
+
+        val unsyncedWords = toSerializable(wordService.getUnsyncedWords())
+
         val response = client.post("${Secrets.LOCAL}/sync") {
             contentType(ContentType.Application.Json)
-            // Ktor automatically serializes the list because of ContentNegotiation
-            setBody(words)
+            setBody(SyncRequest(
+                lastSyncTime = lastSyncedTime,
+                localChanges = unsyncedWords
+            ))
         }
-        // get result List<String> of Words.names that are successfully synced
-        val syncedWordsList : SyncedWordsList = response.body<SyncedWordsList>()
-        // set synced = True for words in syncedWordList
-        syncedWordsList.syncedWords.forEach{
-            wordService.setSync(it)
+
+        val syncResult = response.body<SyncResponse>()
+        println("Sync Result: ${syncResult.wordsToUpdate.count()}")
+        // update
+        val words = fromSerializable(syncResult.wordsToUpdate)
+
+
+        for (word in words){
+            wordService.upsertWord(word)
         }
-        // update lastSyncedTime
-        keyDataManager.saveLastSync()
+
+        for (word in syncResult.wordsToUpdate){
+            wordService.setSync(word.name)
+        }
+        keyDataManager.saveLastSync(syncResult.serverTime)
     } catch (e: Exception){
         println("${e.message}")
     }

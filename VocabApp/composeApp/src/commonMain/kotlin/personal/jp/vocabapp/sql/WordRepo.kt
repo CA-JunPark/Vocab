@@ -11,11 +11,13 @@ interface WordRepo {
     fun findAllWords(): List<Word>
     fun addWord(word: Word): Boolean
     fun updateWord(word: Word): Boolean
+    fun upsertWord(word: Word): Boolean
     fun deleteWord(name: String): Boolean
     fun countWords(): Int
     fun deleteAllWords(): Boolean
     fun selectUnsyncedWord(): List<Word>
     fun setSync(name: String): Boolean
+    fun getUnsyncedWords(): List<Word>
 }
 
 // TODO Exception handling
@@ -74,6 +76,16 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
+    override fun upsertWord(word: Word): Boolean {
+        return try {
+            _queries.upsertWord(
+                word.name, word.meaningKr, word.example, word.antonymEn, word.tags, word.note)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     override fun countWords(): Int {
         return try{
             _queries.countWords().executeAsOne().toInt()
@@ -105,6 +117,14 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
             true
         } catch (e: Exception){
             false
+        }
+    }
+
+    override fun getUnsyncedWords(): List<Word> {
+        return try {
+            _queries.selectUnsyncedWord().executeAsList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }

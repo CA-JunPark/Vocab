@@ -11,15 +11,15 @@ CREATE TABLE Word (
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
-    synced INTEGER AS Boolean NOT NULL DEFAULT 0,
+    syncedTime TEXT,
     note TEXT
 );
 
 CREATE INDEX name ON Word(name);
 
 insertWord:
-INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, synced, note)
-VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,?);
+INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, syncedTime, note)
+VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL,?);
 
 selectAllWordsInfo:
 SELECT *
@@ -32,14 +32,30 @@ LIMIT 1;
 
 deletedWord:
 UPDATE Word
-SET isDeleted = 1, modifiedTime = CURRENT_TIMESTAMP, synced = 0
+SET isDeleted = 1, modifiedTime = CURRENT_TIMESTAMP, syncedTime = NULL
 WHERE name = ?;
 
 updateWord:
 UPDATE Word
 SET meaningKr = ?, example = ?, antonymEn = ?,
-    tags = ?, modifiedTime = CURRENT_TIMESTAMP, synced = 0, note = ?
+    tags = ?, modifiedTime = CURRENT_TIMESTAMP, syncedTime = NULL, note = ?
 WHERE name = ?;
+
+upsertWord:
+INSERT INTO Word(
+    name, meaningKr, example, antonymEn, tags,
+    isDeleted, createdTime, modifiedTime, syncedTime, note
+)
+VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, ?)
+ON CONFLICT(name) DO UPDATE SET
+    meaningKr = excluded.meaningKr,
+    example = excluded.example,
+    antonymEn = excluded.antonymEn,
+    tags = excluded.tags,
+    isDeleted = excluded.isDeleted,
+    modifiedTime = CURRENT_TIMESTAMP,
+    syncedTime = NULL,
+    note = excluded.note;
 
 countWords:
 SELECT COUNT(*) FROM Word;
@@ -49,7 +65,7 @@ DELETE FROM Word;
 
 selectUnsyncedWord:
 SELECT * FROM Word
-WHERE synced = 0;
+WHERE syncedTime IS NULL;
 
 setSync:
-UPDATE Word SET synced = 1 WHERE name = ?;
+UPDATE Word SET syncedTime = CURRENT_TIMESTAMP WHERE name = ?;

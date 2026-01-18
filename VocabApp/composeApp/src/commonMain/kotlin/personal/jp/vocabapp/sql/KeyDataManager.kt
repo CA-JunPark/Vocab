@@ -7,17 +7,25 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.LocalDateTime
 import kotlin.time.Clock
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.io.IOException
 
 class KeyDataManager(private val dataStore: DataStore<Preferences>) {
     // Save the time
-    suspend fun saveLastSync() {
-        val currentTime = getSqlTimestamp()
-        dataStore.edit { settings ->
-            settings[stringPreferencesKey("lastSyncedTime")] = getSqlTimestamp()
+    suspend fun saveLastSync(serverTime:String? = null) {
+        if (serverTime != null){
+            dataStore.edit { settings ->
+                settings[stringPreferencesKey("lastSyncedTime")] = serverTime
+            }
+        }
+        else{
+            dataStore.edit { settings ->
+                settings[stringPreferencesKey("lastSyncedTime")] = getSqlTimestamp()
+            }
         }
     }
 
@@ -44,19 +52,14 @@ class KeyDataManager(private val dataStore: DataStore<Preferences>) {
         // use TimeZone.UTC for consistency
         val dateTime = now.toLocalDateTime(TimeZone.UTC)
 
-        return buildString {
-            append(dateTime.year)
-            append("-")
-            append(dateTime.month.toString().padStart(2, '0'))
-            append("-")
-            append(dateTime.day.toString().padStart(2, '0'))
-            append(" ")
-            append(dateTime.hour.toString().padStart(2, '0'))
-            append(":")
-            append(dateTime.minute.toString().padStart(2, '0'))
-            append(":")
-            append(dateTime.second.toString().padStart(2, '0'))
-        }
+        return "%04d-%02d-%02d %02d:%02d:%02d".format(
+            dateTime.year,
+            dateTime.month.number,
+            dateTime.day,
+            dateTime.hour,
+            dateTime.minute,
+            dateTime.second
+        )
     }
 }
 

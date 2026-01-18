@@ -11,11 +11,13 @@ interface WordService {
     fun getAllWords(): List<Word>
     fun addWord(word: Word): Boolean
     fun updateWord(word: Word): Boolean
+    fun upsertWord(word: Word): Boolean
     fun deleteWord(name: String): Boolean
     fun countWords(): Int
     fun deleteAllWords(): Boolean
     fun selectUnsyncedWord(): List<Word>
     fun setSync(name: String): Boolean
+    fun getUnsyncedWords(): List<Word>
 }
 
 class WordServiceImpl(
@@ -41,6 +43,10 @@ class WordServiceImpl(
         return wordRepo.updateWord(word)
     }
 
+    override fun upsertWord(word: Word): Boolean {
+        return wordRepo.upsertWord(word)
+    }
+
     override fun deleteWord(name: String): Boolean {
         return wordRepo.deleteWord(name)
     }
@@ -60,5 +66,9 @@ class WordServiceImpl(
     override fun setSync(name: String): Boolean {
         return wordRepo.setSync(name)
 
+    }
+
+    override fun getUnsyncedWords(): List<Word> {
+        return wordRepo.getUnsyncedWords()
     }
 }
