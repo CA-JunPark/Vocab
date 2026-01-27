@@ -21,13 +21,11 @@
     - [x] push words to remote DB
     - [ ] Sync words to remote DB 
         - [x]check internet is available 
-        - [ ] push from front
-        - [ ] pull from back
-        - [ ] compare at server
-        - [ ] last write wins
-        - [ ] return names of words that are synced
-        - update all `synced=true` if success
-    - [ ] modify sync field of each word that is being synced
+        - [x] push from front
+        - [x] pull from back
+        - [x] compare at server
+        - [x] last write wins
+        - [x] return names of words that are synced
 - [ ] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
     - [x] assign url
