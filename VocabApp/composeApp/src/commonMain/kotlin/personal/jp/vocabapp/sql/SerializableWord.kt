@@ -9,6 +9,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.Secrets
+import co.touchlab.kermit.Logger
 
 @Serializable
 data class SerializableWord(
@@ -93,7 +94,7 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         val lastSyncedTime = keyDataManager.getLastSync()
 
         val unsyncedWords = toSerializable(wordService.getUnsyncedWords(lastSyncedTime))
-        println("Unsynced Words: $unsyncedWords")
+        Logger.d { "Unsynced Words: $unsyncedWords" }
         // post request
         val response = client.post("${Secrets.LOCAL}/sync") {
             contentType(ContentType.Application.Json)
@@ -117,7 +118,7 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         }
         keyDataManager.saveLastSync(syncResult.serverTime)
     } catch (e: Exception){
-        println("${e.message}")
+        Logger.e { "${e.message}" }
     }
 
 }

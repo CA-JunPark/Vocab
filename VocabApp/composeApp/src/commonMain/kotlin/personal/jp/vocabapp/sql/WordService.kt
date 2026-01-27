@@ -7,30 +7,30 @@ package personal.jp.vocabapp.sql
 import db.Word as Word
 
 interface WordService {
-    fun getWordOrNull(name: String): Word?
-    fun getAllWords(): List<Word>
-    fun addWord(word: Word): Boolean
-    fun updateWord(word: Word): Boolean
-    fun upsertWord(word: Word): Boolean
-    fun deleteWord(name: String): Boolean
-    fun countWords(): Int
-    fun deleteAllWords(): Boolean
-    fun setSync(name: String): Boolean
-    fun getUnsyncedWords(lastSyncedTime: String): List<Word>
+    suspend fun getWordOrNull(name: String): Word?
+    suspend fun getAllWords(): List<Word>
+    suspend fun addWord(word: Word): Boolean
+    suspend fun updateWord(word: Word): Boolean
+    suspend fun upsertWord(word: Word): Boolean
+    suspend fun deleteWord(name: String): Boolean
+    suspend fun countWords(): Int
+    suspend fun deleteAllWords(): Boolean
+    suspend fun setSync(name: String): Boolean
+    suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word>
 }
 
 class WordServiceImpl(
     private val wordRepo: WordRepo
 ) : WordService {
-    override fun getWordOrNull(name: String): Word? {
+    override suspend fun getWordOrNull(name: String): Word? {
        return wordRepo.findWordOrNull(name)
     }
 
-    override fun getAllWords(): List<Word> {
+    override suspend fun getAllWords(): List<Word> {
         return wordRepo.findAllWords()
     }
 
-    override fun addWord(word: Word): Boolean {
+    override suspend fun addWord(word: Word): Boolean {
         // check duplicates
         wordRepo.findWordOrNull(word.name)?.let {
             return false
@@ -38,32 +38,32 @@ class WordServiceImpl(
         return wordRepo.addWord(word)
     }
 
-    override fun updateWord(word: Word): Boolean {
+    override suspend fun updateWord(word: Word): Boolean {
         return wordRepo.updateWord(word)
     }
 
-    override fun upsertWord(word: Word): Boolean {
+    override suspend fun upsertWord(word: Word): Boolean {
         return wordRepo.upsertWord(word)
     }
 
-    override fun deleteWord(name: String): Boolean {
+    override suspend fun deleteWord(name: String): Boolean {
         return wordRepo.deleteWord(name)
     }
 
-    override fun countWords(): Int {
+    override suspend fun countWords(): Int {
         return wordRepo.countWords()
     }
 
-    override fun deleteAllWords(): Boolean {
+    override suspend fun deleteAllWords(): Boolean {
         return wordRepo.deleteAllWords()
     }
 
-    override fun setSync(name: String): Boolean {
+    override suspend fun setSync(name: String): Boolean {
         return wordRepo.setSync(name)
 
     }
 
-    override fun getUnsyncedWords(lastSyncedTime: String): List<Word> {
+    override suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word> {
         return wordRepo.getUnsyncedWords(lastSyncedTime)
     }
 }
