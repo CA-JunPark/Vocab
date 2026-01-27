@@ -15,9 +15,8 @@ interface WordRepo {
     fun deleteWord(name: String): Boolean
     fun countWords(): Int
     fun deleteAllWords(): Boolean
-    fun selectUnsyncedWord(): List<Word>
     fun setSync(name: String): Boolean
-    fun getUnsyncedWords(): List<Word>
+    fun getUnsyncedWords(lastSyncedTime: String): List<Word>
 }
 
 // TODO Exception handling
@@ -103,14 +102,6 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun selectUnsyncedWord(): List<Word> {
-        return try {
-            _queries.selectUnsyncedWord().executeAsList()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
     override fun setSync(name: String): Boolean {
         return try{
             _queries.setSync(name)
@@ -120,9 +111,9 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun getUnsyncedWords(): List<Word> {
+    override fun getUnsyncedWords(lastSyncedTime: String): List<Word> {
         return try {
-            _queries.selectUnsyncedWord().executeAsList()
+            _queries.selectUnsyncedWord(lastSyncedTime).executeAsList()
         } catch (e: Exception) {
             emptyList()
         }

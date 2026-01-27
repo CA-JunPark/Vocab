@@ -92,8 +92,9 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
     try{
         val lastSyncedTime = keyDataManager.getLastSync()
 
-        val unsyncedWords = toSerializable(wordService.getUnsyncedWords())
-
+        val unsyncedWords = toSerializable(wordService.getUnsyncedWords(lastSyncedTime))
+        println("Unsynced Words: $unsyncedWords")
+        // post request
         val response = client.post("${Secrets.LOCAL}/sync") {
             contentType(ContentType.Application.Json)
             setBody(SyncRequest(
@@ -103,15 +104,14 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         }
 
         val syncResult = response.body<SyncResponse>()
-        println("Sync Result: ${syncResult.wordsToUpdate.count()}")
-        // update
+
+        // update local
         val words = fromSerializable(syncResult.wordsToUpdate)
-
-
         for (word in words){
             wordService.upsertWord(word)
         }
 
+        // update last synced time
         for (word in syncResult.wordsToUpdate){
             wordService.setSync(word.name)
         }

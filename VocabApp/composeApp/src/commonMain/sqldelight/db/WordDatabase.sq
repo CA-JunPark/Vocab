@@ -65,7 +65,7 @@ DELETE FROM Word;
 
 selectUnsyncedWord:
 SELECT * FROM Word
-WHERE syncedTime IS NULL;
+WHERE modifiedTime > :lastSyncedTime;
 
 setSync:
 UPDATE Word SET syncedTime = CURRENT_TIMESTAMP WHERE name = ?;

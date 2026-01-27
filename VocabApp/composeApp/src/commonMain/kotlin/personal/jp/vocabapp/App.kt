@@ -126,13 +126,6 @@ fun MyScreen() {
                 Text("Add Word")
             }
             Button(onClick = {scope.launch {
-                println("DB Push ALL")
-                val words = toSerializable(service.getAllWords())
-                println(backendPush(client, words))
-            }}){
-                Text("DB push")
-            }
-            Button(onClick = {scope.launch {
                 println("Sync")
                 sync(client, service, keyDataManager)
                 println("Count: ${service.countWords()}")
@@ -173,28 +166,5 @@ suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<
     } catch (e: Exception) {
         println("Serialization Error: ${e.message}")
         null
-    }
-}
-
-suspend fun backendPush(
-    client: HttpClient,
-    tasks: List<SerializableWord>,
-    api: String = "sync/push"
-): Data {
-    println("tasks $tasks")
-    return try {
-        val response = client.post("${Secrets.LOCAL}/$api") {
-            // Set content type so the server knows it's JSON
-            contentType(ContentType.Application.Json)
-            // Ktor automatically serializes the list because of ContentNegotiation
-            setBody(tasks)
-        }
-        // Directly return the deserialized body
-        response.body<Data>()
-    } catch (e: Exception) {
-        // Log the actual error for better debugging
-        println("Network or Serialization Error: ${e.message}")
-        // Return a default object or handle error state
-        Data()
     }
 }
