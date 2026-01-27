@@ -26,7 +26,7 @@
         - [x] compare at server
         - [x] last write wins
         - [x] return names of words that are synced
-- [ ] Setup Gemini
+- [x] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
     - [x] assign url
     - [ ] turso
@@ -45,22 +45,20 @@
 - [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime)
 - [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime)
 - [x] Implement `updateWord(word: Word)` (update LastModifiedTime)
-- [ ] Implement `syncDB()` logic
-    - [ ] Get all `synced=false` words
-    - [ ] Batch update remote DB (check `modified` to determine win)
-    - [ ] Update all `synced=true` if success
-    - [ ] Batch update local DB from remote
-    - [ ] Show sync results (deleted, updated, added)
+- [x] Implement `syncDB()` logic
+    - [x] Get all `modifiedTime > LastSyncTime` words
+    - [x] Batch update remote DB (check `modifiedTime` to determine win)
+    - [x] Update all `LastSyncTime` if success
+    - [x] Batch update local DB from remote
+    - [x] Show sync results (deleted, updated, added)
 
 ### API Services
 - [x] Implement `GoogleSignInService`
-- [ ] Implement `GeminiService`
-    - [ ] Prompt Engineering
-    - [ ] Function `enrichWord(word: String): Word`
-    - [ ] Prompt engineering for strict JSON response
-    - [ ] Implement `resultValidation(JSON)` to validate and parse response
-- [ ] Implement `TursoService`
-    - [ ] `syncDB()`: sync localDB and remoteDB
+- [x] Implement `GeminiService`
+    - [x] Prompt Engineering
+    - [x] JSON response
+- [x] Implement `TursoService`
+    - [x] `syncDB()`: sync localDB and remoteDB
 
 ## 3. UI Layer (Compose Multiplatform)
 ### Design System
