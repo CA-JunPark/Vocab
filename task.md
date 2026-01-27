@@ -8,9 +8,13 @@
     - [x] JVM 
         - [x] get access and refresh token
         - [x] save token to secure storage (DPAPI + DataStore)
+        - [ ] get ID token
+        - [ ] save ID token to secure storage
     - [x] Android
         - [x] get access and refresh token
         - [x] save token to secure storage (AndroidKeyStore + Google Tink + DataStore)
+        - [ ] get ID token
+        - [ ] save ID token to secure storage
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
     - [x] need to add Auth Header to requests 
@@ -31,6 +35,7 @@
     - [x] assign url
     - [ ] turso
     - [ ] gemini
+    - [ ] check id token for all connections
     - [ ] need to check refreshing token works
 - [ ] Setup Glance for Android widget
 
