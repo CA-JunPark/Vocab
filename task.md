@@ -43,14 +43,14 @@
 ## 2. Data Layer
 ### Model
 - [x] Define `Word` class
-- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `created`, `modified`, `isDeleted`, `synced`, `note` fields
+- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `createdTime`, `modifiedTime`, `isDeleted`, `synced`, `note` fields
 
 ### Storage (SQLDelight)
 - [x] Create database and tables
-- [x] Create columns including `tags`, `CreatedTime`, `LastModifiedTime`, `isDeleted`, `synced`, `note`
-- [x] Implement `insertWord(word: Word)` (set CreatedTime, LastModifiedTime)
-- [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update LastModifiedTime)
-- [x] Implement `updateWord(word: Word)` (update LastModifiedTime)
+- [x] Create columns including `tags`, `createdTime`, `modifiedTime`, `isDeleted`, `synced`, `note`
+- [x] Implement `insertWord(word: Word)` (set createdTime, modifiedTime)
+- [x] Implement `deleteWord(word: Word)` (soft delete: set isDeleted=true, update modifiedTime)
+- [x] Implement `updateWord(word: Word)` (update modifiedTime too)
 - [x] Implement `syncDB()` logic
     - [x] Get all `modifiedTime > LastSyncTime` words
     - [x] Batch update remote DB (check `modifiedTime` to determine win)
@@ -60,8 +60,9 @@
 
 ### API Services
 - [x] Implement `GoogleSignInService`
-- [x] Implement `GeminiService`
-    - [x] Prompt Engineering
+- [ ] Implement `GeminiService`
+    - [ ] Prompt Engineering
+    - [ ] miss-spelling correction
     - [x] JSON response
 - [x] Implement `TursoService`
     - [x] `syncDB()`: sync localDB and remoteDB
@@ -74,7 +75,11 @@
 - [ ] **Main List Screen**
     - [ ] List of words with popular translation
     - [ ] Search bar
-    - [ ] Sort options (Alphabetical, Asc/Desc, tags)
+        - [ ] input field
+            - [ ] filter by content or tags
+        - [ ] button to switch filter
+    - [ ] Sort button
+        - [ ] options: Alphabetical, Asc/Desc, tags
     - [ ] FAB to add
     - [ ] Settings button
     - [ ] Login Status Display
@@ -84,13 +89,14 @@
     - [ ] ESC to close (Desktop only)
 - [ ] **Add Screen** (Modal)
     - [ ] Input field for word
-    - [ ] Tags input field
+    - [ ] gemini button to generate fields
+        - [ ] show error if not Google Sign-in
+    - [ ] other editable fields (meaningKr, example, oppositeEn, tags, note)
+    - [ ] save button (FAB)
     - [ ] ESC to close (Desktop only)
 - [ ] **Edit Screen** (Modal)
-    - [ ] Input field for word
-    - [ ] Manual edit fields for translations/examples
-    - [ ] Tags input field
-    - [ ] FAB (Save)
+    - [ ] editable fields (word, meaningKr, example, oppositeEn, tags, note)
+    - [ ] save button (FAB)
     - [ ] ESC to close (Desktop only)
 - [ ] **Settings Screen**
     - [ ] Google Login button
