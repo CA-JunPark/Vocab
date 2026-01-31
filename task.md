@@ -78,6 +78,7 @@
         - [ ] input field
             - [ ] filter by content or tags
         - [ ] button to switch filter
+        - [ ] Debounce Search (300ms)
     - [ ] Sort button
         - [ ] options: Alphabetical, Asc/Desc, tags
     - [ ] FAB to add
@@ -105,6 +106,26 @@
     - [ ] Tag list
     - [ ] ESC to close (Desktop only)
 
+### Loding / Skeleton UI
+- [ ] Add Skeleton UI for loading states
+
+### Logic to UI
+- [ ] AndroidX Lifecycle ViewModel (share logics between Android and Desktop)
+- [ ] Flow
+- [ ] Koin ViewModels
+
+### Navigation
+- [ ] Navigation Compose (Multiplatform)
+
+### Text and Fonts
+- [ ] Compose Resources (support multiple languages, fonts for both platforms)
+
+### Desktop Specific Features
+- [ ] add hotkeys for desktop
+- [ ] hover effects
+- [ ] Tab Navigation
+- [ ] remember window size and position
+
 ## 4. Android Specific Features
 - [ ] **Widget (Glance)**
     - [ ] `VocabWidget` display logic (random subset)
@@ -118,3 +139,5 @@
 - [ ] Tag Management
 - [ ] Gemini Model Switching if Request Per Day is exceeded
 - [x] load tokens to header after google login (right now the app needs to be restarted)
+- [ ] Sync Conflict UI: ask to choose which one to keep when conflict happens
+- [ ] App Icon
