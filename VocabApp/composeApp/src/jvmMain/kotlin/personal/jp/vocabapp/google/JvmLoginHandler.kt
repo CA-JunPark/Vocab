@@ -9,14 +9,18 @@ import personal.jp.vocabapp.Secrets
 import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
-
+import co.touchlab.kermit.Logger
 class JvmLoginHandler : LoginHandler {
+    private var server: io.ktor.server.engine.EmbeddedServer<*, *>? = null
+
     override fun login(onCodeReceived: (String) -> Unit) {
         val port = 8080
         val redirectUri = "http://localhost:$port/callback"
 
+        stop()
+
         // Start the local server to listen for the callback
-        val server = embeddedServer(Netty, port = port) {
+        server = embeddedServer(Netty, port = port) {
             routing {
                 get("/callback") {
                     val code = call.parameters["code"]
@@ -44,5 +48,28 @@ class JvmLoginHandler : LoginHandler {
 
         // Open the browser
         Desktop.getDesktop().browse(URI(authUrl))
+    }
+
+    override fun stop() {
+        val currentServer = server
+        server = null // Clear reference immediately to prevent multiple stop calls
+
+        if (currentServer != null) {
+            // Run shutdown in a separate thread to avoid blocking the current execution context
+            Thread {
+                try {
+                    // Grace period of 1s, timeout of 3s
+                    currentServer.stop(2000, 4000)
+                } catch (e: Exception) {
+                    // Netty often throws RejectedExecutionException during shutdown;
+                    // since we are closing the app's login server, we ignore it.
+                    if (e.toString().contains("RejectedExecutionException")) {
+                        Logger.d("Netty shutdown ignored: ${e.message}")
+                    } else {
+                        Logger.e("Server stop error: ${e.message}")
+                    }
+                }
+            }.start()
+        }
     }
 }

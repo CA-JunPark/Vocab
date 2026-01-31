@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import personal.jp.vocabapp.Platform
 import personal.jp.vocabapp.Secrets
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 interface LoginHandler {
     /**
@@ -22,6 +25,7 @@ interface LoginHandler {
      * @param onCodeReceived callback when the auth code is captured.
      */
     fun login(onCodeReceived: (String) -> Unit)
+    fun stop()
 }
 
 class AuthFlowManager {
@@ -43,17 +47,28 @@ class AuthRepository(
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     init {
-        println("!!! AuthRepository: Initializing and collecting flow...")
+        Logger.d("!!! AuthRepository: Initializing and collecting flow...")
         // Listen for codes arriving from either JVM or Android
         authFlowManager.authCode
             .onEach { code ->
-                println("!!! AuthRepository: Flow received code: $code")
+                Logger.d("!!! AuthRepository: Flow received code: $code")
                 exchangeCodeForToken(code)
+                scope.launch {
+                    delay(1000) // 1 second is plenty for Netty to finish
+                    try {
+                        loginHandler.stop()
+                    } catch (e: Exception) {
+                        // Swallow the specific Netty error if it still happens
+                        Logger.d("Server stop warning: ${e.message}")
+                    }
+
+                }
             }
             .launchIn(scope)
     }
 
-    fun startLogin(){
+    suspend fun startLogin(){
+        clearTokens()
         loginHandler.login { code ->
             // This callback is used primarily by JVM (Netty)
             authFlowManager.onCodeReceived(code)
@@ -66,7 +81,6 @@ class AuthRepository(
         }
         else{
             exchangeCodeForTokenAndroid(code)
-
         }
     }
 
@@ -84,7 +98,7 @@ class AuthRepository(
 
             saveTokens(response)
         } catch (e: Exception) {
-            println("Exchange failed: ${e.message}")
+            Logger.d("Exchange failed: ${e.message}")
         }
     }
     private suspend fun exchangeCodeForTokenAndroid(code: String) {
@@ -100,7 +114,7 @@ class AuthRepository(
 
             saveTokens(response)
         } catch (e: Exception) {
-            println("Exchange failed: ${e.message}")
+            Logger.d("Exchange failed: ${e.message}")
         }
     }
 
@@ -111,5 +125,11 @@ class AuthRepository(
             secureStorage.saveToken(REFRESH_TOKEN, it)
         }
         secureStorage.saveToken(ID_TOKEN, response.idToken ?: "")
+    }
+
+    private suspend fun clearTokens(){
+        secureStorage.deleteToken(ID_TOKEN)
+        secureStorage.deleteToken(ACCESS_TOKEN)
+        secureStorage.deleteToken(REFRESH_TOKEN)
     }
 }

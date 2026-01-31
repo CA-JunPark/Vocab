@@ -8,6 +8,8 @@ import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.authClient
 
 import db.WordDatabase
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf

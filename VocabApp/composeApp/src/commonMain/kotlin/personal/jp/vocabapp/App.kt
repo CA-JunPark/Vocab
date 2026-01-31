@@ -30,6 +30,7 @@ import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.google.GeminiResponse
 import personal.jp.vocabapp.google.enrichWordByGemini
 import co.touchlab.kermit.Logger
+import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.google.ID_TOKEN
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
@@ -62,7 +63,9 @@ fun MyScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { authRepository.startLogin() }) {
+            Button(onClick = { scope.launch{
+                authRepository.startLogin()
+            } }) {
                 Text("Login with Google.")
             }
             Button(onClick = { showContent = !showContent }) {
@@ -85,12 +88,11 @@ fun MyScreen() {
                 Text("Check Tokens")
             }
             Button(onClick = {scope.launch {
-                secureStorage.deleteToken(ACCESS_TOKEN)
-                Logger.d { "Token deleted" }
+                secureStorage.deleteToken(ID_TOKEN)
+                Logger.d { "ID Token deleted" }
             }}){
-                Text("Clear Access Tokens")
+                Text("Clear ID Tokens")
             }
-
             Button(onClick = {scope.launch {
                 Logger.d { "DB Pull" }
                 Logger.d { "${backendPull(client)}" }
@@ -138,10 +140,16 @@ fun MyScreen() {
                 Text("saveLastSync")
             }
             Button(onClick = {scope.launch {
-                val gemini : GeminiResponse? = enrichWordByGemini(client, "interaction")
+                val gemini : GeminiResponse? = enrichWordByGemini(client, "paper")
                 println(gemini?.antonymEn)
             }}){
-                Text("Gemini")
+                Text("Gemini paper")
+            }
+            Button(onClick = {scope.launch {
+                val gemini : GeminiResponse? = enrichWordByGemini(client, "computer")
+                println(gemini?.antonymEn)
+            }}){
+                Text("Gemini com")
             }
 
         }
@@ -165,10 +173,17 @@ data class Data(
 
 suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<SerializableWord>? {
     return try {
-        val response = client.get("${Secrets.LOCAL}/$api")
+        val response = client.get("${Secrets.BACKEND_API}/$api")
+
+        Logger.d { "Server Status: ${response.status}" }
+
+        val responseText = response.bodyAsText()
+        Logger.d { "Server Response: $responseText" }
+
         return response.body<List<SerializableWord>>()
     } catch (e: Exception) {
-        Logger.e { "Serialization Error: ${e.message}" }
+        Logger.e { "API Error: ${e.message}" }
+        e.printStackTrace()
         null
     }
 }

@@ -19,7 +19,7 @@ data class GeminiResponse(
 
 suspend fun enrichWordByGemini(client: HttpClient, word: String): GeminiResponse?{
     return try {
-        val response = client.get("${Secrets.LOCAL}/gemini") {
+        val response = client.get("${Secrets.BACKEND_API}/gemini") {
             url {
                 parameters.append("word", word)
             }

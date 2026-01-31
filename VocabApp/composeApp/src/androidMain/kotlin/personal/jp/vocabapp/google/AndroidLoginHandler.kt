@@ -26,4 +26,8 @@ class AndroidLoginHandler(private val context: Context) : LoginHandler {
         val customTabsIntent = builder.build()
         customTabsIntent.launchUrl(context, authUrl.toUri())
     }
+
+    override fun stop(){
+
+    }
 }

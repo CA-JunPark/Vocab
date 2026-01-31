@@ -17,12 +17,12 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import personal.jp.vocabapp.Secrets
 
-
 private val refreshClient = HttpClient(CIO) {
     install(ContentNegotiation) {
         json(Json { ignoreUnknownKeys = true })
     }
 }
+
 fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO) {
         install(ContentNegotiation) {
