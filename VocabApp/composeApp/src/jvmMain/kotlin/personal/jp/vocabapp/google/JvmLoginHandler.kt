@@ -21,11 +21,8 @@ class JvmLoginHandler : LoginHandler {
                 get("/callback") {
                     val code = call.parameters["code"]
                     if (code != null) {
-                        onCodeReceived(code)
                         call.respondText("Login successful! You can close this tab.")
-
-                        // Optional: Stop the server after receiving the code
-                        // server.stop(1000, 5000)
+                        onCodeReceived(code)
                     } else {
                         call.respondText("Authorization failed.")
                     }

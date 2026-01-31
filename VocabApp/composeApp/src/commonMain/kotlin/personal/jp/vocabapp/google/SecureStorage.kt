@@ -21,3 +21,5 @@ expect fun createDataStorage(context: Any? = null): DataStore<Preferences>
 
 const val ACCESS_TOKEN : String = "accessToken"
 const val REFRESH_TOKEN : String = "refreshToken"
+
+const val ID_TOKEN : String = "idToken"

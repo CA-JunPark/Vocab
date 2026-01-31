@@ -110,5 +110,6 @@ class AuthRepository(
         response.refreshToken?.let {
             secureStorage.saveToken(REFRESH_TOKEN, it)
         }
+        secureStorage.saveToken(ID_TOKEN, response.idToken ?: "")
     }
 }

@@ -30,6 +30,7 @@ import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.google.GeminiResponse
 import personal.jp.vocabapp.google.enrichWordByGemini
 import co.touchlab.kermit.Logger
+import personal.jp.vocabapp.google.ID_TOKEN
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
@@ -78,8 +79,8 @@ fun MyScreen() {
                 }
             }
             Button(onClick = {scope.launch {
-                val token = secureStorage.getToken(ACCESS_TOKEN)
-                Logger.d { "Token is: $token" }
+                val token = secureStorage.getToken(ID_TOKEN)
+                Logger.d { "ID Token is: $token" }
             }}){
                 Text("Check Tokens")
             }
@@ -87,7 +88,7 @@ fun MyScreen() {
                 secureStorage.deleteToken(ACCESS_TOKEN)
                 Logger.d { "Token deleted" }
             }}){
-                Text("Clear Tokens")
+                Text("Clear Access Tokens")
             }
 
             Button(onClick = {scope.launch {
