@@ -109,3 +109,5 @@
 - [ ] How to handle adding same word
 - [x] createWord function that does not need all fields
 - [ ] convert UTC to local time when displaying created/modified time
+- [ ] Tag Management
+- [ ] Gemini Model Switching if Request Per Day is exceeded

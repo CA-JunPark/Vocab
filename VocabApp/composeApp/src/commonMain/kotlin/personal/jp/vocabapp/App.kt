@@ -32,6 +32,8 @@ import personal.jp.vocabapp.google.ACCESS_TOKEN
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
+import personal.jp.vocabapp.google.GeminiResponse
+import personal.jp.vocabapp.google.enrichWordByGemini
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
@@ -138,6 +140,12 @@ fun MyScreen() {
                 println(keyDataManager.getLastSync())
             }}){
                 Text("saveLastSync")
+            }
+            Button(onClick = {scope.launch {
+                val gemini : GeminiResponse? = enrichWordByGemini(client, "interaction")
+                println(gemini?.antonymEn)
+            }}){
+                Text("Gemini")
             }
 
         }
