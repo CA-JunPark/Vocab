@@ -17,8 +17,12 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import personal.jp.vocabapp.Secrets
 
-//expect fun authClient(secureStorage: SecureStorage) :
 
+private val refreshClient = HttpClient(CIO) {
+    install(ContentNegotiation) {
+        json(Json { ignoreUnknownKeys = true })
+    }
+}
 fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -31,20 +35,15 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
         install(Auth) {
             bearer {
                 loadTokens {
-                    val access = secureStorage.getToken(ACCESS_TOKEN)
+                    val idToken = secureStorage.getToken(ID_TOKEN)
                     val refresh = secureStorage.getToken(REFRESH_TOKEN)
-                    if (access.isEmpty() || refresh.isEmpty()) null
-                    else BearerTokens(access, refresh)
+                    if (idToken.isEmpty() || refresh.isEmpty()) null
+                    else BearerTokens(idToken, refresh)
                 }
 
                 refreshTokens {
-                    // temp client for refresh
-                    val basicClient = HttpClient(CIO) {
-                        install(ContentNegotiation) { json() }
-                    }
-
                     try {
-                        val response = basicClient.post("https://oauth2.googleapis.com/token") {
+                        val response = refreshClient.post("https://oauth2.googleapis.com/token") {
                             setBody(FormDataContent(Parameters.build {
                                 append("grant_type", "refresh_token")
                                 append("refresh_token", oldTokens?.refreshToken ?: "")
@@ -55,19 +54,25 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
 
                         if (response.status.value == 200) {
                             val newToken: TokenResponse = response.body()
+                            // oldToken.accessToken is ID token
+                            val id = newToken.idToken ?: oldTokens?.accessToken ?: ""
                             val access = newToken.accessToken
-                            val refresh = newToken.refreshToken ?: oldTokens?.refreshToken ?: ""
+                            val refresh = newToken.refreshToken ?: oldTokens?.refreshToken
 
-                            secureStorage.saveToken(ACCESS_TOKEN, access)
-                            if (newToken.refreshToken != null) {
-                                secureStorage.saveToken(REFRESH_TOKEN, refresh)
-                            }
+                            // save to storage
                             newToken.idToken?.let {
                                 secureStorage.saveToken(ID_TOKEN, it)
-                                println("ID Token has been refreshed!")
+                            }
+                            secureStorage.saveToken(ACCESS_TOKEN, access)
+                            newToken.refreshToken?.let{
+                                secureStorage.saveToken(REFRESH_TOKEN, it)
                             }
 
-                            BearerTokens(access, refresh)
+                            if (id.isNotEmpty() && refresh != null) {
+                                BearerTokens(id, refresh)
+                            } else {
+                                null
+                            }
                         } else {
                             // if refresh fails, delete tokens
                             secureStorage.deleteToken(ACCESS_TOKEN)
@@ -77,8 +82,6 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                         }
                     } catch (e: Exception) {
                         null
-                    } finally {
-                        basicClient.close()
                     }
                 }
             }
