@@ -8,13 +8,13 @@
     - [x] JVM 
         - [x] get access and refresh token
         - [x] save token to secure storage (DPAPI + DataStore)
-        - [ ] get ID token
-        - [ ] save ID token to secure storage
+        - [x] get ID token
+        - [x] save ID token to secure storage
     - [x] Android
         - [x] get access and refresh token
         - [x] save token to secure storage (AndroidKeyStore + Google Tink + DataStore)
-        - [ ] get ID token
-        - [ ] save ID token to secure storage
+        - [x] get ID token
+        - [x] save ID token to secure storage
     - load ID token on client Bearer Header
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
