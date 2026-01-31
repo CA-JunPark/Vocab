@@ -4,43 +4,46 @@ package personal.jp.vocabapp.sql
 // CRUD concepts
 
 import db.WordDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import co.touchlab.kermit.Logger
 import db.Word as Word
 
 interface WordRepo {
-    fun findWordOrNull(name: String): Word?
-    fun findAllWords(): List<Word>
-    fun addWord(word: Word): Boolean
-    fun updateWord(word: Word): Boolean
-    fun upsertWord(word: Word): Boolean
-    fun deleteWord(name: String): Boolean
-    fun countWords(): Int
-    fun deleteAllWords(): Boolean
-    fun setSync(name: String): Boolean
-    fun getUnsyncedWords(lastSyncedTime: String): List<Word>
+    suspend fun findWordOrNull(name: String): Word?
+    suspend fun findAllWords(): List<Word>
+    suspend fun addWord(word: Word): Boolean
+    suspend fun updateWord(word: Word): Boolean
+    suspend fun upsertWord(word: Word): Boolean
+    suspend fun deleteWord(name: String): Boolean
+    suspend fun countWords(): Int
+    suspend fun deleteAllWords(): Boolean
+    suspend fun setSync(name: String): Boolean
+    suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word>
 }
 
 // TODO Exception handling
 class WordRepoImpl(db: WordDatabase): WordRepo {
     private val _queries = db.wordDatabaseQueries
 
-    override fun findWordOrNull(name: String): Word? {
-        return try{
+    override suspend fun findWordOrNull(name: String): Word? = withContext(Dispatchers.IO) {
+        try{
             _queries.selectWord(name).executeAsOneOrNull()
         } catch (e: Exception){
             null
         }
     }
 
-    override fun findAllWords(): List<Word> {
-        return try{
+    override suspend fun findAllWords(): List<Word> = withContext(Dispatchers.IO) {
+        try{
             _queries.selectAllWordsInfo().executeAsList()
         } catch (e: Exception){
             emptyList()
         }
     }
 
-    override fun addWord(word: Word): Boolean {
-        return try {
+    override suspend fun addWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+        try {
             _queries.insertWord(
                 name = word.name,
                 meaningKr = word.meaningKr,
@@ -51,13 +54,13 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
             )
             true
         } catch (e: Exception) {
-            println("Error: ${e.message}")
+            Logger.e { "Error: ${e.message}" }
             false
         }
     }
 
-    override fun deleteWord(name: String): Boolean {
-        return try{
+    override suspend fun deleteWord(name: String): Boolean = withContext(Dispatchers.IO) {
+        try{
             _queries.deletedWord(name)
             true
         } catch (e: Exception){
@@ -65,8 +68,8 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun updateWord(word: Word): Boolean {
-        return try{
+    override suspend fun updateWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+        try{
             _queries.updateWord(word.meaningKr, word.example, word.antonymEn, word.tags, word.note,
                                 word.name,)
             true
@@ -75,8 +78,8 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun upsertWord(word: Word): Boolean {
-        return try {
+    override suspend fun upsertWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+        try {
             _queries.upsertWord(
                 word.name, word.meaningKr, word.example, word.antonymEn, word.tags, word.note)
             true
@@ -85,16 +88,16 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun countWords(): Int {
-        return try{
+    override suspend fun countWords(): Int = withContext(Dispatchers.IO) {
+        try{
             _queries.countWords().executeAsOne().toInt()
         } catch (e: Exception){
             0
         }
     }
 
-    override fun deleteAllWords(): Boolean {
-        return try {
+    override suspend fun deleteAllWords(): Boolean = withContext(Dispatchers.IO) {
+        try {
             _queries.deleteAllWords()
             true
         } catch (e: Exception) {
@@ -102,8 +105,8 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun setSync(name: String): Boolean {
-        return try{
+    override suspend fun setSync(name: String): Boolean = withContext(Dispatchers.IO) {
+        try{
             _queries.setSync(name)
             true
         } catch (e: Exception){
@@ -111,8 +114,8 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override fun getUnsyncedWords(lastSyncedTime: String): List<Word> {
-        return try {
+    override suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word> = withContext(Dispatchers.IO) {
+        try {
             _queries.selectUnsyncedWord(lastSyncedTime).executeAsList()
         } catch (e: Exception) {
             emptyList()

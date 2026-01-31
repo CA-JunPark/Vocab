@@ -15,13 +15,13 @@ class AndroidLoginHandler(private val context: Context) : LoginHandler {
         val encodedRedirectUri = URLEncoder.encode(redirectUri, "UTF-8")
         val encodedScope = URLEncoder.encode("https://www.googleapis.com/auth/userinfo.profile", "UTF-8")
 
-        // 2. Build URL - Ensure no spaces or hidden characters
         val authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=$clientId&" +
                 "redirect_uri=$encodedRedirectUri&" +
                 "scope=$encodedScope&" +
                 "response_type=code"
-        // 2. Launch the browser/Custom Tab
+        
+        // launch custom browser tab
         val builder = CustomTabsIntent.Builder()
         val customTabsIntent = builder.build()
         customTabsIntent.launchUrl(context, authUrl.toUri())

@@ -34,6 +34,7 @@ import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.google.GeminiResponse
 import personal.jp.vocabapp.google.enrichWordByGemini
+import co.touchlab.kermit.Logger
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
@@ -84,27 +85,27 @@ fun MyScreen() {
             }
             Button(onClick = {scope.launch {
                 val token = secureStorage.getToken(ACCESS_TOKEN)
-                println("Token is: $token")
+                Logger.d { "Token is: $token" }
             }}){
                 Text("Check Tokens")
             }
             Button(onClick = {scope.launch {
                 secureStorage.deleteToken(ACCESS_TOKEN)
-                println("Token deleted")
+                Logger.d { "Token deleted" }
             }}){
                 Text("Clear Tokens")
             }
 
             Button(onClick = {scope.launch {
-                println("DB Pull")
-                println(backendPull(client))
+                Logger.d { "DB Pull" }
+                Logger.d { "${backendPull(client)}" }
             }}){
                 Text("DB pull")
             }
             Button(onClick = {scope.launch {
                 service.deleteAllWords()
-                println("Add word")
-                println("Count: ${service.countWords()}")
+                Logger.d { "Add word" }
+                Logger.d { "Count: ${service.countWords()}" }
                 try{
                     service.addWord(
                         createWord(
@@ -121,23 +122,23 @@ fun MyScreen() {
                         )
                     )
                 } catch (e: Exception){
-                    println("Error: ${e.message}")
+                    Logger.e { "Error: ${e.message}" }
                 }
-                println("Count: ${service.countWords()}")
+                Logger.d { "Count: ${service.countWords()}" }
             }}){
                 Text("Add Word")
             }
             Button(onClick = {scope.launch {
-                println("Sync")
+                Logger.d { "Sync" }
                 sync(client, service, keyDataManager)
-                println("Count: ${service.countWords()}")
-                println("Words:" + service.getAllWords())
+                Logger.d { "Count: ${service.countWords()}" }
+                Logger.d { "Words:" + service.getAllWords() }
             }}){
                 Text("Sync")
             }
             Button(onClick = {scope.launch {
                 keyDataManager.saveLastSync()
-                println(keyDataManager.getLastSync())
+                Logger.d { "${keyDataManager.getLastSync()}" }
             }}){
                 Text("saveLastSync")
             }
@@ -172,7 +173,7 @@ suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<
         val response = client.get("${Secrets.LOCAL}/$api")
         return response.body<List<SerializableWord>>()
     } catch (e: Exception) {
-        println("Serialization Error: ${e.message}")
+        Logger.e { "Serialization Error: ${e.message}" }
         null
     }
 }
