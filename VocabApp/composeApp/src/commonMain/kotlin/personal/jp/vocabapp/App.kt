@@ -13,14 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import db.Word
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
@@ -38,7 +33,6 @@ import co.touchlab.kermit.Logger
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
-import personal.jp.vocabapp.sql.toSerializable
 import personal.jp.vocabapp.sql.KeyDataManager
 
 @Composable
@@ -138,7 +132,7 @@ fun MyScreen() {
             }
             Button(onClick = {scope.launch {
                 keyDataManager.saveLastSync()
-                Logger.d { "${keyDataManager.getLastSync()}" }
+                Logger.d { keyDataManager.getLastSync() }
             }}){
                 Text("saveLastSync")
             }

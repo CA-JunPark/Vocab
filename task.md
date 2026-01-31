@@ -61,8 +61,8 @@
 ### API Services
 - [x] Implement `GoogleSignInService`
 - [ ] Implement `GeminiService`
-    - [ ] Prompt Engineering
-    - [ ] miss-spelling correction
+    - [x] Prompt Engineering
+    - [x] miss-spelling correction
     - [x] JSON response
 - [x] Implement `TursoService`
     - [x] `syncDB()`: sync localDB and remoteDB
@@ -113,10 +113,6 @@
     - [ ] FAB (+) to add new word to DB
 
 ## 5. Integration & Polish & Debugging
-- [ ] Google Sign-in integration (KMPAuth)
-- [ ] Token management (SharedPreferences/Keychain)
-- [ ] Testing & Bug Fixes
-- [ ] How to handle adding same word
 - [x] createWord function that does not need all fields
 - [ ] convert UTC to local time when displaying created/modified time
 - [ ] Tag Management
