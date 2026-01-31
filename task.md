@@ -34,9 +34,9 @@
 - [x] Setup Gemini
 - [ ] Connect Google Cloud Run to Turso and Gemini
     - [x] assign url
-    - [ ] turso
-    - [ ] gemini
-    - [ ] check id token for all connections
+    - [x] turso
+    - [x] gemini
+    - [x] check id token for all connections
     - [ ] need to check refreshing token works
 - [ ] Setup Glance for Android widget
 
