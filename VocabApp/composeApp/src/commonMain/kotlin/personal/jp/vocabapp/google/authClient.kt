@@ -5,13 +5,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -85,6 +89,16 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                     }
                 }
             }
+        }
+    }.apply {
+        // Use HttpSend to intercept every request just before it goes out.
+        plugin(HttpSend).intercept { request ->
+            val idToken = secureStorage.getToken(ID_TOKEN)
+
+            if (idToken.isNotEmpty()) {
+                request.headers[HttpHeaders.Authorization] = "Bearer $idToken"
+            }
+            execute(request)
         }
     }
 }

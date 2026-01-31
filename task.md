@@ -117,4 +117,4 @@
 - [ ] convert UTC to local time when displaying created/modified time
 - [ ] Tag Management
 - [ ] Gemini Model Switching if Request Per Day is exceeded
-- [ ] load tokens to header after google login (right now the app needs to be restarted)
+- [x] load tokens to header after google login (right now the app needs to be restarted)
