@@ -3,6 +3,7 @@
 ## 1. Project Setup & Core Architecture
 - [x] Configure KMP project with `androidApp` and `desktopApp` targets
 - [x] Setup Koin for dependency injection
+    - [ ] Koin ViewModels using androidx-lifecycle-viewmodel
 - [x] Setup SQLDelight for database
 - [ ] Setup Google OAuth2 for Android and Desktop
     - [x] JVM 
