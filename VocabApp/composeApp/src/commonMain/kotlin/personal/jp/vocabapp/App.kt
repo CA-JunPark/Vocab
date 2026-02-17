@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -36,6 +37,12 @@ import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.KeyDataManager
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
+import org.koin.compose.viewmodel.koinViewModel
+import personal.jp.vocabapp.di.WordEnrichmentScreen
+import personal.jp.vocabapp.di.WordEnrichmentViewModel
+import personal.jp.vocabapp.di.WordUiState
 
 @Composable
 @Preview
@@ -151,7 +158,7 @@ fun MyScreen() {
             }}){
                 Text("Gemini com")
             }
-
+            WordEnrichmentScreen("potato")
         }
     }
 }
@@ -187,3 +194,4 @@ suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<
         null
     }
 }
+

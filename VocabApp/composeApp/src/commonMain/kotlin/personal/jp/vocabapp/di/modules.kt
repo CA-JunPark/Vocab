@@ -35,6 +35,7 @@ fun wordModule(driverFactory: DriverFactory) = module{
     singleOf(::WordRepoImpl) { bind<WordRepo>() }
     singleOf(::WordServiceImpl) { bind<WordService>() }
     viewModelOf(::WordViewModel)
+    viewModelOf(::WordEnrichmentViewModel)
 }
 
 fun apiModule() = module{

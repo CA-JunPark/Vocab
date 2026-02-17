@@ -70,6 +70,7 @@ kotlin {
             // The Preferences DataStore library
             implementation(libs.androidx.datastore.preferences)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0-alpha06")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
