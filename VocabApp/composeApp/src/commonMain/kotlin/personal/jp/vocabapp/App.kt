@@ -1,5 +1,6 @@
 package personal.jp.vocabapp
 
+import VocabAppTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,7 +62,7 @@ fun MyScreen() {
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
 
-    MaterialTheme {
+    VocabAppTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
