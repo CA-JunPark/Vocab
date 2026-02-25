@@ -10,34 +10,39 @@ import androidx.compose.ui.graphics.Color
 import personal.jp.vocabapp.google.GeminiResponse
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import db.Word
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import personal.jp.vocabapp.google.enrichWordByGemini
+import kotlinx.coroutines.delay
+import personal.jp.vocabapp.sql.WordService
+import personal.jp.vocabapp.sql.WordServiceImpl
 
 sealed class WordUiState {
     object Idle : WordUiState()
     object Loading : WordUiState()
-    data class Success(val data: GeminiResponse) : WordUiState()
+    data class Success(val data: Word) : WordUiState()
     data class Error(val message: String) : WordUiState()
 }
 
-class WordEnrichmentViewModel(private val client: HttpClient) : ViewModel() {
-
+class WordViewModel(private val wordService: WordService) : ViewModel() {
     private val _uiState = MutableStateFlow<WordUiState>(WordUiState.Idle)
     val uiState: StateFlow<WordUiState> = _uiState
 
-    fun enrichWord(word: String) {
+    fun fetchWord(word: String){
         viewModelScope.launch {
             _uiState.value = WordUiState.Loading
 
-            val result = enrichWordByGemini(client, word)
+            val result = wordService.getWordOrNull(word)
 
-            if (result != null) {
+            if (result != null){
                 _uiState.value = WordUiState.Success(result)
-            } else {
+            }
+            else {
                 _uiState.value = WordUiState.Error("Failed to fetch word details.")
             }
         }
@@ -45,21 +50,24 @@ class WordEnrichmentViewModel(private val client: HttpClient) : ViewModel() {
 }
 
 @Composable
-fun WordEnrichmentScreen(word: String) {
-    val viewModel: WordEnrichmentViewModel = koinViewModel()
+fun WordScreen(word: String) {
+    val viewModel: WordViewModel = koinViewModel()
     val state = viewModel.uiState.collectAsState().value
 
     Column {
-        Button(onClick = { viewModel.enrichWord(word) }) {
-            Text("Enrich Word")
+
+        Button(onClick = {
+            viewModel.fetchWord(word)
+        }) {
+            Text("Enrich Word (offline)")
         }
 
         when (state) {
             is WordUiState.Loading -> CircularProgressIndicator()
             is WordUiState.Success -> {
-                Text("Meaning: ${state.data.meaningKr.joinToString()}")
-                Text("Example: ${state.data.example.firstOrNull() ?: ""}")
+                Text("Meaning: ${state.data}")
             }
+
             is WordUiState.Error -> Text("Error: ${state.message}", color = Color.Red)
             else -> Text("Enter a word to start")
         }

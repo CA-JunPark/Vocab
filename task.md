@@ -70,7 +70,7 @@
 
 ## 3. UI Layer (Compose Multiplatform)
 ### Design System
-- [ ] Define Typography, Colors (Material 3), and Theme
+- [x] Define Theme of colors
 
 ### Screens
 - [ ] **Main List Screen**

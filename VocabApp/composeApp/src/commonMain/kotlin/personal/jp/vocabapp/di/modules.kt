@@ -19,7 +19,7 @@ import personal.jp.vocabapp.sql.WordRepo
 import personal.jp.vocabapp.sql.WordRepoImpl
 import personal.jp.vocabapp.sql.WordService
 import personal.jp.vocabapp.sql.WordServiceImpl
-import personal.jp.vocabapp.sql.WordViewModel
+import personal.jp.vocabapp.di.WordViewModel
 
 
 expect val platformModule: Module
@@ -35,7 +35,6 @@ fun wordModule(driverFactory: DriverFactory) = module{
     singleOf(::WordRepoImpl) { bind<WordRepo>() }
     singleOf(::WordServiceImpl) { bind<WordService>() }
     viewModelOf(::WordViewModel)
-    viewModelOf(::WordEnrichmentViewModel)
 }
 
 fun apiModule() = module{
