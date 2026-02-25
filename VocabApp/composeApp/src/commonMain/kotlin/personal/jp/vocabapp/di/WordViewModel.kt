@@ -59,7 +59,7 @@ fun WordScreen(word: String) {
         Button(onClick = {
             viewModel.fetchWord(word)
         }) {
-            Text("Enrich Word (offline)")
+            Text("Get Potato")
         }
 
         when (state) {

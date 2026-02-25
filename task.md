@@ -16,7 +16,8 @@
         - [x] save token to secure storage (AndroidKeyStore + Google Tink + DataStore)
         - [x] get ID token
         - [x] save ID token to secure storage
-    - load ID token on client Bearer Header
+    - [x] load ID token on client Bearer Header
+    - [ ] Silent Sign in on App Start
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
     - [x] need to add Auth Header to requests 
