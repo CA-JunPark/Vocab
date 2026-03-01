@@ -24,7 +24,6 @@ fun VocabTheme(
 ) {
     val colorScheme = DarkColorScheme
 
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = getAppTypography(),
