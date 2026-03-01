@@ -29,14 +29,14 @@ https://sqldelight.github.io/sqldelight/latest/multiplatform_sqlite/#__tabbed_3_
     - [x] DB to Repository
     - [x] Repository to Services 
     - [ ] Services to ViewModels
-- [ ] Setup Ktor for proxy server.
-- [ ] Setup Google Sign-in for Android and Desktop.
-- [ ] Setup Turso for cloud storage.
-    - [ ] sync local DB and remote DB
-- [ ] Setup Gemini for content generation.
-    - [ ] GeminiService
-    - [ ] Prompt engineering for strict JSON response.
-    - [ ] Result validation (JSON).
+- [x] Setup Ktor for proxy server.
+- [x] Setup Google Sign-in for Android and Desktop.
+- [x] Setup Turso for cloud storage.
+    - [x] sync local DB and remote DB
+- [x] Setup Gemini for content generation.
+    - [x] GeminiService
+    - [x] Prompt engineering for strict JSON response.
+    - [x] Result validation (JSON).
 - [ ] Setup Glance for Android widget.
 
 ### 2. Data Layer

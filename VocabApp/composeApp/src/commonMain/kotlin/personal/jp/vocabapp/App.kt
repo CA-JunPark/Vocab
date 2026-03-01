@@ -1,6 +1,6 @@
 package personal.jp.vocabapp
 
-import VocabAppTheme
+import personal.jp.vocabapp.theme.VocabTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +36,7 @@ import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.KeyDataManager
-import personal.jp.vocabapp.di.WordScreen
+import personal.jp.vocabapp.viewmodels.WordScreen
 
 @Composable
 @Preview
@@ -55,11 +55,11 @@ fun MyScreen() {
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
 
-    VocabAppTheme {
+    VocabTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.background)
                 .safeContentPadding()
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
