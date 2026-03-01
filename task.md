@@ -107,6 +107,8 @@
     - [ ] Manual Sync button
     - [ ] Tag list
     - [ ] ESC to close (Desktop only)
+    - [ ] The Legal/Credits Button
+- [ ] The Legal/Credits Screen
 
 ### Loding / Skeleton UI
 - [ ] Add Skeleton UI for loading states
