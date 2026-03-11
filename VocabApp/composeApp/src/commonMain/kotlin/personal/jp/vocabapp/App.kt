@@ -64,95 +64,97 @@ fun MyScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { scope.launch{
-                authRepository.startLogin()
-            } }) {
-                Text("Login with Google.")
-            }
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click meee!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-            Button(onClick = {scope.launch {
-                val token = secureStorage.getToken(ID_TOKEN)
-                Logger.d { "ID Token is: $token" }
-            }}){
-                Text("Check Tokens")
-            }
-            Button(onClick = {scope.launch {
-                secureStorage.deleteToken(ID_TOKEN)
-                Logger.d { "ID Token deleted" }
-            }}){
-                Text("Clear ID Tokens")
-            }
-            Button(onClick = {scope.launch {
-                Logger.d { "DB Pull" }
-                Logger.d { "${backendPull(client)}" }
-            }}){
-                Text("DB pull")
-            }
-            Button(onClick = {scope.launch {
-                service.deleteAllWords()
-                Logger.d { "Add word" }
-                Logger.d { "Count: ${service.countWords()}" }
-                try{
-                    service.addWord(
-                        createWord(
-                            name = "potato",
-                            meaningKr = "감자",
-                            example = "I had potato",
-                        )
-                    )
-                    service.addWord(
-                        createWord(
-                            name = "Sweet potato",
-                            meaningKr = "고구마",
-                            example = "I had sweet potato",
-                        )
-                    )
-                } catch (e: Exception){
-                    Logger.e { "Error: ${e.message}" }
-                }
-                Logger.d { "Count: ${service.countWords()}" }
-            }}){
-                Text("Add Word")
-            }
-            Button(onClick = {scope.launch {
-                Logger.d { "Sync" }
-                sync(client, service, keyDataManager)
-                Logger.d { "Count: ${service.countWords()}" }
-                Logger.d { "Words:" + service.getAllWords() }
-            }}){
-                Text("Sync")
-            }
-            Button(onClick = {scope.launch {
-                keyDataManager.saveLastSync()
-                Logger.d { keyDataManager.getLastSync() }
-            }}){
-                Text("saveLastSync")
-            }
-            Button(onClick = {scope.launch {
-                val gemini : GeminiResponse? = enrichWordByGemini(client, "paper")
-                println(gemini?.antonymEn)
-            }}){
-                Text("Gemini paper")
-            }
-            Button(onClick = {scope.launch {
-                val gemini : GeminiResponse? = enrichWordByGemini(client, "computer")
-                println(gemini?.antonymEn)
-            }}){
-                Text("Gemini com")
-            }
+//            Button(onClick = { scope.launch{
+//                authRepository.startLogin()
+//            } }) {
+//                Text("Login with Google.")
+//            }
+//            Button(onClick = { showContent = !showContent }) {
+//                Text("Click meee!")
+//            }
+//            AnimatedVisibility(showContent) {
+//                val greeting = remember { Greeting().greet() }
+//                Column(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
+//                    Text("Compose: $greeting")
+//                }
+//            }
+//            Button(onClick = {scope.launch {
+//                val token = secureStorage.getToken(ID_TOKEN)
+//                Logger.d { "ID Token is: $token" }
+//            }}){
+//                Text("Check Tokens")
+//            }
+//            Button(onClick = {scope.launch {
+//                secureStorage.deleteToken(ID_TOKEN)
+//                Logger.d { "ID Token deleted" }
+//            }}){
+//                Text("Clear ID Tokens")
+//            }
+//            Button(onClick = {scope.launch {
+//                Logger.d { "DB Pull" }
+//                Logger.d { "${backendPull(client)}" }
+//            }}){
+//                Text("DB pull")
+//            }
+//            Button(onClick = {scope.launch {
+//                service.deleteAllWords()
+//                Logger.d { "Add word" }
+//                Logger.d { "Count: ${service.countWords()}" }
+//                try{
+//                    service.addWord(
+//                        createWord(
+//                            name = "potato",
+//                            meaningKr = "감자",
+//                            example = "I had potato",
+//                            tags="food, vegetable"
+//                        )
+//                    )
+//                    service.addWord(
+//                        createWord(
+//                            name = "sweet potato",
+//                            meaningKr = "고구마",
+//                            example = "I had sweet potato",
+//                        )
+//                    )
+//                } catch (e: Exception){
+//                    Logger.e { "Error: ${e.message}" }
+//                }
+//                Logger.d { "Count: ${service.countWords()}" }
+//            }}){
+//                Text("Add Word")
+//            }
+//            Button(onClick = {scope.launch {
+//                Logger.d { "Sync" }
+//                sync(client, service, keyDataManager)
+//                Logger.d { "Count: ${service.countWords()}" }
+//                Logger.d { "Words:" + service.getAllWords() }
+//            }}){
+//                Text("Sync")
+//            }
+//            Button(onClick = {scope.launch {
+//                keyDataManager.saveLastSync()
+//                Logger.d { keyDataManager.getLastSync() }
+//            }}){
+//                Text("saveLastSync")
+//            }
+//            Button(onClick = {scope.launch {
+//                val gemini : GeminiResponse? = enrichWordByGemini(client, "paper")
+//                println(gemini?.antonymEn)
+//            }}){
+//                Text("Gemini paper")
+//            }
+//            Button(onClick = {scope.launch {
+//                val gemini : GeminiResponse? = enrichWordByGemini(client, "computer")
+//                println(gemini?.antonymEn)
+//            }}){
+//                Text("Gemini com")
+//            }
             WordScreen("potato")
+            WordScreen("sweet potato")
         }
     }
 }

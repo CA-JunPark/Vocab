@@ -71,6 +71,7 @@ kotlin {
             implementation(libs.androidx.datastore.preferences)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0-alpha06")
+            implementation(compose.materialIconsExtended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -79,7 +80,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.androidx.room.common.jvm)
-            implementation("org.slf4j:slf4j-nop:2.0.9")
+            implementation("org.slf4j:slf4j-nop:2.0.17")
             implementation(libs.ktor.client.java)
             implementation(libs.ktor.server.core)
             implementation(libs.ktor.server.netty)

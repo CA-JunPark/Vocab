@@ -10,6 +10,7 @@ import personal.jp.vocabapp.google.authClient
 import db.WordDatabase
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import personal.jp.vocabapp.sql.DriverFactory
 import personal.jp.vocabapp.sql.KeyDataManager
@@ -32,7 +33,7 @@ fun wordModule(driverFactory: DriverFactory) = module{
     single { WordDatabase(driverFactory.createDriver()) }
     singleOf(::WordRepoImpl) { bind<WordRepo>() }
     singleOf(::WordServiceImpl) { bind<WordService>() }
-    viewModelOf(::WordViewModel)
+    viewModel { WordViewModel(get()) }
 }
 
 fun apiModule() = module{

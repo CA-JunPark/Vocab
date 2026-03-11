@@ -59,6 +59,10 @@
     - [x] Update all `LastSyncTime` if success
     - [x] Batch update local DB from remote
     - [x] Show sync results (deleted, updated, added)
+- [ ] Tag Management
+    - [ ] `tag_name` and `color` field
+    - [ ] Add tag
+    - [ ] Delete tag
 
 ### API Services
 - [x] Implement `GoogleSignInService`
