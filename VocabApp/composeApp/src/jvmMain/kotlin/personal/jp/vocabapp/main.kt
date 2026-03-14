@@ -1,7 +1,9 @@
 package personal.jp.vocabapp
 
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.sunildhiman90.kmauth.core.KMAuthConfig
 import com.sunildhiman90.kmauth.core.KMAuthInitializer
 import com.sunildhiman90.kmauth.google.KMAuthGoogle
@@ -30,6 +32,11 @@ import kotlin.text.append
 // JVM
 fun main() = application {
 
+    val windowState = rememberWindowState(
+        width = 450.dp,
+        height = 900.dp
+    )
+
     startKoin{
         modules(wordModule(getDriverFactory()), apiModule(),
             platformModule, authModule
@@ -38,7 +45,9 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
+        state = windowState,
         title = "VocabApp",
+        resizable = true
     ) {
         App()
     }

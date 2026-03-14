@@ -51,7 +51,6 @@ import personal.jp.vocabapp.viewmodels.WordWithTags
 @Composable
 @Preview
 fun App() {
-
     MyScreen()
 }
 
