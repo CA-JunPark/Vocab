@@ -47,6 +47,12 @@ class KeyDataManager(private val dataStore: DataStore<Preferences>) {
         return token
     }
 
+    suspend fun resetSyncTime(){
+        dataStore.edit { settings ->
+            settings[stringPreferencesKey("lastSyncedTime")] = "1970-01-01 00:00:00"
+        }
+    }
+
     fun getSqlTimestamp(): String {
         val now = Clock.System.now()
         // use TimeZone.UTC for consistency

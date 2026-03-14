@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.Secrets
 import co.touchlab.kermit.Logger
 import db.Tag
+import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Serializable
@@ -28,7 +29,6 @@ data class SerializableWord(
 )
 
 fun toSerializable(word: Word, tags: List<Tag>): SerializableWord {
-
     return SerializableWord(
         name = word.name,
         meaningKr = word.meaningKr,
@@ -80,7 +80,8 @@ data class SyncResponse(
 
 suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager) {
     try {
-        val lastSyncedTime = keyDataManager.getLastSync() ?: "1970-01-01T00:00:00Z"
+        val lastSyncedTime = keyDataManager.getLastSync() ?: "1970-01-01 00:00:00"
+        Logger.d {"lastSyncedTime: $lastSyncedTime"}
         val unsyncedWordsRaw = wordService.getUnsyncedWords(lastSyncedTime)
 
         val localChanges = unsyncedWordsRaw.map { word ->
@@ -95,13 +96,16 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
 
         val syncResult = response.body<SyncResponse>()
 
+        Logger.d {"Sync Count: ${syncResult.wordsToUpdate.size}"}
         for (sWord in syncResult.wordsToUpdate) {
+            println("Updating word: ${sWord.name}")
             val (word, tags) = fromSerializable(sWord)
             // assign colors in upserWord
             wordService.upsertWord(word, tags)
             wordService.setSync(word.name)
         }
 
+        Logger.d {"serverTime: ${syncResult.serverTime}"}
         keyDataManager.saveLastSync(syncResult.serverTime)
     } catch (e: Exception) {
         Logger.e { "Sync Failed: ${e.message}" }

@@ -1,5 +1,6 @@
 package personal.jp.vocabapp.google
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -38,6 +39,7 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
         }
         install(Auth) {
             bearer {
+                ->
                 loadTokens {
                     val idToken = secureStorage.getToken(ID_TOKEN)
                     val refresh = secureStorage.getToken(REFRESH_TOKEN)
@@ -46,6 +48,7 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                 }
 
                 refreshTokens {
+                    Logger.i { "401 Unauthorized detected. Attempting to refresh token..." }
                     try {
                         val response = refreshClient.post("https://oauth2.googleapis.com/token") {
                             setBody(FormDataContent(Parameters.build {
@@ -57,48 +60,34 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                         }
 
                         if (response.status.value == 200) {
-                            val newToken: TokenResponse = response.body()
+                            val tokenData: TokenResponse = response.body()
                             // oldToken.accessToken is ID token
-                            val id = newToken.idToken ?: oldTokens?.accessToken ?: ""
-                            val access = newToken.accessToken
-                            val refresh = newToken.refreshToken ?: oldTokens?.refreshToken
+                            val newIdToken = tokenData.idToken ?: ""
+                            val newRefreshToken = tokenData.refreshToken ?: oldTokens?.refreshToken ?: ""
 
                             // save to storage
-                            newToken.idToken?.let {
-                                secureStorage.saveToken(ID_TOKEN, it)
+                            if (newIdToken.isNotEmpty()) {
+                                secureStorage.saveToken(ID_TOKEN, newIdToken)
                             }
-                            secureStorage.saveToken(ACCESS_TOKEN, access)
-                            newToken.refreshToken?.let{
-                                secureStorage.saveToken(REFRESH_TOKEN, it)
+                            if (newRefreshToken.isNotEmpty()) {
+                                secureStorage.saveToken(REFRESH_TOKEN, newRefreshToken)
                             }
 
-                            if (id.isNotEmpty() && refresh != null) {
-                                BearerTokens(id, refresh)
-                            } else {
-                                null
-                            }
+                            Logger.i { "Token refreshed successfully." }
+                            BearerTokens(newIdToken, newRefreshToken)
                         } else {
                             // if refresh fails, delete tokens
-                            secureStorage.deleteToken(ACCESS_TOKEN)
-                            secureStorage.deleteToken(REFRESH_TOKEN)
+                            Logger.e { "Refresh failed: ${response.status}" }
                             secureStorage.deleteToken(ID_TOKEN)
+                            secureStorage.deleteToken(REFRESH_TOKEN)
                             null
                         }
                     } catch (e: Exception) {
                         null
                     }
                 }
-            }
-        }
-    }.apply {
-        // Use HttpSend to intercept every request just before it goes out.
-        plugin(HttpSend).intercept { request ->
-            val idToken = secureStorage.getToken(ID_TOKEN)
 
-            if (idToken.isNotEmpty()) {
-                request.headers[HttpHeaders.Authorization] = "Bearer $idToken"
             }
-            execute(request)
         }
     }
 }
