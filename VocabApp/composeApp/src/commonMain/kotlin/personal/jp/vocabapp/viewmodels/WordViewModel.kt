@@ -82,11 +82,6 @@ fun WordScreen(word: String) {
     LaunchedEffect(word) {
         viewModel.fetchWord(word)
     }
-    LaunchedEffect(state) {
-        if (state is WordUiState.Success) {
-            println("UI received success: ${state.data}")
-        }
-    }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.padding(16.dp)

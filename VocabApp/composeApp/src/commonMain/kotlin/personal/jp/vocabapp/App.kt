@@ -38,6 +38,7 @@ import personal.jp.vocabapp.google.GeminiResponse
 import personal.jp.vocabapp.google.enrichWordByGemini
 import co.touchlab.kermit.Logger
 import io.ktor.client.statement.bodyAsText
+import personal.jp.vocabapp.Screens.MainScreen
 import personal.jp.vocabapp.google.ID_TOKEN
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.sync
@@ -65,27 +66,38 @@ fun MyScreen() {
     val keyDataManager : KeyDataManager = koinInject()
 
     var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
-    LaunchedEffect(Unit) {
-        val words = service.getAllWords()
-        allWordsWithTags = words.map { word ->
-            val tags = service.getTagsForWord(word.name)
-            WordWithTags(word, tags)
+
+    // refresh Words
+    val refreshWords = {
+        scope.launch {
+            val rawWords = service.getAllWords()
+            allWordsWithTags = rawWords.map { word ->
+                WordWithTags(word, service.getTagsForWord(word.name))
+            }
         }
     }
+    LaunchedEffect(Unit) {
+        refreshWords()
+    }
+
     VocabTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { scope.launch{
-                authRepository.startLogin()
-            } }) {
-                Text("Login with Google.")
-            }
+        MainScreen(
+            wordsList = allWordsWithTags
+        )
+
+//        var showContent by remember { mutableStateOf(false) }
+//        Column(
+//            modifier = Modifier
+//                .background(MaterialTheme.colorScheme.background)
+//                .safeContentPadding()
+//                .fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//        ) {
+//            Button(onClick = { scope.launch{
+//                authRepository.startLogin()
+//            } }) {
+//                Text("Login with Google.")
+//            }
 //            Button(onClick = { showContent = !showContent }) {
 //                Text("Click meee!")
 //            }
@@ -169,10 +181,10 @@ fun MyScreen() {
 //            }}){
 //                Text("Gemini com")
 //            }
-            allWordsWithTags.forEach {
-                WordScreen(it.word.name)
-            }
-        }
+//            allWordsWithTags.forEach {
+//                WordScreen(it.word.name)
+//            }
+//        }
     }
 }
 
