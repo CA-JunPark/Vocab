@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,8 +39,10 @@ import personal.jp.vocabapp.sql.WordService
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.VolumeUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.draw.clip
 import db.Tag
+import personal.jp.vocabapp.theme.VocabTheme
 
 data class WordWithTags(
     val word: Word,
@@ -89,10 +92,19 @@ fun WordScreen(word: String) {
         modifier = Modifier.padding(16.dp)
     ) {
 
-        Button(onClick = {
-            println("Potato Click")
-            // open detail
-        }) {
+        Button(
+            onClick = {
+                println("Click")
+                // open detail
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            contentPadding = PaddingValues(0.dp),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
             when (state) {
                 is WordUiState.Loading -> CircularProgressIndicator()
                 is WordUiState.Success -> {

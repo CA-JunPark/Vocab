@@ -112,7 +112,7 @@ WHERE wt.wordName = ?;
 searchTags:
 SELECT * FROM Tag
 WHERE tagName LIKE ('%' || :query || '%')
-LIMIT 10;
+LIMIT 4;
 
 updateTag:
 UPDATE Tag

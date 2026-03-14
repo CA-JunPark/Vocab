@@ -105,58 +105,58 @@ fun MyScreen() {
 //            }}){
 //                Text("Check Tokens")
 //            }
-            Button(onClick = {scope.launch {
-                secureStorage.deleteToken(ID_TOKEN)
-                Logger.d { "ID Token deleted" }
-            }}){
-                Text("Clear ID Tokens")
-            }
+//            Button(onClick = {scope.launch {
+//                secureStorage.deleteToken(ID_TOKEN)
+//                Logger.d { "ID Token deleted" }
+//            }}){
+//                Text("Clear ID Tokens")
+//            }
 //            Button(onClick = {scope.launch {
 //                Logger.d { "DB Pull" }
 //                Logger.d { "${backendPull(client)}" }
 //            }}){
 //                Text("DB pull")
 //            }
-            Button(onClick = {scope.launch {
-                service.deleteAllWords()
-                Logger.d { "Add word" }
-                Logger.d { "Count: ${service.countWords()}" }
-                try{
-                    val (testWord, testTags) =
-                        prepareWordData(
-                            name = "computer",
-                            meaning = "컴퓨터",
-                            example = "I fixed computer",
-                            tagNames = listOf("IT", "electronics")
-                        )
-
-                    service.addWord(testWord, testTags)
-                } catch (e: Exception){
-                    Logger.e { "Error: ${e.message}" }
-                }
-                Logger.d { "Count: ${service.countWords()}" }
-            }}){
-                Text("Add Word")
-            }
-            Button(onClick = {scope.launch {
-                Logger.d { "Sync" }
-                sync(client, service, keyDataManager)
-                Logger.d { "Local Words Count: ${service.countWords()}" }
-            }}){
-                Text("Sync")
-            }
-            Button(onClick = {scope.launch {
-                keyDataManager.saveLastSync()
-                Logger.d { keyDataManager.getLastSync() }
-            }}){
-                Text("saveLastSync")
-            }
-            Button(onClick = {scope.launch {
-                keyDataManager.resetSyncTime()
-                Logger.d { keyDataManager.getLastSync() }
-            }}){
-                Text("resetSyncTime")
-            }
+//            Button(onClick = {scope.launch {
+//                service.deleteAllWords()
+//                Logger.d { "Add word" }
+//                Logger.d { "Count: ${service.countWords()}" }
+//                try{
+//                    val (testWord, testTags) =
+//                        prepareWordData(
+//                            name = "computer",
+//                            meaning = "컴퓨터",
+//                            example = "I fixed computer",
+//                            tagNames = listOf("IT", "electronics")
+//                        )
+//
+//                    service.addWord(testWord, testTags)
+//                } catch (e: Exception){
+//                    Logger.e { "Error: ${e.message}" }
+//                }
+//                Logger.d { "Count: ${service.countWords()}" }
+//            }}){
+//                Text("Add Word")
+//            }
+//            Button(onClick = {scope.launch {
+//                Logger.d { "Sync" }
+//                sync(client, service, keyDataManager)
+//                Logger.d { "Local Words Count: ${service.countWords()}" }
+//            }}){
+//                Text("Sync")
+//            }
+//            Button(onClick = {scope.launch {
+//                keyDataManager.saveLastSync()
+//                Logger.d { keyDataManager.getLastSync() }
+//            }}){
+//                Text("saveLastSync")
+//            }
+//            Button(onClick = {scope.launch {
+//                keyDataManager.resetSyncTime()
+//                Logger.d { keyDataManager.getLastSync() }
+//            }}){
+//                Text("resetSyncTime")
+//            }
 //            Button(onClick = {scope.launch {
 //                val gemini : GeminiResponse? = enrichWordByGemini(client, "paper")
 //                println(gemini?.antonymEn)
