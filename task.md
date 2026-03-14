@@ -63,13 +63,13 @@
     - [x] Batch update local DB from remote
     - [x] Show sync results (deleted, updated, added)
 - [ ] Tag Management
-    - [ ] `tag_name` and `color` field
-    - [ ] Add tag
-    - [ ] Delete tag
-    - [ ] Update tag
-        - [ ] cannot be empty
+    - [x] `tag_name` and `color` field
+    - [x] Add tag
+    - [x] Delete tag
+    - [x] Update tag
+        - [x] cannot be empty
     - [ ] Get similar tags
-    - [ ] Delete tags that are not used
+    - [x] Delete tags that are not used
         - [ ] In setting add "Delete unused tags" button
 
 ### API Services
