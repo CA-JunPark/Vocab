@@ -4,16 +4,23 @@ import personal.jp.vocabapp.theme.VocabTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -33,10 +40,12 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.google.ID_TOKEN
 import personal.jp.vocabapp.sql.SerializableWord
-import personal.jp.vocabapp.sql.createWord
 import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.KeyDataManager
+import personal.jp.vocabapp.sql.prepareWordData
+import personal.jp.vocabapp.viewmodels.VocabularyCard
 import personal.jp.vocabapp.viewmodels.WordScreen
+import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Composable
 @Preview
@@ -55,6 +64,14 @@ fun MyScreen() {
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
 
+    var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        val words = service.getAllWords()
+        allWordsWithTags = words.map { word ->
+            val tags = service.getTagsForWord(word.name)
+            WordWithTags(word, tags)
+        }
+    }
     VocabTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -64,11 +81,11 @@ fun MyScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            Button(onClick = { scope.launch{
-//                authRepository.startLogin()
-//            } }) {
-//                Text("Login with Google.")
-//            }
+            Button(onClick = { scope.launch{
+                authRepository.startLogin()
+            } }) {
+                Text("Login with Google.")
+            }
 //            Button(onClick = { showContent = !showContent }) {
 //                Text("Click meee!")
 //            }
@@ -105,21 +122,15 @@ fun MyScreen() {
 //                Logger.d { "Add word" }
 //                Logger.d { "Count: ${service.countWords()}" }
 //                try{
-//                    service.addWord(
-//                        createWord(
+//                    val (testWord, testTags) =
+//                        prepareWordData(
 //                            name = "potato",
-//                            meaningKr = "감자",
+//                            meaning = "감자",
 //                            example = "I had potato",
-//                            tags="food, vegetable"
+//                            tagNames = listOf("vegetable", "ground")
 //                        )
-//                    )
-//                    service.addWord(
-//                        createWord(
-//                            name = "sweet potato",
-//                            meaningKr = "고구마",
-//                            example = "I had sweet potato",
-//                        )
-//                    )
+//
+//                    service.addWord(testWord, testTags)
 //                } catch (e: Exception){
 //                    Logger.e { "Error: ${e.message}" }
 //                }
@@ -153,8 +164,9 @@ fun MyScreen() {
 //            }}){
 //                Text("Gemini com")
 //            }
-            WordScreen("potato")
-            WordScreen("sweet potato")
+            allWordsWithTags.forEach {
+                WordScreen(it.word.name)
+            }
         }
     }
 }

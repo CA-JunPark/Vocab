@@ -14,10 +14,34 @@ data class GeminiResponse(
     val example: List<String>,
     val antonymEn: List<String>,
     val tags: List<String>,
-)
+) {
+    fun toDomainModels(): Pair<db.Word, List<db.Tag>> {
+        val word = db.Word(
+            name = this.name,
+            meaningKr = this.meaningKr.joinToString(", "),
+            example = this.example.joinToString("\n"),
+            antonymEn = this.antonymEn.joinToString(", "),
+            // WordService will handle rest by defaults
+            createdTime = "",
+            modifiedTime = "",
+            isDeleted = false,
+            syncedTime = null,
+            note = null
+        )
+
+        val tagList = this.tags.map { tagName ->
+            db.Tag(
+                tagName = tagName.trim(),
+                color = "#808080" // 기본색. Service의 TagColorManager가 나중에 랜덤색으로 바꿈
+            )
+        }
+
+        return Pair(word, tagList)
+    }
+}
 
 
-suspend fun enrichWordByGemini(client: HttpClient, word: String): GeminiResponse?{
+suspend fun enrichWordByGemini(client: HttpClient, word: String): GeminiResponse? {
     return try {
         val response = client.get("${Secrets.BACKEND_API}/gemini") {
             url {
@@ -26,14 +50,15 @@ suspend fun enrichWordByGemini(client: HttpClient, word: String): GeminiResponse
         }
 
         if (response.status.isSuccess()) {
-            response.body<GeminiResponse>()
+            val body = response.body<GeminiResponse>()
+            Logger.d("Gemini successfully enriched: ${body.name}")
+            body
         } else {
-            Logger.e("Server Error: ${response.status.value} - ${response.status.description}")
+            Logger.e("Gemini Server Error: ${response.status.value}")
             null
         }
-
     } catch (e: Exception) {
-        Logger.e("Error: ${e.message}")
+        Logger.e("Gemini Request Failed: ${e.message}")
         null
     }
 }

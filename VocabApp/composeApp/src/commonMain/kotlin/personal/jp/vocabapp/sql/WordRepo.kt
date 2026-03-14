@@ -7,19 +7,23 @@ import db.WordDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import co.touchlab.kermit.Logger
+import db.Tag
 import db.Word as Word
 
 interface WordRepo {
     suspend fun findWordOrNull(name: String): Word?
     suspend fun findAllWords(): List<Word>
-    suspend fun addWord(word: Word): Boolean
-    suspend fun updateWord(word: Word): Boolean
-    suspend fun upsertWord(word: Word): Boolean
+    suspend fun addWord(word: Word, tags: List<Tag>): Boolean
+    suspend fun updateWord(word: Word, tags: List<Tag>): Boolean
+    suspend fun upsertWord(word: Word, tags: List<Tag>): Boolean
     suspend fun deleteWord(name: String): Boolean
     suspend fun countWords(): Int
     suspend fun deleteAllWords(): Boolean
     suspend fun setSync(name: String): Boolean
     suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word>
+    suspend fun getTagsForWord(wordName: String): List<Tag>
+    suspend fun searchTags(query: String): List<Tag>
+    suspend fun updateTagInfo(oldName: String, newName: String, color: String): Boolean
 }
 
 // TODO Exception handling
@@ -42,16 +46,22 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override suspend fun addWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun addWord(word: Word, tags: List<Tag>): Boolean = withContext(Dispatchers.IO) {
         try {
-            _queries.insertWord(
-                name = word.name,
-                meaningKr = word.meaningKr,
-                example = word.example,
-                antonymEn = word.antonymEn,
-                tags = word.tags,
-                note = word.note
-            )
+            _queries.transaction {
+                _queries.insertWord(
+                    name = word.name,
+                    meaningKr = word.meaningKr,
+                    example = word.example,
+                    antonymEn = word.antonymEn,
+                    note = word.note
+                )
+
+                tags.forEach { tag ->
+                    _queries.insertTag(tag.tagName, tag.color)
+                    _queries.insertWordTag(word.name, tag.tagName)
+                }
+            }
             true
         } catch (e: Exception) {
             Logger.e { "Error: ${e.message}" }
@@ -68,20 +78,48 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
-    override suspend fun updateWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun updateWord(word: Word, tags: List<Tag>): Boolean = withContext(Dispatchers.IO) {
         try{
-            _queries.updateWord(word.meaningKr, word.example, word.antonymEn, word.tags, word.note,
-                                word.name,)
+            _queries.transaction {
+                _queries.updateWord(
+                    meaningKr = word.meaningKr,
+                    example = word.example,
+                    antonymEn = word.antonymEn,
+                    note = word.note,
+                    name = word.name
+                )
+                // delete previous tags
+                _queries.deleteWordTagsByWord(word.name)
+                // add new tags
+                tags.forEach { tag ->
+                    _queries.insertTag(tag.tagName, tag.color)
+                    _queries.insertWordTag(word.name, tag.tagName)
+                }
+            }
             true
         } catch (e: Exception){
             false
         }
     }
 
-    override suspend fun upsertWord(word: Word): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun upsertWord(word: Word, tags: List<Tag>): Boolean = withContext(Dispatchers.IO) {
         try {
-            _queries.upsertWord(
-                word.name, word.meaningKr, word.example, word.antonymEn, word.tags, word.note)
+            _queries.transaction {
+                _queries.upsertWord(
+                    name = word.name,
+                    meaningKr = word.meaningKr,
+                    example = word.example,
+                    antonymEn = word.antonymEn,
+                    note = word.note
+                )
+                // delete previous tags
+                _queries.deleteWordTagsByWord(word.name)
+                // add new tags
+                tags.forEach { tag ->
+                    _queries.insertTag(tag.tagName, tag.color)
+                    _queries.insertWordTag(word.name, tag.tagName)
+                }
+            }
             true
         } catch (e: Exception) {
             false
@@ -119,6 +157,23 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
             _queries.selectUnsyncedWord(lastSyncedTime).executeAsList()
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    override suspend fun getTagsForWord(wordName: String): List<Tag> = withContext(Dispatchers.IO) {
+        _queries.selectTagsForWord(wordName).executeAsList()
+    }
+
+    override suspend fun searchTags(query: String): List<Tag> = withContext(Dispatchers.IO) {
+        _queries.searchTags(query).executeAsList()
+    }
+
+    override suspend fun updateTagInfo(oldName: String, newName: String, color: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            _queries.updateTag(newName, color, oldName)
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 }

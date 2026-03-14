@@ -2,12 +2,13 @@
 
 import kotlin.Boolean;
 
+
+
 CREATE TABLE Word (
     name TEXT PRIMARY KEY NOT NULL,
     meaningKr TEXT NOT NULL,
     example TEXT,
     antonymEn TEXT DEFAULT "",
-    tags TEXT DEFAULT "",
     createdTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     isDeleted INTEGER AS Boolean NOT NULL DEFAULT 0,
@@ -15,11 +16,30 @@ CREATE TABLE Word (
     note TEXT
 );
 
+CREATE TABLE Tag (
+    tagName TEXT PRIMARY KEY NOT NULL,
+    color TEXT NOT NULL
+);
+
+-- mapping table
+CREATE TABLE WordTag (
+    wordName TEXT NOT NULL,
+    tagName TEXT NOT NULL,
+    PRIMARY KEY (wordName, tagName),
+    -- If Word is deleted, delete the mapping
+    FOREIGN KEY (wordName) REFERENCES Word(name) ON DELETE CASCADE,
+    -- If tagName is updated, update Word's tag
+    FOREIGN KEY (tagName) REFERENCES Tag(tagName) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
 CREATE INDEX name ON Word(name);
+CREATE INDEX idx_wordtag_word ON WordTag(wordName);
+CREATE INDEX idx_wordtag_tag ON WordTag(tagName);
 
 insertWord:
-INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, tags, isDeleted, createdTime, modifiedTime, syncedTime, note)
-VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL,?);
+INSERT OR IGNORE INTO Word(name, meaningKr, example, antonymEn, isDeleted, createdTime, modifiedTime, syncedTime, note)
+VALUES(?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL,?);
 
 selectAllWordsInfo:
 SELECT *
@@ -38,20 +58,19 @@ WHERE name = ?;
 updateWord:
 UPDATE Word
 SET meaningKr = ?, example = ?, antonymEn = ?,
-    tags = ?, modifiedTime = CURRENT_TIMESTAMP, syncedTime = NULL, note = ?
+    modifiedTime = CURRENT_TIMESTAMP, syncedTime = NULL, note = ?
 WHERE name = ?;
 
 upsertWord:
 INSERT INTO Word(
-    name, meaningKr, example, antonymEn, tags,
+    name, meaningKr, example, antonymEn,
     isDeleted, createdTime, modifiedTime, syncedTime, note
 )
-VALUES(?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, ?)
+VALUES(?, ?, ?,?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, ?)
 ON CONFLICT(name) DO UPDATE SET
     meaningKr = excluded.meaningKr,
     example = excluded.example,
     antonymEn = excluded.antonymEn,
-    tags = excluded.tags,
     isDeleted = excluded.isDeleted,
     modifiedTime = CURRENT_TIMESTAMP,
     syncedTime = NULL,
@@ -69,3 +88,37 @@ WHERE modifiedTime > :lastSyncedTime;
 
 setSync:
 UPDATE Word SET syncedTime = CURRENT_TIMESTAMP WHERE name = ?;
+
+--------------- For Tags ----------------
+
+-- mapping function
+insertWordTag:
+INSERT OR IGNORE INTO WordTag(wordName, tagName)
+VALUES (?, ?);
+
+-- delete mapping function
+deleteWordTagsByWord:
+DELETE FROM WordTag WHERE wordName = ?;
+
+insertTag:
+INSERT OR IGNORE INTO Tag(tagName, color)
+VALUES (?, ?);
+
+selectTagsForWord:
+SELECT t.* FROM Tag t
+JOIN WordTag wt ON t.tagName = wt.tagName
+WHERE wt.wordName = ?;
+
+searchTags:
+SELECT * FROM Tag
+WHERE tagName LIKE ('%' || :query || '%')
+LIMIT 10;
+
+updateTag:
+UPDATE Tag
+SET tagName = :newTagName, color = :newColor
+WHERE tagName = :oldTagName;
+
+deleteUnusedTags:
+DELETE FROM Tag
+WHERE tagName NOT IN (SELECT DISTINCT tagName FROM WordTag);

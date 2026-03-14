@@ -40,12 +40,15 @@
     - [x] gemini
     - [x] check id token for all connections
     - [ ] need to check refreshing token works
+- [ ] Tag Management
 - [ ] Setup Glance for Android widget
 
 ## 2. Data Layer
 ### Model
 - [x] Define `Word` class
-- [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `createdTime`, `modifiedTime`, `isDeleted`, `synced`, `note` fields
+    - [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `createdTime`, `modifiedTime`, `isDeleted`, `synced`, `note` fields
+- [ ] Define `Tag` class
+    - [ ] Add `tag_name` and `color` fields
 
 ### Storage (SQLDelight)
 - [x] Create database and tables
@@ -63,6 +66,11 @@
     - [ ] `tag_name` and `color` field
     - [ ] Add tag
     - [ ] Delete tag
+    - [ ] Update tag
+        - [ ] cannot be empty
+    - [ ] Get similar tags
+    - [ ] Delete tags that are not used
+        - [ ] In setting add "Delete unused tags" button
 
 ### API Services
 - [x] Implement `GoogleSignInService`
@@ -99,6 +107,7 @@
     - [ ] gemini button to generate fields
         - [ ] show error if not Google Sign-in
     - [ ] other editable fields (meaningKr, example, oppositeEn, tags, note)
+    - [ ] tags field showing similar tags (suggestion)
     - [ ] save button (FAB)
     - [ ] ESC to close (Desktop only)
 - [ ] **Edit Screen** (Modal)
@@ -112,6 +121,7 @@
     - [ ] Tag list
     - [ ] ESC to close (Desktop only)
     - [ ] The Legal/Credits Button
+    - [ ] Delete unused tags button
 - [ ] The Legal/Credits Screen
 
 ### Loding / Skeleton UI

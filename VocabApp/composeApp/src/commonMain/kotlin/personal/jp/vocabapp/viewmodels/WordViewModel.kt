@@ -39,11 +39,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.ui.draw.clip
+import db.Tag
 
+data class WordWithTags(
+    val word: Word,
+    val tags: List<Tag>
+)
 sealed class WordUiState {
     object Idle : WordUiState()
     object Loading : WordUiState()
-    data class Success(val data: Word) : WordUiState()
+    data class Success(val data: WordWithTags) : WordUiState()
     data class Error(val message: String) : WordUiState()
 }
 
@@ -51,21 +56,20 @@ class WordViewModel(private val wordService: WordService) : ViewModel() {
     private val _uiState = MutableStateFlow<WordUiState>(WordUiState.Idle)
     val uiState: StateFlow<WordUiState> = _uiState
 
-    fun fetchWord(word: String){
+    fun fetchWord(wordName: String) {
         viewModelScope.launch {
             _uiState.value = WordUiState.Loading
-            val result = wordService.getWordOrNull(word)
 
-            if (result != null) {
-                _uiState.value = WordUiState.Success(result)
-                // Log here! It only runs once per fetch.
-                println("Meaning fetched successfully: $result")
+            val word = wordService.getWordOrNull(wordName)
+            val tags = wordService.getTagsForWord(wordName)
+
+            if (word != null) {
+                _uiState.value = WordUiState.Success(WordWithTags(word, tags))
             } else {
-                _uiState.value = WordUiState.Error("Failed to fetch word details.")
+                _uiState.value = WordUiState.Error("Word not found")
             }
         }
     }
-
 }
 
 @Composable
@@ -102,25 +106,11 @@ fun WordScreen(word: String) {
 }
 
 @Composable
-fun VocabularyCard(data: Word, modifier: Modifier = Modifier) {
-    val tags = data.tags?.split(",")
-        ?.map { it.trim() }
-        ?.filter { it.isNotBlank() }
-        ?: emptyList()
-    // Main Card Container
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-//            .background(
-//                color = Color(0xFF1B202D), // Dark blue/grey background
-//                shape = RoundedCornerShape(16.dp)
-//            )
-            .padding(16.dp)
-    ) {
+fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth().padding(16.dp)) {
         Column {
-            // English Word
             Text(
-                text = data.name,
+                text = data.word.name,
                 color = Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -128,17 +118,15 @@ fun VocabularyCard(data: Word, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Korean Translation and Speaker Icon
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = data.meaningKr,
+                    text = data.word.meaningKr,
                     color = Color(0xFF9BA1B0),
                     fontSize = 15.sp
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
                 Button(onClick = {
                     println("Sound Click")
@@ -152,53 +140,60 @@ fun VocabularyCard(data: Word, modifier: Modifier = Modifier) {
                     )
                 }
             }
-            // Tags Row
 
-            if (tags.isNotEmpty()) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            Spacer(modifier = Modifier.height(8.dp))
 
-                ) {
-                    for (tag in tags) {
-                        TagChip(
-                            text = tag,
-                            backgroundColor = Color(0xFF222C47),
-                            textColor = Color(0xFF8AA1E3)
-                        )
+            if (data.tags.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    data.tags.forEach { tag ->
+                        TagChip(tag = tag)
                     }
                 }
             } else {
                 // Invisible placeholder to maintain the exact same card height
-                TagChip(
-                    text = " ", // A single space so the text engine calculates height
-                    backgroundColor = Color.Transparent,
-                    textColor = Color.Transparent
-                )
+                Spacer(modifier = Modifier.height(26.dp))
             }
         }
     }
 }
 
-// Reusable component for the colored tags
 @Composable
-fun TagChip(text: String, backgroundColor: Color, textColor: Color) {Box(
-    modifier = Modifier
-        .padding(end = 8.dp)
-        .clip(RoundedCornerShape(6.dp))
-        // Make it clickable
-        .clickable {
-            println("Tag Click") // Fixed the comma typo here too!
-            // TODO Open Search Tag
-        }
-        .background(color = backgroundColor)
-        .padding(horizontal = 8.dp, vertical = 4.dp)
+fun TagChip(tag: Tag) {
+    // Hex String (#FFFFFF)to Compose Color
+    val bgColor = try {
+        Color(tag.color.removePrefix("#").toLong(16) or 0xFF000000)
+    } catch (e: Exception) {
+        Color(0xFF222C47) // Default color if fail
+    }
+
+    val textColor = getContrastColor(tag.color)
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(color = bgColor)
+            .clickable { /* TODO 태그 검색 로직 */ }
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
-            text = text,
+            text = tag.tagName,
             color = textColor,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )
+    }
 }
 
+// for readability
+fun getContrastColor(hexColor: String): Color {
+    return try {
+        val r = hexColor.substring(1, 3).toInt(16)
+        val g = hexColor.substring(3, 5).toInt(16)
+        val b = hexColor.substring(5, 7).toInt(16)
+        // (YIQ equation)
+        val yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
+        if (yiq >= 128) Color.Black else Color.White
+    } catch (e: Exception) {
+        Color.White
+    }
 }

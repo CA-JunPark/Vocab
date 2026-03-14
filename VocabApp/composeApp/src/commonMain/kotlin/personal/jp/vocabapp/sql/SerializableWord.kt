@@ -10,6 +10,8 @@ import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.Secrets
 import co.touchlab.kermit.Logger
+import db.Tag
+import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Serializable
 data class SerializableWord(
@@ -25,55 +27,42 @@ data class SerializableWord(
     val note: String? = ""
 )
 
-fun toSerializable(words:List<Word>): List<SerializableWord> {
-    return words.map{
-        SerializableWord(
-            name = it.name,
-            meaningKr = it.meaningKr,
-            example = it.example,
-            antonymEn = it.antonymEn,
-            tags = it.tags,
-            createdTime = it.createdTime,
-            modifiedTime = it.modifiedTime,
-            isDeleted = it.isDeleted,
-            syncedTime = it.syncedTime,
-            note = it.note
-        )
-    }
-}
+fun toSerializable(word: Word, tags: List<Tag>): SerializableWord {
 
-fun fromSerializable(words:List<SerializableWord>): List<Word> {
-    return words.map {
-        Word(
-            name = it.name,
-            meaningKr = it.meaningKr,
-            example = it.example,
-            antonymEn = it.antonymEn,
-            tags = it.tags,
-            createdTime = it.createdTime,
-            modifiedTime = it.modifiedTime,
-            isDeleted = it.isDeleted,
-            syncedTime = it.syncedTime,
-            note = it.note
-        )
-    }
-}
-
-fun createWord(name: String, meaningKr: String,
-               example: String? = "", antonymEn: String? = "", tags: String? = "", note: String? = ""): Word{
-    return Word(
-        name = name,
-        meaningKr = meaningKr,
-        // default values
-        example = example,
-        antonymEn = antonymEn,
-        tags = tags,
-        createdTime = "",
-        modifiedTime = "",
-        isDeleted = false,
-        syncedTime = null,
-        note = note
+    return SerializableWord(
+        name = word.name,
+        meaningKr = word.meaningKr,
+        example = word.example,
+        antonymEn = word.antonymEn,
+        createdTime = word.createdTime,
+        modifiedTime = word.modifiedTime,
+        isDeleted = word.isDeleted,
+        syncedTime = word.syncedTime,
+        note = word.note,
+        tags = tags.joinToString(",") { it.tagName }// get only names
     )
+}
+
+
+fun fromSerializable(sWord: SerializableWord): Pair<Word, List<db.Tag>> {
+    val word = Word(
+        name = sWord.name,
+        meaningKr = sWord.meaningKr,
+        example = sWord.example,
+        antonymEn = sWord.antonymEn,
+        createdTime = sWord.createdTime,
+        modifiedTime = sWord.modifiedTime,
+        isDeleted = sWord.isDeleted,
+        syncedTime = sWord.syncedTime,
+        note = sWord.note
+    )
+    // put default color for tags
+    val tags = sWord.tags?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotBlank() }
+        ?.map { Tag(it, "#808080") } // give default color
+        ?: emptyList()
+    return Pair(word, tags)
 }
 
 @Serializable
@@ -89,37 +78,56 @@ data class SyncResponse(
 )
 
 
-suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager){
-    try{
-        val lastSyncedTime = keyDataManager.getLastSync()
+suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager) {
+    try {
+        val lastSyncedTime = keyDataManager.getLastSync() ?: "1970-01-01T00:00:00Z"
+        val unsyncedWordsRaw = wordService.getUnsyncedWords(lastSyncedTime)
 
-        val unsyncedWords = toSerializable(wordService.getUnsyncedWords(lastSyncedTime))
-        Logger.d { "Unsynced Words: $unsyncedWords" }
-        // post request
-        val response = client.post("${Secrets.LOCAL}/sync") {
+        val localChanges = unsyncedWordsRaw.map { word ->
+            val tags = wordService.getTagsForWord(word.name)
+            toSerializable(word, tags)
+        }
+
+        val response = client.post("${Secrets.BACKEND_API}/sync") {
             contentType(ContentType.Application.Json)
-            setBody(SyncRequest(
-                lastSyncTime = lastSyncedTime,
-                localChanges = unsyncedWords
-            ))
+            setBody(SyncRequest(lastSyncTime = lastSyncedTime, localChanges = localChanges))
         }
 
         val syncResult = response.body<SyncResponse>()
 
-        // update local
-        val words = fromSerializable(syncResult.wordsToUpdate)
-        for (word in words){
-            wordService.upsertWord(word)
-        }
-
-        // update last synced time
-        for (word in syncResult.wordsToUpdate){
+        for (sWord in syncResult.wordsToUpdate) {
+            val (word, tags) = fromSerializable(sWord)
+            // assign colors in upserWord
+            wordService.upsertWord(word, tags)
             wordService.setSync(word.name)
         }
-        keyDataManager.saveLastSync(syncResult.serverTime)
-    } catch (e: Exception){
-        Logger.e { "${e.message}" }
-    }
 
+        keyDataManager.saveLastSync(syncResult.serverTime)
+    } catch (e: Exception) {
+        Logger.e { "Sync Failed: ${e.message}" }
+    }
 }
 
+fun prepareWordData(
+    name: String,
+    meaning: String,
+    example: String = "",
+    antonym: String = "",
+    tagNames: List<String>
+): Pair<Word, List<Tag>> {
+    val word = Word(
+        name = name.trim(),
+        meaningKr = meaning.trim(),
+        example = example.trim(),
+        antonymEn = antonym.trim(),
+        createdTime = "",
+        modifiedTime = "",
+        isDeleted = false,
+        syncedTime = null,
+        note = ""
+    )
+
+    val tags = tagNames.map { Tag(tagName = it.trim(), color = "#808080") }
+
+    return word to tags
+}

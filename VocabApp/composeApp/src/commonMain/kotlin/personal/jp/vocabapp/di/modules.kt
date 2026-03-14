@@ -12,8 +12,10 @@ import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.bind
 import personal.jp.vocabapp.sql.DriverFactory
 import personal.jp.vocabapp.sql.KeyDataManager
+import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordRepo
 import personal.jp.vocabapp.sql.WordRepoImpl
 import personal.jp.vocabapp.sql.WordService
@@ -31,9 +33,10 @@ val authModule = module {
 
 fun wordModule(driverFactory: DriverFactory) = module{
     single { WordDatabase(driverFactory.createDriver()) }
-    singleOf(::WordRepoImpl) { bind<WordRepo>() }
-    singleOf(::WordServiceImpl) { bind<WordService>() }
-    viewModel { WordViewModel(get()) }
+    single { TagColorManager() }
+    single<WordRepo> { WordRepoImpl(get()) }
+    single { WordServiceImpl(get(), get()) } bind WordService::class
+    viewModel { WordViewModel(get<WordServiceImpl>()) }
 }
 
 fun apiModule() = module{
