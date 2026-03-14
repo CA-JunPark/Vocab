@@ -89,7 +89,7 @@ fun MyScreen() {
                 is Screen.AddWord -> {
                     AddWordScreen(
                         onClose = { currentScreen = Screen.Home },
-                        onSave = { name, meaning, example, antonym, tags, notes ->
+                        onSave = { word, wordWithTags ->
                             scope.launch {
                                 // Refresh and load words before go back to Home
                                 refreshWords()

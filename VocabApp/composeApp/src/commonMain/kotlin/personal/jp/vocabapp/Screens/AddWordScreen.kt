@@ -21,13 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import db.Word
+import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Composable
 fun AddWordScreen(
     onClose: () -> Unit,
-    onSave: (name: String, meaning: String, example: String, antonym: String, tags: String, notes: String) -> Unit
+    onSave: (word: Word, wordWithTags: WordWithTags) -> Unit
 ) {
-    // 입력 상태 관리
     var word by remember { mutableStateOf("") }
     var meaning by remember { mutableStateOf("") }
     var example by remember { mutableStateOf("") }
@@ -40,7 +41,6 @@ fun AddWordScreen(
             AddWordTopBar(onClose = onClose)
         },
         bottomBar = {
-            // 하단에 고정되는 Save 버튼 영역
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -48,7 +48,7 @@ fun AddWordScreen(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { onSave(word, meaning, example, antonym, tags, notes) },
+                    onClick = { /*TODO onSave*/ },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
                     shape = RoundedCornerShape(12.dp)
@@ -61,7 +61,6 @@ fun AddWordScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        // 본문 스크롤 영역
         Column(
             modifier = Modifier
                 .fillMaxSize()
