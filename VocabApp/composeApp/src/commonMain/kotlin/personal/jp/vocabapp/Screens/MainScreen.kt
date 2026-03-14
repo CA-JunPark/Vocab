@@ -1,8 +1,15 @@
 package personal.jp.vocabapp.Screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +62,11 @@ import personal.jp.vocabapp.viewmodels.WordScreen
 import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Composable
-fun MainScreen(wordsList: List<WordWithTags>){
+fun MainScreen(
+    wordsList: List<WordWithTags>,
+    onAddClick: () -> Unit,
+    onSettingsClick: () -> Unit = {}
+){
     var searchQuery by remember { mutableStateOf("") }
     var selectedMode by remember { mutableStateOf(SearchMode.Content) }
     val filteredList = remember(searchQuery, wordsList, selectedMode) {
@@ -77,7 +90,7 @@ fun MainScreen(wordsList: List<WordWithTags>){
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                VocabTopBar()
+                VocabTopBar({ onSettingsClick() })
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -89,9 +102,11 @@ fun MainScreen(wordsList: List<WordWithTags>){
                 Spacer(modifier = Modifier.height(16.dp))
             }
         },
+
+        // Add Word Button
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO */ },
+                onClick = { onAddClick() },
                 containerColor = Color(0xFF2D65FF),
                 contentColor = Color.White,
                 shape = CircleShape,
@@ -115,11 +130,7 @@ fun MainScreen(wordsList: List<WordWithTags>){
 }
 
 @Composable
-fun VocabTopBar() {
-    fun onSettingsClick(){
-        println("Settings Clicked")
-        //TODO goto Settings Screen
-    }
+fun VocabTopBar(onSettingsClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,

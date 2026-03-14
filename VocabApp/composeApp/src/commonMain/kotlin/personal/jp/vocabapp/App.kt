@@ -1,52 +1,33 @@
 package personal.jp.vocabapp
 
+import androidx.compose.animation.AnimatedContent
 import personal.jp.vocabapp.theme.VocabTheme
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import personal.jp.vocabapp.sql.WordServiceImpl
-import vocabapp.composeapp.generated.resources.Res
-import vocabapp.composeapp.generated.resources.compose_multiplatform
 import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
-import personal.jp.vocabapp.google.GeminiResponse
-import personal.jp.vocabapp.google.enrichWordByGemini
 import co.touchlab.kermit.Logger
 import io.ktor.client.statement.bodyAsText
+import personal.jp.vocabapp.Screens.AddWordScreen
 import personal.jp.vocabapp.Screens.MainScreen
-import personal.jp.vocabapp.google.ID_TOKEN
+import personal.jp.vocabapp.Screens.Screen
 import personal.jp.vocabapp.sql.SerializableWord
-import personal.jp.vocabapp.sql.sync
 import personal.jp.vocabapp.sql.KeyDataManager
-import personal.jp.vocabapp.sql.prepareWordData
-import personal.jp.vocabapp.viewmodels.VocabularyCard
-import personal.jp.vocabapp.viewmodels.WordScreen
 import personal.jp.vocabapp.viewmodels.WordWithTags
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 
 @Composable
 @Preview
@@ -64,7 +45,10 @@ fun MyScreen() {
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
 
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
     var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
+
 
     // refresh Words
     val refreshWords = {
@@ -80,9 +64,51 @@ fun MyScreen() {
     }
 
     VocabTheme {
-        MainScreen(
-            wordsList = allWordsWithTags
-        )
+        AnimatedContent(
+            targetState = currentScreen,
+            transitionSpec = {
+                // 새 화면이 들어올 때(Enter)와 나갈 때(Exit)의 규칙 정의
+                if (targetState is Screen.AddWord) {
+                    // 홈 -> 추가 화면: 아래에서 위로 슬라이드 + 페이드 인
+                    (slideInVertically { it } + fadeIn()).togetherWith(fadeOut())
+                } else {
+                    // 추가 화면 -> 홈: 위에서 아래로 슬라이드 + 페이드 아웃
+                    fadeIn().togetherWith(slideOutVertically { it } + fadeOut())
+                }
+            }
+        ){ screen ->
+            when (screen) {
+                is Screen.Home -> {
+                    MainScreen(
+                        wordsList = allWordsWithTags,
+                        onAddClick = { currentScreen = Screen.AddWord },
+                        onSettingsClick = { currentScreen = Screen.Settings }
+                    )
+                }
+
+                is Screen.AddWord -> {
+                    AddWordScreen(
+                        onClose = { currentScreen = Screen.Home },
+                        onSave = { name, meaning, example, antonym, tags, notes ->
+                            scope.launch {
+                                // Refresh and load words before go back to Home
+                                refreshWords()
+                                currentScreen = Screen.Home
+                            }
+                        }
+                    )
+                }
+
+                is Screen.WordDetail -> {
+                    //TODO
+                }
+
+                is Screen.Settings -> {
+                    // TODO
+                //  SettingsScreen(onBack = { currentScreen = Screen.Home })
+                }
+            }
+        }
 
 //        var showContent by remember { mutableStateOf(false) }
 //        Column(

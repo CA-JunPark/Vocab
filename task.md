@@ -87,12 +87,12 @@
 
 ### Screens
 - [ ] **Main List Screen**
-    - [ ] List of words with popular translation
-    - [ ] Search bar
-        - [ ] input field
-            - [ ] filter by content or tags
-        - [ ] button to switch filter
-        - [ ] Debounce Search (300ms)
+    - [x] List of words with popular translation
+    - [x] Search bar
+        - [x] input field
+            - [x] filter by content or tags
+        - [x] button to switch filter
+        - [x] Debounce Search (300ms)
     - [ ] Sort button
         - [ ] options: Alphabetical, Asc/Desc, tags
     - [ ] FAB to add
