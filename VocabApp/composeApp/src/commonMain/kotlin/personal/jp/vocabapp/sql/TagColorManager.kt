@@ -1,57 +1,51 @@
 package personal.jp.vocabapp.sql
 
+import androidx.compose.ui.graphics.Color
 import db.Tag
+import kotlin.math.abs
 
-class TagColorManager(
-    private val palette: List<String> = listOf(
-        // Warmer Tones
-        "#FF8A80", "#FF5252", "#FF1744", // Reds
-        "#FFAB40", "#FF9100",           // Oranges
-        "#FFD740", "#FFC400",           // Yellows
+class TagColorManager {
 
-        // Cooler Tones
-        "#CCFF90", "#B2FF59", "#76FF03", // Greens
-        "#A7FFEB", "#64FFDA", "#1DE9B6", // Teals
-        "#80D8FF", "#40C4FF", "#00B0FF", // Sky Blues
-        "#82B1FF", "#448AFF", "#2979FF", // Royal Blues
-
-        // Purple & Pinks
-        "#B388FF", "#7C4DFF",           // Purples
-        "#F8BBD0", "#FF80AB", "#F50057", // Pinks
-
-        // Neutrals
-        "#CFD8DC", "#90A4AE"            // Greys
-    )
-) {
     /**
-     * Get Tag List
-     * Remove duplicate colors
-     * assign random color from palette
+     * Assigns Compose Colors based on the tag's name hash.
+     * Use this if your Tag model can hold a Compose Color or if
+     * you are mapping them in your ViewModel.
      */
+    fun getTagColor(tagName: String): Color {
+        // Stable hash for consistency
+        val hash = abs(tagName.hashCode())
+
+        // Hue (0.0 to 360.0)
+        val hue = (hash % 360).toFloat()
+
+        // Saturation (0.0 to 1.0) - 65% for vibrant but readable tags
+        val saturation = 0.65f
+
+        // Lightness (0.6 to 0.8)
+        // (hash % 21) gives 0-20. Dividing by 100f gives 0.0 to 0.2.
+        val lightness = 0.6f + ((hash % 21) / 100f)
+
+        // Return native Compose Color
+        return Color.hsl(
+            hue = hue,
+            saturation = saturation,
+            lightness = lightness
+        )
+    }
+
     fun assignColors(tags: List<Tag>): List<Tag> {
-        // get used Colors in given tags
-        val usedColors = tags
-            .filter { it.color.isNotBlank() && it.color != "#808080" }
-            .map { it.color }
-            .toSet()
-
-        // shuffle colors in palette
-        val availableColors = palette.filter { it !in usedColors }
-            .ifEmpty { palette } // if all colors are used, use original palette
-            .shuffled()
-
-        var newTagIndex = 0
-
         return tags.map { tag ->
             if (tag.color.isBlank() || tag.color == "#808080") {
-                val color = availableColors[newTagIndex % availableColors.size]
-                newTagIndex++
-                tag.copy(color = color)
+                // Convert the Compose color to a Hex String for DB storage
+                val color = getTagColor(tag.tagName)
+                tag.copy(color = colorToHexString(color))
             } else {
                 tag
             }
         }
     }
 
-    fun getFullPalette(): List<String> = palette
+    private fun colorToHexString(color: Color): String {
+        return String.format("#%08X", color.value.toLong())
+    }
 }
