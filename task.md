@@ -93,11 +93,11 @@
             - [x] filter by content or tags
         - [x] button to switch filter
         - [x] Debounce Search (300ms)
-    - [ ] Sort button
-        - [ ] options: Alphabetical, Asc/Desc, tags
-    - [ ] FAB to add
-    - [ ] Settings button
-    - [ ] Login Status Display
+    - [x] Sort button
+        - [x] options: Alphabetical, Asc/Desc, tags
+    - [x] FAB to add
+    - [x] Settings button
+    - [x] Login Status Display
 - [ ] **Word Detail Screen** (Modal)
     - [ ] Show translation, examples, opposites, tags
     - [ ] TTS button (Android only)
@@ -115,8 +115,8 @@
     - [ ] save button (FAB)
     - [ ] ESC to close (Desktop only)
 - [ ] **Settings Screen**
-    - [ ] Google Login button
-    - [ ] Account info display
+    - [x] Google Login button
+    - [x] Account info display
     - [ ] Manual Sync button
     - [ ] Tag list
     - [ ] ESC to close (Desktop only)
@@ -133,7 +133,7 @@
 - [ ] Koin ViewModels
 
 ### Navigation
-- [ ] Navigation Compose (Multiplatform)
+- [x] Navigation Compose (Multiplatform)
 
 ### Text and Fonts
 - [ ] Compose Resources (support multiple languages, fonts for both platforms)

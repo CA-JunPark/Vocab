@@ -21,13 +21,12 @@ import personal.jp.vocabapp.Screens.Screen
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.KeyDataManager
 import personal.jp.vocabapp.viewmodels.WordWithTags
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import personal.jp.vocabapp.Screens.SettingsScreen
 
 @Composable
 @Preview
@@ -49,6 +48,8 @@ fun MyScreen() {
 
     var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
 
+    val userProfile by authRepository.currentUser.collectAsState()
+    val isLoginInProgress by authRepository.isLoginInProgress.collectAsState()
 
     // refresh Words
     val refreshWords = {
@@ -67,12 +68,9 @@ fun MyScreen() {
         AnimatedContent(
             targetState = currentScreen,
             transitionSpec = {
-                // 새 화면이 들어올 때(Enter)와 나갈 때(Exit)의 규칙 정의
                 if (targetState is Screen.AddWord) {
-                    // 홈 -> 추가 화면: 아래에서 위로 슬라이드 + 페이드 인
                     (slideInVertically { it } + fadeIn()).togetherWith(fadeOut())
                 } else {
-                    // 추가 화면 -> 홈: 위에서 아래로 슬라이드 + 페이드 아웃
                     fadeIn().togetherWith(slideOutVertically { it } + fadeOut())
                 }
             }
@@ -80,6 +78,7 @@ fun MyScreen() {
             when (screen) {
                 is Screen.Home -> {
                     MainScreen(
+                        userProfile,
                         wordsList = allWordsWithTags,
                         onAddClick = { currentScreen = Screen.AddWord },
                         onSettingsClick = { currentScreen = Screen.Settings }
@@ -107,8 +106,26 @@ fun MyScreen() {
                 }
 
                 is Screen.Settings -> {
-                    // TODO
-                //  SettingsScreen(onBack = { currentScreen = Screen.Home })
+                    SettingsScreen(
+                        userProfile = userProfile,
+                        isLoginInProgress = isLoginInProgress,
+                        onBackClick = { currentScreen = Screen.Home },
+                        onLoginClick = {
+                            scope.launch {
+                                authRepository.startLogin()
+                            }
+                        },
+                        onLogoutClick = {
+                            scope.launch {
+                                authRepository.logout()
+                            }
+                        },
+                        // TODO
+                        onSyncClick = {  },
+                        onCancelLogin = {
+                            scope.launch { authRepository.cancelLogin() }
+                        }
+                    )
                 }
             }
         }

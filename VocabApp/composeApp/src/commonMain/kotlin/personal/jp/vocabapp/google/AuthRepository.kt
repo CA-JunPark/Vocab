@@ -17,7 +17,13 @@ import personal.jp.vocabapp.Platform
 import personal.jp.vocabapp.Secrets
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import personal.jp.vocabapp.Screens.UserProfile
+import io.ktor.util.decodeBase64String
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 interface LoginHandler {
     /**
@@ -45,14 +51,26 @@ class AuthRepository(
     private val secureStorage: SecureStorage
 ) {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val _isLoginInProgress = MutableStateFlow(false)
+    val isLoginInProgress = _isLoginInProgress.asStateFlow()
+
+    private val _currentUser = MutableStateFlow<UserProfile?>(null)
+    val currentUser = _currentUser.asStateFlow()
 
     init {
+        scope.launch {
+            if (isLoggedIn()) {
+                _currentUser.value = getCurrentUser()
+            }
+        }
         Logger.d("!!! AuthRepository: Initializing and collecting flow...")
         // Listen for codes arriving from either JVM or Android
         authFlowManager.authCode
             .onEach { code ->
                 Logger.d("!!! AuthRepository: Flow received code: $code")
                 exchangeCodeForToken(code)
+                _currentUser.value = getCurrentUser()
+                _isLoginInProgress.value = false // when login is done
                 scope.launch {
                     delay(1000) // 1 second is plenty for Netty to finish
                     try {
@@ -68,6 +86,7 @@ class AuthRepository(
     }
 
     suspend fun startLogin(){
+        _isLoginInProgress.value = true
         clearTokens()
         loginHandler.login { code ->
             // This callback is used primarily by JVM (Netty)
@@ -76,11 +95,15 @@ class AuthRepository(
     }
 
     private suspend fun exchangeCodeForToken(code: String) {
-        if (platform.name.contains("JVM")){
-            exchangeCodeForTokenJVM(code)
-        }
-        else{
-            exchangeCodeForTokenAndroid(code)
+        try {
+            if (platform.name.contains("JVM")){
+                exchangeCodeForTokenJVM(code)
+            } else {
+                exchangeCodeForTokenAndroid(code)
+            }
+        } catch (e: Exception) {
+            Logger.d("Exchange failed: ${e.message}")
+            _isLoginInProgress.value = false // when login is failed
         }
     }
 
@@ -132,4 +155,62 @@ class AuthRepository(
         secureStorage.deleteToken(ACCESS_TOKEN)
         secureStorage.deleteToken(REFRESH_TOKEN)
     }
+
+    suspend fun isLoggedIn(): Boolean {
+        return secureStorage.getToken(ACCESS_TOKEN) != null
+    }
+
+    suspend fun getCurrentUser(): UserProfile? {
+        val idToken = secureStorage.getToken(ID_TOKEN) ?: return null
+
+        return try {
+            // JWT parts (0: Header, 1: Payload, 2: Signature)
+            val parts = idToken.split(".")
+            if (parts.size < 2) return null
+
+            val payloadJson = parts[1].decodeBase64Url()
+            val decoded = Json { ignoreUnknownKeys = true }.decodeFromString<GoogleIdTokenPayload>(payloadJson)
+            Logger.d("Decoded payload: $decoded")
+
+            UserProfile(
+                name = decoded.name ?: "User",
+                email = decoded.email ?: "No Email",
+                profileImageUrl = decoded.picture
+            )
+        } catch (e: Exception) {
+            Logger.e("ID Token decoding failed: ${e.message}")
+            null
+        }
+    }
+    private fun String.decodeBase64Url(): String {
+        // Convert Base64Url specific characters (- and _) to standard Base64 (+ and /)
+        var base64 = this.replace("-", "+").replace("_", "/")
+
+        // Add padding (=) to ensure the Base64 string length is a multiple of 4
+        while (base64.length % 4 != 0) {
+            base64 += "="
+        }
+        return base64.decodeBase64String() // Uses io.ktor.util.decodeBase64String
+    }
+
+    suspend fun cancelLogin() {
+        _isLoginInProgress.value = false
+        try {
+            loginHandler.stop()
+        } catch (e: Exception) {
+            Logger.d("Login stop warning: ${e.message}")
+        }
+    }
+
+    suspend fun logout() {
+        clearTokens()
+        _currentUser.value = null
+    }
 }
+
+@Serializable
+private data class GoogleIdTokenPayload(
+    val name: String? = null,
+    val email: String? = null,
+    val picture: String? = null
+)

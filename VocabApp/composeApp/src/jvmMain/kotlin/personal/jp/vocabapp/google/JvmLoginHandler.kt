@@ -36,7 +36,8 @@ class JvmLoginHandler : LoginHandler {
 
         // Prepare the Google Auth URL
         val encodedRedirectUri = URLEncoder.encode(redirectUri, "UTF-8")
-        val encodedScope = URLEncoder.encode("https://www.googleapis.com/auth/userinfo.profile", "UTF-8")
+        val scope = "openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        val encodedScope = URLEncoder.encode(scope, "UTF-8")
 
         val authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=${Secrets.WEB_CLIENT_ID}&" +

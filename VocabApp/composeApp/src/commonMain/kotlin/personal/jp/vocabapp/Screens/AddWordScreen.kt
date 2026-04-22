@@ -30,7 +30,6 @@ import db.Word
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 import personal.jp.vocabapp.google.enrichWordByGemini
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.viewmodels.WordWithTags

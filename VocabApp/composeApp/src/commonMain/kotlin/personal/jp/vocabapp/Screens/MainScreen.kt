@@ -1,15 +1,8 @@
 package personal.jp.vocabapp.Screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,14 +14,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,9 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import personal.jp.vocabapp.viewmodels.WordScreen
 import personal.jp.vocabapp.viewmodels.WordWithTags
+import coil3.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun MainScreen(
+    user: UserProfile?,
     wordsList: List<WordWithTags>,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit = {}
@@ -90,7 +83,7 @@ fun MainScreen(
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                VocabTopBar({ onSettingsClick() })
+                VocabTopBar(user, {onSettingsClick() })
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -128,15 +121,36 @@ fun MainScreen(
 }
 
 @Composable
-fun VocabTopBar(onSettingsClick: () -> Unit) {
+fun VocabTopBar(user: UserProfile?, onSettingsClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // TODO Change Profile Icon if Signed in
-            Icon(Icons.Default.AccountCircle, "Profile", modifier = Modifier.size(32.dp))
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF2B313E)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (user?.profileImageUrl != null) {
+                    AsyncImage(
+                        model = user.profileImageUrl,
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp),
+                        tint = Color.White
+                    )
+                }
+            }
             Spacer(modifier = Modifier.width(12.dp))
             Text("Vocab", fontSize = 24.sp, fontWeight = FontWeight.Bold, )
         }

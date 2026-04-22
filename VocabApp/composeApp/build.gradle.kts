@@ -72,6 +72,9 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0-alpha06")
             implementation(compose.materialIconsExtended)
+            // image
+            implementation("io.coil-kt.coil3:coil-compose:3.4.0")
+            implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
