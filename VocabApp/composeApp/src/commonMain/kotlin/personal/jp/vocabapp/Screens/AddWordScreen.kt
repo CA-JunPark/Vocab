@@ -27,8 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import db.Tag
 import db.Word
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
+import personal.jp.vocabapp.google.enrichWordByGemini
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.viewmodels.WordWithTags
 
@@ -42,9 +45,11 @@ data class Definition(
 @Composable
 fun AddWordScreen(
     wordService: WordServiceImpl,
+    httpClient: HttpClient,
     onClose: () -> Unit,
     onSave: (targetWordName: String, definitions: List<Definition>, tagStrings: List<String>) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var targetWord by remember { mutableStateOf("") }
     var definitions by remember { mutableStateOf(listOf(Definition())) }
     var tagsList by remember { mutableStateOf(emptyList<String>()) }
@@ -119,7 +124,14 @@ fun AddWordScreen(
                         modifier = Modifier.weight(1f)
                     )
                     // AI Fill Button
-                    AIFillButton()
+                    AIFillButton(
+                        targetWord = targetWord,
+                        httpClient = httpClient,
+                        onResult = { newDefinitions, newTags ->
+                            definitions = newDefinitions
+                            tagsList = newTags
+                        }
+                    )
                 }
             }
 
@@ -139,7 +151,7 @@ fun AddWordScreen(
                 )
             }
 
-            // Add Another Definition
+            // Add Another Definition Button
             OutlinedButton(
                 onClick = { definitions = definitions + Definition() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -323,26 +335,75 @@ fun VocabTextField(
     )
 }
 
-fun ClickAIFill(){
-    println("AI FILL")
-    // TODO
-}
-
 @Composable
-fun AIFillButton(){
+fun AIFillButton(
+    targetWord: String,
+    httpClient: HttpClient,
+    onResult: (List<Definition>, List<String>) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isLoading by remember { mutableStateOf(false) }
+
     Button(
-        onClick = {ClickAIFill()},
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
+        onClick = {
+            if (targetWord.isNotBlank() && !isLoading) {
+                scope.launch {
+                    isLoading = true
+                    val result = enrichWordByGemini(httpClient, targetWord)
+
+                    result?.let { gemini ->
+                        val count = maxOf(
+                            gemini.meaningKr.size,
+                            gemini.example.size,
+                            gemini.antonymEn.size
+                        )
+
+                        val newDefinitions = List(count) { index ->
+                            Definition(
+                                meaningKr = gemini.meaningKr.getOrNull(index) ?: "",
+                                exampleSentence = gemini.example.getOrNull(index) ?: "",
+                                antonym = gemini.antonymEn.getOrNull(index) ?: ""
+                            )
+                        }
+
+                        onResult(newDefinitions, gemini.tags)
+                    }
+                    isLoading = false
+                }
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF2D65FF),
+            disabledContainerColor = Color(0xFF2D65FF).copy(alpha = 0.5f)
+        ),
+        enabled = !isLoading,
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp),
         modifier = Modifier.height(56.dp)
     ) {
-        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                color = Color.White,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Icon(
+                Icons.Default.AutoAwesome,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
         Spacer(modifier = Modifier.width(6.dp))
-        Text("AI Fill", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = if (isLoading) "Filling..." else "AI Fill",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
-
 
 @Composable
 fun TagChip(tag: String, onDeleteClick: () -> Unit) {
@@ -377,13 +438,12 @@ fun TagSuggestionsMenu(
     suggestions: List<Tag>,
     onSuggestionClick: (Tag) -> Unit
 ) {
-    // 입력창 바로 아래에 위치하도록 오프셋 조정
     Card(
         modifier = Modifier
-            .padding(top = 60.dp) // TextField 높이만큼 띄움
-            .fillMaxWidth(0.6f), // 너비 조절
+            .padding(top = 60.dp)
+            .fillMaxWidth(0.6f),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF232938)), // 어두운 배경색
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF232938)),
         border = BorderStroke(1.dp, Color(0xFF2B3040))
     ) {
         Column(modifier = Modifier.padding(vertical = 8.dp)) {

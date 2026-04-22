@@ -32,7 +32,7 @@ data class GeminiResponse(
         val tagList = this.tags.map { tagName ->
             db.Tag(
                 tagName = tagName.trim(),
-                color = "#808080" // 기본색. Service의 TagColorManager가 나중에 랜덤색으로 바꿈
+                color = "#808080" // Default color
             )
         }
 

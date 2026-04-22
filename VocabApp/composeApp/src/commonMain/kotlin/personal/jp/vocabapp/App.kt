@@ -89,6 +89,7 @@ fun MyScreen() {
                 is Screen.AddWord -> {
                     AddWordScreen(
                         service,
+                        client,
                         onClose = { currentScreen = Screen.Home },
                         onSave = { targetWord, definitions, tags ->
                             scope.launch {
