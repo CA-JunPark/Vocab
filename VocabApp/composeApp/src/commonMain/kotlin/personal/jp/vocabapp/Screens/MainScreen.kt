@@ -99,7 +99,6 @@ fun MainScreen(
                     selectedMode = selectedMode,
                     onModeChange = { selectedMode = it }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
             }
         },
 
@@ -119,8 +118,7 @@ fun MainScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(4.dp),
         ) {
             items(filteredList, key = { it.word.name }) { item ->
                 WordScreen(item.word.name)
@@ -160,7 +158,7 @@ fun SearchBar(
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(12.dp)),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).clip(RoundedCornerShape(12.dp)),
         placeholder = { Text("Search words...", color = Color.Gray) },
         leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
         colors = TextFieldDefaults.colors(

@@ -73,7 +73,6 @@ fun AddWordScreen(
 
             VocabTextField(label = "Word", value = word, onValueChange = { word = it }, placeholder = "e.g. Ephemeral")
 
-            // Gemini Auto-fill 배너
             GeminiAutoFillBanner()
 
             VocabTextField(label = "Meaning (KR)", value = meaning, onValueChange = { meaning = it }, placeholder = "Korean translation")
@@ -171,8 +170,8 @@ fun VocabTextField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFF1B202D),
                 unfocusedContainerColor = Color(0xFF1B202D),
-                focusedBorderColor = Color(0xFF2D65FF), // 포커스 시 파란색 테두리
-                unfocusedBorderColor = Color(0xFF2B3040), // 평소엔 은은한 테두리
+                focusedBorderColor = Color(0xFF2D65FF),
+                unfocusedBorderColor = Color(0xFF2B3040),
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
                 cursorColor = Color(0xFF2D65FF)
@@ -194,7 +193,6 @@ fun GeminiAutoFillBanner() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        // 임시 텍스트 로고 (실제 SVG 로고로 대체 가능)
         Text("✨ Gemini", color = Color(0xFFA1A9BD), fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Spacer(modifier = Modifier.width(12.dp))
         Text("Auto-fill (Coming Soon)", color = Color(0xFFA1A9BD), fontSize = 14.sp)
