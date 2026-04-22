@@ -1,16 +1,20 @@
 package personal.jp.vocabapp.Screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome // AI Fill 아이콘으로 대체
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.rounded.Label
+import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,24 +25,52 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import db.Tag
 import db.Word
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.time.delay
+import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.viewmodels.WordWithTags
+
+// Data class for managing multiple definitions
+data class Definition(
+    val meaningKr: String = "",
+    val exampleSentence: String = "",
+    val antonym: String = ""
+)
 
 @Composable
 fun AddWordScreen(
+    wordService: WordServiceImpl,
     onClose: () -> Unit,
-    onSave: (word: Word, wordWithTags: WordWithTags) -> Unit
+    onSave: (targetWordName: String, definitions: List<Definition>, tagStrings: List<String>) -> Unit
 ) {
-    var word by remember { mutableStateOf("") }
-    var meaning by remember { mutableStateOf("") }
-    var example by remember { mutableStateOf("") }
-    var antonym by remember { mutableStateOf("") }
-    var tags by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
+    var targetWord by remember { mutableStateOf("") }
+    var definitions by remember { mutableStateOf(listOf(Definition())) }
+    var tagsList by remember { mutableStateOf(emptyList<String>()) }
+    var tagInputText by remember { mutableStateOf("") }
+
+    var tagSuggestions by remember { mutableStateOf(emptyList<Tag>()) }
+    var showSuggestions by remember { mutableStateOf(false) }
+
+    LaunchedEffect(tagInputText) {
+        if (tagInputText.isNotBlank()) {
+            delay(300)
+            tagSuggestions = wordService.searchTags(tagInputText)
+            showSuggestions = tagSuggestions.isNotEmpty()
+        } else {
+            tagSuggestions = emptyList()
+            showSuggestions = false
+        }
+    }
+
+    val onSaveAction = {
+        onSave(targetWord, definitions, tagsList)
+    }
 
     Scaffold(
         topBar = {
-            AddWordTopBar(onClose = onClose)
+            AddWordTopBar(onClose = onClose, onSave = onSaveAction)
         },
         bottomBar = {
             Box(
@@ -48,7 +80,7 @@ fun AddWordScreen(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = { /*TODO onSave*/ },
+                    onClick = onSaveAction,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
                     shape = RoundedCornerShape(12.dp)
@@ -67,134 +99,322 @@ fun AddWordScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            VocabTextField(label = "Word", value = word, onValueChange = { word = it }, placeholder = "e.g. Ephemeral")
+            // Target Word Section
+            Column {
+                Text("TARGET WORD", color = Color(0xFFA1A9BD), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    VocabTextField(
+                        value = targetWord,
+                        onValueChange = { targetWord = it },
+                        placeholder = "Enter word...",
+                        modifier = Modifier.weight(1f)
+                    )
+                    // AI Fill Button
+                    AIFillButton()
+                }
+            }
 
-            GeminiAutoFillBanner()
+            // Definitions Section
+            definitions.forEachIndexed { index, definition ->
+                DefinitionCard(
+                    definition = definition,
+                    index = index,
+                    onDefinitionChange = { updatedDef ->
+                        definitions = definitions.mapIndexed { i, d -> if (i == index) updatedDef else d }
+                    },
+                    onDeleteClick = {
+                        if (definitions.size > 1) {
+                            definitions = definitions.filterIndexed { i, _ -> i != index }
+                        }
+                    }
+                )
+            }
 
-            VocabTextField(label = "Meaning (KR)", value = meaning, onValueChange = { meaning = it }, placeholder = "Korean translation")
+            // Add Another Definition
+            OutlinedButton(
+                onClick = { definitions = definitions + Definition() },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFF2B3040)),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+            ) {
+                Icon(Icons.Outlined.AddCircleOutline, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("ADD ANOTHER DEFINITION", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            }
 
-            VocabTextField(
-                label = "Example Sentence",
-                value = example,
-                onValueChange = { example = it },
-                placeholder = "Enter a sentence using the word...",
-                singleLine = false,
-                modifier = Modifier.height(100.dp) // 높이를 키움
-            )
+            // Tags Section
+            Column {
+                Text("TAGS", color = Color(0xFFA1A9BD), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(12.dp))
 
-            VocabTextField(
-                label = "Opposite Word",
-                value = antonym,
-                onValueChange = { antonym = it },
-                placeholder = "Antonym",
-                leadingIcon = { Icon(Icons.Rounded.SwapHoriz, contentDescription = null, tint = Color.Gray) }
-            )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tagsList.forEach { tag ->
+                        TagChip(tag = tag, onDeleteClick = { tagsList = tagsList.filter { it != tag } })
+                    }
+                }
 
-            VocabTextField(
-                label = "Tags",
-                value = tags,
-                onValueChange = { tags = it },
-                placeholder = "e.g. Verbs, N5",
-                leadingIcon = { Icon(Icons.Rounded.Label, contentDescription = null, tint = Color.Gray) }
-            )
+                if (tagsList.isNotEmpty()) Spacer(modifier = Modifier.height(12.dp))
 
-            VocabTextField(
-                label = "Notes",
-                value = notes,
-                onValueChange = { notes = it },
-                placeholder = "Add any personal notes...",
-                singleLine = false,
-                modifier = Modifier.height(100.dp)
-            )
+                Box {
+                    VocabTextField(
+                        value = tagInputText,
+                        onValueChange = { tagInputText = it },
+                        placeholder = "ADD TAG...",
+                        trailingIcon = {
+                            if (tagInputText.isNotBlank()) {
+                                IconButton(onClick = {
+                                    if (!tagsList.contains(tagInputText.trim())) {
+                                        tagsList = tagsList + tagInputText.trim()
+                                    }
+                                    tagInputText = ""
+                                    showSuggestions = false
+                                }) {
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                                }
+                            }
+                        }
+                    )
 
-            Spacer(modifier = Modifier.height(32.dp)) // 하단 버튼이 가리지 않도록 여백
+                    // Tag Suggestions
+                    if (showSuggestions) {
+                        TagSuggestionsMenu(
+                            suggestions = tagSuggestions,
+                            onSuggestionClick = { selectedTag ->
+                                if (!tagsList.contains(selectedTag.tagName)) {
+                                    tagsList = tagsList + selectedTag.tagName
+                                }
+                                tagInputText = ""
+                                showSuggestions = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
 
 @Composable
-fun AddWordTopBar(onClose: () -> Unit) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+fun AddWordTopBar(onClose: () -> Unit, onSave: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onClose) {
+            Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+        }
+        Text(
+            text = "Add Word",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+        IconButton(onClick = onSave) {
+            Icon(Icons.Default.Check, contentDescription = "Save", tint = Color(0xFF2D65FF))
+        }
+    }
+}
+
+@Composable
+fun DefinitionCard(
+    definition: Definition,
+    index: Int,
+    onDefinitionChange: (Definition) -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1B202D).copy(alpha = 0.5f)),
+        border = BorderStroke(1.dp, Color(0xFF2B3040))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("DEFINITION ${index + 1}", color = Color(0xFF2D65FF), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
+                    Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFF626978))
+                }
             }
-            Text(
-                text = "Add Word",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f).padding(end = 48.dp), // 중앙 정렬을 위해 우측 패딩 조정
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("MEANING (KR)", color = Color(0xFFA1A9BD), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            VocabTextField(
+                value = definition.meaningKr,
+                onValueChange = { onDefinitionChange(definition.copy(meaningKr = it)) },
+                placeholder = "Meaning"
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("EXAMPLE SENTENCE", color = Color(0xFFA1A9BD), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            VocabTextField(
+                value = definition.exampleSentence,
+                onValueChange = { onDefinitionChange(definition.copy(exampleSentence = it)) },
+                placeholder = "Write an example sentence...",
+                singleLine = false,
+                modifier = Modifier.height(100.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("OPPOSITE WORD", color = Color(0xFFA1A9BD), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            VocabTextField(
+                value = definition.antonym,
+                onValueChange = { onDefinitionChange(definition.copy(antonym = it)) },
+                placeholder = "Antonym"
             )
         }
-        HorizontalDivider(color = Color(0xFF2B3040), thickness = 1.dp)
     }
 }
 
 @Composable
 fun VocabTextField(
-    label: String,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
     singleLine: Boolean = true,
-    leadingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
-    Column {
-        Text(
-            text = label,
-            color = Color.White,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        placeholder = { Text(placeholder, color = Color(0xFF626978), fontSize = 14.sp) },
+        trailingIcon = trailingIcon,
+        singleLine = singleLine,
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color(0xFF1B202D),
+            unfocusedContainerColor = Color(0xFF1B202D),
+            focusedBorderColor = Color(0xFF2D65FF),
+            unfocusedBorderColor = Color(0xFF2B3040),
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = modifier.fillMaxWidth(),
-            placeholder = { Text(placeholder, color = Color.Gray) },
-            leadingIcon = leadingIcon,
-            singleLine = singleLine,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF1B202D),
-                unfocusedContainerColor = Color(0xFF1B202D),
-                focusedBorderColor = Color(0xFF2D65FF),
-                unfocusedBorderColor = Color(0xFF2B3040),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = Color(0xFF2D65FF)
+    )
+}
+
+fun ClickAIFill(){
+    println("AI FILL")
+    // TODO
+}
+
+@Composable
+fun AIFillButton(){
+    Button(
+        onClick = {ClickAIFill()},
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp),
+        modifier = Modifier.height(56.dp)
+    ) {
+        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+        Text("AI Fill", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+
+@Composable
+fun TagChip(tag: String, onDeleteClick: () -> Unit) {
+    Surface(
+        color = Color(0xFF2D65FF).copy(alpha = 0.1f),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color(0xFF2D65FF).copy(alpha = 0.2f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = tag.uppercase(),
+                color = Color(0xFF2D65FF),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
             )
-        )
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(
+                Icons.Default.Close,
+                contentDescription = null,
+                tint = Color(0xFF2D65FF),
+                modifier = Modifier.size(14.dp).clickable { onDeleteClick() }
+            )
+        }
     }
 }
 
 @Composable
-fun GeminiAutoFillBanner() {
-    Row(
+fun TagSuggestionsMenu(
+    suggestions: List<Tag>,
+    onSuggestionClick: (Tag) -> Unit
+) {
+    // 입력창 바로 아래에 위치하도록 오프셋 조정
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF1B202D))
-            .border(1.dp, Color(0xFF2B3040), RoundedCornerShape(12.dp))
-            .clickable { /* TODO: Gemini API 연결 */ }
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+            .padding(top = 60.dp) // TextField 높이만큼 띄움
+            .fillMaxWidth(0.6f), // 너비 조절
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF232938)), // 어두운 배경색
+        border = BorderStroke(1.dp, Color(0xFF2B3040))
     ) {
-        Text("✨ Gemini", color = Color(0xFFA1A9BD), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text("Auto-fill (Coming Soon)", color = Color(0xFFA1A9BD), fontSize = 14.sp)
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            // 헤더 섹션
+            Text(
+                "SUGGESTIONS",
+                color = Color(0xFF626978),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            // 추천 리스트
+            suggestions.take(5).forEach { tag ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSuggestionClick(tag) }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        tag.tagName,
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    // 현재 입력 중인 태그와 정확히 일치하면 체크 표시 (옵션)
+                    // if (isExactMatch) Icon(...)
+                }
+            }
+        }
     }
 }

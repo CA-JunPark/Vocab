@@ -88,10 +88,12 @@ fun MyScreen() {
 
                 is Screen.AddWord -> {
                     AddWordScreen(
+                        service,
                         onClose = { currentScreen = Screen.Home },
-                        onSave = { word, wordWithTags ->
+                        onSave = { targetWord, definitions, tags ->
                             scope.launch {
-                                // Refresh and load words before go back to Home
+                                // TODO: DB Save logic
+                                // ex: wordService.saveWordWithMultipleDefinitions(targetWord, definitions, tags)
                                 refreshWords()
                                 currentScreen = Screen.Home
                             }
