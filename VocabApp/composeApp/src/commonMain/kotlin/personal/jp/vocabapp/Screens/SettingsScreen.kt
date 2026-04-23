@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.DialogProperties
 import db.Tag
 import kotlinx.coroutines.launch
 import personal.jp.vocabapp.sql.WordServiceImpl
@@ -43,6 +45,7 @@ fun SettingsScreen(
     userProfile: UserProfile?,
     isLoginInProgress: Boolean,
     hasPendingChanges: Boolean,
+    isSyncing: Boolean,
     wordService: WordServiceImpl,
     onBackClick: () -> Unit,
     onLoginClick: () -> Unit,
@@ -102,6 +105,12 @@ fun SettingsScreen(
                         }
                     }
                 )
+            }
+
+            // Dialogs
+
+            if (isSyncing) {
+                SyncInProgressDialog()
             }
 
             if (showDeleteTagsDialog) {
@@ -485,6 +494,43 @@ fun DeleteUnusedTagsDialog(
             TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
                 Text("Cancel", color = Color(0xFF9BA1B0), fontWeight = FontWeight.Medium)
             }
+        }
+    )
+}
+
+@Composable
+fun SyncInProgressDialog() {
+    AlertDialog(
+        onDismissRequest = { },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        confirmButton = { },
+        icon = {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = Color(0xFF2D65FF),
+                strokeWidth = 4.dp
+            )
+        },
+        title = {
+            Text(
+                "Syncing Data...",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Text(
+                "Please wait while we synchronize your vocabulary with the server.",
+                color = Color(0xFF9BA1B0),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     )
 }

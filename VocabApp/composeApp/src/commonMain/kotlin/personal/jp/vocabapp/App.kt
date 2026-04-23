@@ -67,6 +67,7 @@ fun MyScreen() {
 
     val userProfile by authRepository.currentUser.collectAsState()
     val isLoginInProgress by authRepository.isLoginInProgress.collectAsState()
+    var isSyncing by remember { mutableStateOf(false) }
 
     // refresh Words
     val refreshWords = {
@@ -126,6 +127,7 @@ fun MyScreen() {
                         userProfile = userProfile,
                         isLoginInProgress = isLoginInProgress,
                         hasPendingChanges = hasPendingChanges,
+                        isSyncing = isSyncing,
                         wordService = service,
                         onBackClick = { currentScreen = Screen.Home },
                         onLoginClick = {
@@ -140,8 +142,13 @@ fun MyScreen() {
                         },
                         onSyncClick = {
                             scope.launch {
-                                sync(client, service, keyDataManager)
-                                refreshWords()
+                                isSyncing = true
+                                try {
+                                    sync(client, service, keyDataManager)
+                                    refreshWords()
+                                } finally {
+                                    isSyncing = false
+                                }
                             }
                         },
                         onCancelLogin = {
