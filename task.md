@@ -47,8 +47,8 @@
 ### Model
 - [x] Define `Word` class
     - [x] Add `name`,  `meaningKr`, `example`, `oppositeEn`, `tags`, `createdTime`, `modifiedTime`, `isDeleted`, `synced`, `note` fields
-- [ ] Define `Tag` class
-    - [ ] Add `tag_name` and `color` fields
+- [x] Define `Tag` class
+    - [x] Add `tag_name` and `color` fields
 
 ### Storage (SQLDelight)
 - [x] Create database and tables
@@ -68,7 +68,7 @@
     - [x] Delete tag
     - [x] Update tag
         - [x] cannot be empty
-    - [ ] Get similar tags
+    - [x] Get similar tags
     - [x] Delete tags that are not used
         - [ ] In setting add "Delete unused tags" button
 
@@ -117,7 +117,7 @@
 - [ ] **Settings Screen**
     - [x] Google Login button
     - [x] Account info display
-    - [ ] Manual Sync button
+    - [x] Manual Sync button
     - [ ] Tag list
     - [ ] ESC to close (Desktop only)
     - [ ] The Legal/Credits Button
@@ -159,3 +159,4 @@
 - [x] load tokens to header after google login (right now the app needs to be restarted)
 - [ ] Sync Conflict UI: ask to choose which one to keep when conflict happens
 - [ ] App Icon
+- [ ] gemini response time out

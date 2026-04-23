@@ -93,6 +93,10 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
             contentType(ContentType.Application.Json)
             setBody(SyncRequest(lastSyncTime = lastSyncedTime, localChanges = localChanges))
         }
+        Logger.d { "HTTP Status: ${response.status}" }
+
+        val responseText = response.bodyAsText()
+        println("RAW SERVER RESPONSE: $responseText")
 
         val syncResult = response.body<SyncResponse>()
 
@@ -109,6 +113,7 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         keyDataManager.saveLastSync(syncResult.serverTime)
     } catch (e: Exception) {
         Logger.e { "Sync Failed: ${e.message}" }
+        e.printStackTrace()
     }
 }
 

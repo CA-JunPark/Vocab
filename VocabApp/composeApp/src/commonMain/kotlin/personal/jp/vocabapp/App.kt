@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import personal.jp.vocabapp.Screens.SettingsScreen
+import personal.jp.vocabapp.sql.sync
 
 @Composable
 @Preview
@@ -48,6 +49,21 @@ fun MyScreen() {
 
     var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
 
+    var hasPendingChanges by remember { mutableStateOf(false) }
+
+    val checkPendingChanges = {
+        scope.launch {
+            val lastSync = keyDataManager.getLastSync() ?: "1970-01-01 00:00:00"
+            val latestLocal = service.getLatestModifiedTime()
+
+            hasPendingChanges = if (latestLocal != null) {
+                latestLocal > lastSync
+            } else {
+                false
+            }
+        }
+    }
+
     val userProfile by authRepository.currentUser.collectAsState()
     val isLoginInProgress by authRepository.isLoginInProgress.collectAsState()
 
@@ -58,6 +74,7 @@ fun MyScreen() {
             allWordsWithTags = rawWords.map { word ->
                 WordWithTags(word, service.getTagsForWord(word.name))
             }
+            checkPendingChanges()
         }
     }
     LaunchedEffect(Unit) {
@@ -109,6 +126,7 @@ fun MyScreen() {
                     SettingsScreen(
                         userProfile = userProfile,
                         isLoginInProgress = isLoginInProgress,
+                        hasPendingChanges = hasPendingChanges,
                         onBackClick = { currentScreen = Screen.Home },
                         onLoginClick = {
                             scope.launch {
@@ -120,8 +138,12 @@ fun MyScreen() {
                                 authRepository.logout()
                             }
                         },
-                        // TODO
-                        onSyncClick = {  },
+                        onSyncClick = {
+                            scope.launch {
+                                sync(client, service, keyDataManager)
+                                refreshWords()
+                            }
+                        },
                         onCancelLogin = {
                             scope.launch { authRepository.cancelLogin() }
                         }

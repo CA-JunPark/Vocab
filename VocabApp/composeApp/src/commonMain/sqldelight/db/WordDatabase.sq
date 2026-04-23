@@ -122,3 +122,9 @@ WHERE tagName = :oldTagName;
 deleteUnusedTags:
 DELETE FROM Tag
 WHERE tagName NOT IN (SELECT DISTINCT tagName FROM WordTag);
+
+getLastModifiedTime:
+SELECT modifiedTime
+FROM Word
+ORDER BY modifiedTime DESC
+LIMIT 1;

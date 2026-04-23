@@ -24,6 +24,7 @@ interface WordRepo {
     suspend fun getTagsForWord(wordName: String): List<Tag>
     suspend fun searchTags(query: String): List<Tag>
     suspend fun updateTagInfo(oldName: String, newName: String, color: String): Boolean
+    suspend fun getLatestModifiedTime(): String?
 }
 
 // TODO Exception handling
@@ -175,5 +176,13 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         } catch (e: Exception) {
             false
         }
+    }
+
+    override suspend fun getLatestModifiedTime(): String? = withContext(Dispatchers.IO) {
+       try {
+           _queries.getLastModifiedTime().executeAsOneOrNull()
+       } catch (e: Exception) {
+           null
+       }
     }
 }

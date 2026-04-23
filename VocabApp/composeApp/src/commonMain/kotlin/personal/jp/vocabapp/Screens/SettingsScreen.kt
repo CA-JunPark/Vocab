@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import personal.jp.vocabapp.sql.sync
 
 data class UserProfile(
     val name: String,
@@ -34,6 +35,7 @@ data class UserProfile(
 fun SettingsScreen(
     userProfile: UserProfile?,
     isLoginInProgress: Boolean,
+    hasPendingChanges: Boolean,
     onBackClick: () -> Unit,
     onLoginClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -325,30 +327,34 @@ fun SyncDataCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = if (isLoggedIn) "Local change..." else "Please login to sync data",
+                    text = if (!isLoggedIn) {
+                        "Please login to sync data"
+                    } else if (hasPendingChanges) {
+                        "Pending local changes detected" 
+                    } else {
+                        "All data is up to date"
+                    },
                     color = Color(0xFF9BA1B0),
                     fontSize = 13.sp
                 )
             }
 
             if (isLoggedIn && hasPendingChanges) {
-                Surface(
-                    color = Color(0xFF2B2216),
-                    shape = RoundedCornerShape(12.dp)
+                Button(
+                    onClick = onSyncClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2D65FF),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.height(36.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(Color(0xFFE6A23C)))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            "CHANGES PENDING",
-                            color = Color(0xFFE6A23C),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        "Sync Now",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

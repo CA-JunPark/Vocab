@@ -12,6 +12,8 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
@@ -30,6 +32,14 @@ private val refreshClient = HttpClient(CIO) {
 
 fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO) {
+//        install(Logging) {
+//            logger = object : io.ktor.client.plugins.logging.Logger {
+//                override fun log(message: String) {
+//                    Logger.d { "HTTP Client: $message" }
+//                }
+//            }
+//            level = LogLevel.HEADERS
+//        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -39,16 +49,18 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
         }
         install(Auth) {
             bearer {
-                ->
+                cacheTokens = false
                 loadTokens {
+                    // use idToken since backend checks email data
                     val idToken = secureStorage.getToken(ID_TOKEN)
                     val refresh = secureStorage.getToken(REFRESH_TOKEN)
-                    if (idToken.isEmpty() || refresh.isEmpty()) null
+
+                    if (idToken.isEmpty()) null
                     else BearerTokens(idToken, refresh)
                 }
 
                 refreshTokens {
-                    Logger.i { "401 Unauthorized detected. Attempting to refresh token..." }
+                    Logger.i { "401 Unauthorized detected. Attempting to refresh ID Token..." }
                     try {
                         val response = refreshClient.post("https://oauth2.googleapis.com/token") {
                             setBody(FormDataContent(Parameters.build {
@@ -61,32 +73,26 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
 
                         if (response.status.value == 200) {
                             val tokenData: TokenResponse = response.body()
-                            // oldToken.accessToken is ID token
+
                             val newIdToken = tokenData.idToken ?: ""
                             val newRefreshToken = tokenData.refreshToken ?: oldTokens?.refreshToken ?: ""
 
-                            // save to storage
                             if (newIdToken.isNotEmpty()) {
                                 secureStorage.saveToken(ID_TOKEN, newIdToken)
-                            }
-                            if (newRefreshToken.isNotEmpty()) {
-                                secureStorage.saveToken(REFRESH_TOKEN, newRefreshToken)
+                                Logger.i { "ID Token refreshed successfully." }
                             }
 
-                            Logger.i { "Token refreshed successfully." }
+                            // Ktor에게 새 토큰을 전달하여 재시도하게 합니다
                             BearerTokens(newIdToken, newRefreshToken)
                         } else {
-                            // if refresh fails, delete tokens
                             Logger.e { "Refresh failed: ${response.status}" }
-                            secureStorage.deleteToken(ID_TOKEN)
-                            secureStorage.deleteToken(REFRESH_TOKEN)
                             null
                         }
                     } catch (e: Exception) {
+                        Logger.e { "Refresh Exception: ${e.message}" }
                         null
                     }
                 }
-
             }
         }
     }
