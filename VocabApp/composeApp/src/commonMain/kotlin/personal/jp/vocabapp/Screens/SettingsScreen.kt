@@ -74,7 +74,7 @@ fun SettingsScreen(
             SettingsSection(title = "DATA MANAGEMENT") {
                 SyncDataCard(
                     isLoggedIn = userProfile != null,
-                    hasPendingChanges = true,
+                    hasPendingChanges = hasPendingChanges,
                     onSyncClick = onSyncClick
                 )
             }
@@ -327,35 +327,28 @@ fun SyncDataCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = if (!isLoggedIn) {
-                        "Please login to sync data"
-                    } else if (hasPendingChanges) {
-                        "Pending local changes detected" 
-                    } else {
-                        "All data is up to date"
+                    text = when {
+                        !isLoggedIn -> "Please login to sync your data"
+                        hasPendingChanges -> "Pending changes detected"
+                        else -> "All data is up to date"
                     },
                     color = Color(0xFF9BA1B0),
                     fontSize = 13.sp
                 )
             }
 
-            if (isLoggedIn && hasPendingChanges) {
-                Button(
-                    onClick = onSyncClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2D65FF),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                    modifier = Modifier.height(36.dp)
-                ) {
-                    Text(
-                        "Sync Now",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+            TextButton(
+                onClick = onSyncClick,
+                enabled = isLoggedIn && hasPendingChanges,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color(0xFF2D65FF),
+                    disabledContentColor = Color(0xFF626978)
+                )
+            ) {
+                Text(
+                    text = "Sync Now",
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

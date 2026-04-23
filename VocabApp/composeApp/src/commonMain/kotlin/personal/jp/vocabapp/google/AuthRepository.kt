@@ -170,7 +170,7 @@ class AuthRepository(
 
             val payloadJson = parts[1].decodeBase64Url()
             val decoded = Json { ignoreUnknownKeys = true }.decodeFromString<GoogleIdTokenPayload>(payloadJson)
-            Logger.d("Decoded payload: $decoded")
+//            Logger.d("Decoded payload: $decoded")
 
             UserProfile(
                 name = decoded.name ?: "User",
