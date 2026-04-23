@@ -76,7 +76,7 @@ class WordViewModel(private val wordService: WordService) : ViewModel() {
 }
 
 @Composable
-fun WordScreen(word: String) {
+fun WordCard(word: String, onClick: () -> Unit) {
     val viewModel: WordViewModel = koinViewModel(key = word)
     val state = viewModel.uiState.collectAsState().value
     LaunchedEffect(word) {
@@ -89,8 +89,7 @@ fun WordScreen(word: String) {
 
         Button(
             onClick = {
-                println("Click")
-                // open detail
+                onClick()
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surface,

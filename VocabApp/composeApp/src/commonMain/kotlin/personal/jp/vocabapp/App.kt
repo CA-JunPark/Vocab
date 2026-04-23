@@ -28,6 +28,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import db.Word
 import personal.jp.vocabapp.Screens.SettingsScreen
+import personal.jp.vocabapp.Screens.WordDetailScreen
 import personal.jp.vocabapp.sql.sync
 
 @Composable
@@ -100,7 +101,10 @@ fun MyScreen() {
                         userProfile,
                         wordsList = allWordsWithTags,
                         onAddClick = { currentScreen = Screen.AddWord },
-                        onSettingsClick = { currentScreen = Screen.Settings }
+                        onSettingsClick = { currentScreen = Screen.Settings },
+                        onWordClick = { name ->
+                            currentScreen = Screen.WordDetail(name)
+                        }
                     )
                 }
 
@@ -119,7 +123,16 @@ fun MyScreen() {
                 }
 
                 is Screen.WordDetail -> {
-                    //TODO
+                    WordDetailScreen(
+                        wordName = screen.wordName,
+                        wordService = service,
+                        onEditClick = {
+                            // TODO
+                        },
+                        onClose = {
+                            currentScreen = Screen.Home
+                        }
+                    )
                 }
 
                 is Screen.Settings -> {

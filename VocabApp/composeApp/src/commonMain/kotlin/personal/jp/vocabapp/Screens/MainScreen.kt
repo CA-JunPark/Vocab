@@ -48,17 +48,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import personal.jp.vocabapp.viewmodels.WordScreen
 import personal.jp.vocabapp.viewmodels.WordWithTags
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import personal.jp.vocabapp.viewmodels.WordCard
 
 @Composable
 fun MainScreen(
     user: UserProfile?,
     wordsList: List<WordWithTags>,
     onAddClick: () -> Unit,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onWordClick: (String) -> Unit
 ){
     var searchQuery by remember { mutableStateOf("") }
     var selectedMode by remember { mutableStateOf(SearchMode.Content) }
@@ -114,7 +115,7 @@ fun MainScreen(
             contentPadding = PaddingValues(4.dp),
         ) {
             items(filteredList, key = { it.word.name }) { item ->
-                WordScreen(item.word.name)
+                 WordCard(item.word.name, { onWordClick(item.word.name) })
             }
         }
     }
