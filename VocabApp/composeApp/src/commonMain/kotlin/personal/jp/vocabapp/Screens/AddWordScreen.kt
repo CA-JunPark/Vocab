@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -59,6 +60,8 @@ fun AddWordScreen(
     var tagSuggestions by remember { mutableStateOf(emptyList<Tag>()) }
     var showSuggestions by remember { mutableStateOf(false) }
 
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     LaunchedEffect(tagInputText) {
         if (tagInputText.isNotBlank()) {
@@ -71,6 +74,12 @@ fun AddWordScreen(
         }
     }
 
+    if (showErrorDialog) {
+        GeminiErrorDialog(
+            message = errorMessage,
+            onDismiss = { showErrorDialog = false }
+        )
+    }
 
     val handleSave = {
         scope.launch {
@@ -176,6 +185,10 @@ fun AddWordScreen(
                             targetWord = correctedName
                             definitions = newDefinitions
                             tagsList = newTags
+                        },
+                        onError = { message ->
+                            errorMessage = message
+                            showErrorDialog = true
                         }
                     )
                 }
@@ -394,7 +407,8 @@ fun AIFillButton(
     httpClient: HttpClient,
     isLoading: Boolean,
     onLoadingChange: (Boolean) -> Unit,
-    onResult: (String, List<Definition>, List<String>) -> Unit
+    onResult: (String, List<Definition>, List<String>) -> Unit,
+    onError: (String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -405,22 +419,24 @@ fun AIFillButton(
                     onLoadingChange(true)
                     val result = enrichWordByGemini(httpClient, targetWord)
                     onLoadingChange(false)
-                    result?.let { gemini ->
+                    if (result != null) {
                         val count = maxOf(
-                            gemini.meaningKr.size,
-                            gemini.example.size,
-                            gemini.antonymEn.size
+                            result.meaningKr.size,
+                            result.example.size,
+                            result.antonymEn.size
                         )
 
                         val newDefinitions = List(count) { index ->
                             Definition(
-                                meaningKr = gemini.meaningKr.getOrNull(index) ?: "",
-                                exampleSentence = gemini.example.getOrNull(index) ?: "",
-                                antonym = gemini.antonymEn.getOrNull(index) ?: ""
+                                meaningKr = result.meaningKr.getOrNull(index) ?: "",
+                                exampleSentence = result.example.getOrNull(index) ?: "",
+                                antonym = result.antonymEn.getOrNull(index) ?: ""
                             )
                         }
 
-                        onResult(gemini.name, newDefinitions, gemini.tags)
+                        onResult(result.name, newDefinitions, result.tags)
+                    } else {
+                        onError("Failed to fetch data from Gemini. Please check your internet connection or try again later.")
                     }
                 }
             }
@@ -500,7 +516,6 @@ fun TagSuggestionsMenu(
         border = BorderStroke(1.dp, Color(0xFF2B3040))
     ) {
         Column(modifier = Modifier.padding(vertical = 8.dp)) {
-            // 헤더 섹션
             Text(
                 "SUGGESTIONS",
                 color = Color(0xFF626978),
@@ -509,7 +524,6 @@ fun TagSuggestionsMenu(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // 추천 리스트
             suggestions.take(5).forEach { tag ->
                 Row(
                     modifier = Modifier
@@ -524,10 +538,59 @@ fun TagSuggestionsMenu(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
-                    // 현재 입력 중인 태그와 정확히 일치하면 체크 표시 (옵션)
-                    // if (isExactMatch) Icon(...)
                 }
             }
         }
     }
+}
+
+
+@Composable
+fun GeminiErrorDialog(
+    message: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = null,
+                tint = Color(0xFFFF5252),
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color(0xFFFF5252).copy(alpha = 0.1f), CircleShape)
+                    .padding(8.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "AI Fill Failed",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                color = Color(0xFF9BA1B0),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("OK", color = Color(0xFF2D65FF), fontWeight = FontWeight.Bold)
+            }
+        }
+    )
 }
