@@ -103,12 +103,12 @@
     - [ ] TTS button (Android only)
     - [ ] ESC to close (Desktop only)
 - [ ] **Add Screen** (Modal)
-    - [ ] Input field for word
-    - [ ] gemini button to generate fields
-        - [ ] show error if not Google Sign-in
-    - [ ] other editable fields (meaningKr, example, oppositeEn, tags, note)
-    - [ ] tags field showing similar tags (suggestion)
-    - [ ] save button (FAB)
+    - [x] Input field for word
+    - [x] gemini button to generate fields
+        - [x] show error if not Google Sign-in
+    - [x] other editable fields (meaningKr, example, oppositeEn, tags, note)
+    - [x] tags field showing similar tags (suggestion)
+    - [x] save button (FAB)
     - [ ] ESC to close (Desktop only)
 - [ ] **Edit Screen** (Modal)
     - [ ] editable fields (word, meaningKr, example, oppositeEn, tags, note)

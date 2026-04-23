@@ -54,9 +54,11 @@ fun AddWordScreen(
     var definitions by remember { mutableStateOf(listOf(Definition())) }
     var tagsList by remember { mutableStateOf(emptyList<String>()) }
     var tagInputText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     var tagSuggestions by remember { mutableStateOf(emptyList<Tag>()) }
     var showSuggestions by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(tagInputText) {
         if (tagInputText.isNotBlank()) {
@@ -154,13 +156,24 @@ fun AddWordScreen(
                         value = targetWord,
                         onValueChange = { targetWord = it },
                         placeholder = "Enter word...",
+                        enabled = !isLoading,
                         modifier = Modifier.weight(1f)
                     )
                     // AI Fill Button
                     AIFillButton(
                         targetWord = targetWord,
                         httpClient = httpClient,
-                        onResult = { newDefinitions, newTags ->
+                        isLoading = isLoading,
+                        onLoadingChange = { loading ->
+                            isLoading = loading
+                            // clear all the data when AI fill starts
+                            if (loading) {
+                                definitions = listOf(Definition())
+                                tagsList = emptyList()
+                            }
+                        },
+                        onResult = { correctedName, newDefinitions, newTags ->
+                            targetWord = correctedName
                             definitions = newDefinitions
                             tagsList = newTags
                         }
@@ -173,6 +186,7 @@ fun AddWordScreen(
                 DefinitionCard(
                     definition = definition,
                     index = index,
+                    enabled = !isLoading,
                     onDefinitionChange = { updatedDef ->
                         definitions = definitions.mapIndexed { i, d -> if (i == index) updatedDef else d }
                     },
@@ -284,6 +298,7 @@ fun AddWordTopBar(onClose: () -> Unit, onSave: () -> Unit) {
 fun DefinitionCard(
     definition: Definition,
     index: Int,
+    enabled: Boolean,
     onDefinitionChange: (Definition) -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -312,7 +327,8 @@ fun DefinitionCard(
             VocabTextField(
                 value = definition.meaningKr,
                 onValueChange = { onDefinitionChange(definition.copy(meaningKr = it)) },
-                placeholder = "Meaning"
+                placeholder = "Meaning",
+                enabled = enabled
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -324,7 +340,8 @@ fun DefinitionCard(
                 onValueChange = { onDefinitionChange(definition.copy(exampleSentence = it)) },
                 placeholder = "Write an example sentence...",
                 singleLine = false,
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier.height(100.dp),
+                enabled = enabled
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -334,7 +351,8 @@ fun DefinitionCard(
             VocabTextField(
                 value = definition.antonym,
                 onValueChange = { onDefinitionChange(definition.copy(antonym = it)) },
-                placeholder = "Antonym"
+                placeholder = "Antonym",
+                enabled = enabled
             )
         }
     }
@@ -347,11 +365,13 @@ fun VocabTextField(
     placeholder: String,
     modifier: Modifier = Modifier,
     singleLine: Boolean = true,
+    enabled: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
+        enabled = enabled,
         modifier = modifier.fillMaxWidth(),
         placeholder = { Text(placeholder, color = Color(0xFF626978), fontSize = 14.sp) },
         trailingIcon = trailingIcon,
@@ -372,18 +392,19 @@ fun VocabTextField(
 fun AIFillButton(
     targetWord: String,
     httpClient: HttpClient,
-    onResult: (List<Definition>, List<String>) -> Unit
+    isLoading: Boolean,
+    onLoadingChange: (Boolean) -> Unit,
+    onResult: (String, List<Definition>, List<String>) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(false) }
 
     Button(
         onClick = {
             if (targetWord.isNotBlank() && !isLoading) {
                 scope.launch {
-                    isLoading = true
+                    onLoadingChange(true)
                     val result = enrichWordByGemini(httpClient, targetWord)
-
+                    onLoadingChange(false)
                     result?.let { gemini ->
                         val count = maxOf(
                             gemini.meaningKr.size,
@@ -399,17 +420,16 @@ fun AIFillButton(
                             )
                         }
 
-                        onResult(newDefinitions, gemini.tags)
+                        onResult(gemini.name, newDefinitions, gemini.tags)
                     }
-                    isLoading = false
                 }
             }
         },
+        enabled = !isLoading && targetWord.isNotBlank(),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF2D65FF),
             disabledContainerColor = Color(0xFF2D65FF).copy(alpha = 0.5f)
         ),
-        enabled = !isLoading,
         shape = RoundedCornerShape(12.dp),
         contentPadding = PaddingValues(horizontal = 12.dp),
         modifier = Modifier.height(56.dp)
