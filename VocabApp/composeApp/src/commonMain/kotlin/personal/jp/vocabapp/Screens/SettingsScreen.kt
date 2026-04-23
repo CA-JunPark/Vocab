@@ -9,11 +9,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CloudOff
-import androidx.compose.material.icons.filled.PersonOff
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
-import personal.jp.vocabapp.sql.sync
+import db.Tag
+import kotlinx.coroutines.launch
+import personal.jp.vocabapp.sql.WordServiceImpl
 
 data class UserProfile(
     val name: String,
@@ -36,12 +43,18 @@ fun SettingsScreen(
     userProfile: UserProfile?,
     isLoginInProgress: Boolean,
     hasPendingChanges: Boolean,
+    wordService: WordServiceImpl,
     onBackClick: () -> Unit,
     onLoginClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onSyncClick: () -> Unit,
-    onCancelLogin: () -> Unit
+    onCancelLogin: () -> Unit,
+    onDeleteTagsComplete: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    var showDeleteTagsDialog by remember { mutableStateOf(false) }
+    var unusedTags by remember { mutableStateOf(emptyList<Tag>()) }
+
     Scaffold(
         topBar = {
             SettingsTopBar(onBackClick)
@@ -76,6 +89,31 @@ fun SettingsScreen(
                     isLoggedIn = userProfile != null,
                     hasPendingChanges = hasPendingChanges,
                     onSyncClick = onSyncClick
+                )
+            }
+
+            // --- TAG MANAGEMENT SECTION ---
+            SettingsSection(title = "TAG MANAGEMENT") {
+                DeleteUnusedTagsCard(
+                    onDeleteClick = {
+                        scope.launch {
+                            unusedTags = wordService.getUnusedTags()
+                            showDeleteTagsDialog = true
+                        }
+                    }
+                )
+            }
+
+            if (showDeleteTagsDialog) {
+                DeleteUnusedTagsDialog(
+                    tags = unusedTags,
+                    onDismiss = { showDeleteTagsDialog = false },
+                    onConfirm = {
+                        scope.launch {
+                            wordService.deleteUnusedTags()
+                            showDeleteTagsDialog = false
+                        }
+                    }
                 )
             }
         }
@@ -352,4 +390,101 @@ fun SyncDataCard(
             }
         }
     }
+}
+
+@Composable
+fun DeleteUnusedTagsCard(onDeleteClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1B202D))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Delete Unused Tags", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Remove tags not assigned to any words", color = Color(0xFF9BA1B0), fontSize = 13.sp)
+            }
+            IconButton(
+                onClick = onDeleteClick,
+                colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFF2B313E))
+            ) {
+                Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFFFF5252))
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteUnusedTagsDialog(
+    tags: List<Tag>,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        tonalElevation = 0.dp,
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        icon = {
+            Box(
+                modifier = Modifier.size(56.dp).clip(CircleShape).background(Color(0xFF2B313E)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFFFF5252), modifier = Modifier.size(28.dp))
+            }
+        },
+        title = {
+            Text("Delete Unused Tags?", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "The following tags are not assigned to any words and will be permanently removed.",
+                    color = Color(0xFF9BA1B0),
+                    fontSize = 14.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                // 태그 칩 리스트
+                FlowRow(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tags.forEach { tag ->
+                        Surface(
+                            color = Color(0xFF2B313E),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        ) {
+                            Text(
+                                text = tag.tagName,
+                                color = Color(0xFF9BA1B0),
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5252)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Delete Tags", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Text("Cancel", color = Color(0xFF9BA1B0), fontWeight = FontWeight.Medium)
+            }
+        }
+    )
 }

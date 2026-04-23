@@ -127,6 +127,7 @@ fun MyScreen() {
                         userProfile = userProfile,
                         isLoginInProgress = isLoginInProgress,
                         hasPendingChanges = hasPendingChanges,
+                        wordService = service,
                         onBackClick = { currentScreen = Screen.Home },
                         onLoginClick = {
                             scope.launch {
@@ -146,6 +147,9 @@ fun MyScreen() {
                         },
                         onCancelLogin = {
                             scope.launch { authRepository.cancelLogin() }
+                        },
+                        onDeleteTagsComplete = {
+                            refreshWords()
                         }
                     )
                 }

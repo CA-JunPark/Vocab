@@ -22,6 +22,8 @@ interface WordService {
     suspend fun searchTags(query: String): List<Tag>
     suspend fun updateTag(oldName: String, newName: String, color: String): Boolean
     suspend fun getLatestModifiedTime(): String?
+    suspend fun getUnusedTags(): List<Tag>
+    suspend fun deleteUnusedTags(): Boolean
 }
 
 class WordServiceImpl(
@@ -91,5 +93,13 @@ class WordServiceImpl(
 
     override suspend fun getLatestModifiedTime(): String? {
         return wordRepo.getLatestModifiedTime()
+    }
+
+    override suspend fun getUnusedTags(): List<Tag> {
+        return wordRepo.getUnusedTags()
+    }
+
+    override suspend fun deleteUnusedTags(): Boolean {
+        return wordRepo.deleteUnusedTags()
     }
 }

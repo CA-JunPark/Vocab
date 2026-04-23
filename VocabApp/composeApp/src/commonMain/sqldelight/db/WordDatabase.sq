@@ -89,6 +89,13 @@ WHERE modifiedTime > :lastSyncedTime;
 setSync:
 UPDATE Word SET syncedTime = CURRENT_TIMESTAMP WHERE name = ?;
 
+getLastModifiedTime:
+SELECT modifiedTime
+FROM Word
+ORDER BY modifiedTime DESC
+LIMIT 1;
+
+
 --------------- For Tags ----------------
 
 -- mapping function
@@ -123,8 +130,6 @@ deleteUnusedTags:
 DELETE FROM Tag
 WHERE tagName NOT IN (SELECT DISTINCT tagName FROM WordTag);
 
-getLastModifiedTime:
-SELECT modifiedTime
-FROM Word
-ORDER BY modifiedTime DESC
-LIMIT 1;
+getUnusedTags:
+SELECT * FROM Tag
+WHERE tagName NOT IN (SELECT DISTINCT tagName FROM WordTag);

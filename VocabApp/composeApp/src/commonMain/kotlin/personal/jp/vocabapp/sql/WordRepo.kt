@@ -25,6 +25,8 @@ interface WordRepo {
     suspend fun searchTags(query: String): List<Tag>
     suspend fun updateTagInfo(oldName: String, newName: String, color: String): Boolean
     suspend fun getLatestModifiedTime(): String?
+    suspend fun getUnusedTags(): List<Tag>
+    suspend fun deleteUnusedTags(): Boolean
 }
 
 // TODO Exception handling
@@ -184,5 +186,24 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
        } catch (e: Exception) {
            null
        }
+    }
+
+    override suspend fun getUnusedTags(): List<Tag> = withContext(Dispatchers.IO) {
+        try {
+            _queries.getUnusedTags().executeAsList()
+        } catch (e: Exception) {
+            Logger.e { "Error fetching unused tags: ${e.message}" }
+            emptyList()
+        }
+    }
+
+    override suspend fun deleteUnusedTags(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            _queries.deleteUnusedTags()
+            true
+        } catch (e: Exception) {
+            Logger.e { "Error deleting unused tags: ${e.message}" }
+            false
+        }
     }
 }
