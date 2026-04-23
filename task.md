@@ -118,7 +118,7 @@
     - [x] Google Login button
     - [x] Account info display
     - [x] Manual Sync button
-    - [ ] Tag list
+    - [x] Tag list
     - [ ] ESC to close (Desktop only)
     - [ ] The Legal/Credits Button
     - [ ] Delete unused tags button

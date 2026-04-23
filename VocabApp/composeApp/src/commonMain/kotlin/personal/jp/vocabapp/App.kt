@@ -26,6 +26,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import db.Word
 import personal.jp.vocabapp.Screens.SettingsScreen
 import personal.jp.vocabapp.sql.sync
 
@@ -107,10 +108,8 @@ fun MyScreen() {
                         service,
                         client,
                         onClose = { currentScreen = Screen.Home },
-                        onSave = { targetWord, definitions, tags ->
-                            scope.launch {
-                                // TODO: DB Save logic
-                                // ex: wordService.saveWordWithMultipleDefinitions(targetWord, definitions, tags)
+                        onSaveSuccess = {
+                            scope.launch{
                                 refreshWords()
                                 currentScreen = Screen.Home
                             }

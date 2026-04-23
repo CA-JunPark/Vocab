@@ -18,10 +18,9 @@ data class GeminiResponse(
     fun toDomainModels(): Pair<db.Word, List<db.Tag>> {
         val word = db.Word(
             name = this.name,
-            meaningKr = this.meaningKr.joinToString(", "),
+            meaningKr = this.meaningKr.joinToString("\n"),
             example = this.example.joinToString("\n"),
-            antonymEn = this.antonymEn.joinToString(", "),
-            // WordService will handle rest by defaults
+            antonymEn = this.antonymEn.joinToString("\n"),
             createdTime = "",
             modifiedTime = "",
             isDeleted = false,
@@ -29,11 +28,9 @@ data class GeminiResponse(
             note = null
         )
 
+        // Tags Colors are assigned automatically in WordService
         val tagList = this.tags.map { tagName ->
-            db.Tag(
-                tagName = tagName.trim(),
-                color = "#808080" // Default color
-            )
+            db.Tag(tagName = tagName.trim(), color = "")
         }
 
         return Pair(word, tagList)

@@ -9,7 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome // AI Fill 아이콘으로 대체
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -23,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import db.Tag
 import db.Word
 import io.ktor.client.HttpClient
@@ -40,13 +42,12 @@ data class Definition(
     val exampleSentence: String = "",
     val antonym: String = ""
 )
-
 @Composable
 fun AddWordScreen(
     wordService: WordServiceImpl,
     httpClient: HttpClient,
     onClose: () -> Unit,
-    onSave: (targetWordName: String, definitions: List<Definition>, tagStrings: List<String>) -> Unit
+    onSaveSuccess: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var targetWord by remember { mutableStateOf("") }
@@ -68,13 +69,46 @@ fun AddWordScreen(
         }
     }
 
-    val onSaveAction = {
-        onSave(targetWord, definitions, tagsList)
+
+    val handleSave = {
+        scope.launch {
+            if (targetWord.isBlank()) return@launch
+
+            val meaningText = definitions.joinToString("\n") { it.meaningKr }
+            val exampleText = definitions.joinToString("\n") { it.exampleSentence }
+            val antonymText = definitions.joinToString("\n") { it.antonym }
+
+            val newWord = Word(
+                name = targetWord.trim(),
+                meaningKr = meaningText,
+                example = exampleText,
+                antonymEn = antonymText,
+                note = "",
+                createdTime = "",
+                modifiedTime = "",
+                isDeleted = false,
+                syncedTime = null
+            )
+
+            // Tags Colors are assigned automatically in WordService
+            val tags = tagsList.map { tagName ->
+                Tag(tagName = tagName, color = "")
+            }
+
+            val success = wordService.addWord(newWord, tags)
+
+            if (success) {
+                onSaveSuccess()
+            } else {
+                Logger.e("Failed to save word: $targetWord")
+            }
+        }
     }
+
 
     Scaffold(
         topBar = {
-            AddWordTopBar(onClose = onClose, onSave = onSaveAction)
+            AddWordTopBar(onClose = onClose, onSave = { handleSave() })
         },
         bottomBar = {
             Box(
@@ -84,7 +118,7 @@ fun AddWordScreen(
                     .padding(16.dp)
             ) {
                 Button(
-                    onClick = onSaveAction,
+                    onClick = { handleSave() },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
                     shape = RoundedCornerShape(12.dp)
@@ -238,7 +272,7 @@ fun AddWordTopBar(onClose: () -> Unit, onSave: () -> Unit) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
         IconButton(onClick = onSave) {
             Icon(Icons.Default.Check, contentDescription = "Save", tint = Color(0xFF2D65FF))

@@ -116,27 +116,3 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         e.printStackTrace()
     }
 }
-
-fun prepareWordData(
-    name: String,
-    meaning: String,
-    example: String = "",
-    antonym: String = "",
-    tagNames: List<String>
-): Pair<Word, List<Tag>> {
-    val word = Word(
-        name = name.trim(),
-        meaningKr = meaning.trim(),
-        example = example.trim(),
-        antonymEn = antonym.trim(),
-        createdTime = "",
-        modifiedTime = "",
-        isDeleted = false,
-        syncedTime = null,
-        note = ""
-    )
-
-    val tags = tagNames.map { Tag(tagName = it.trim(), color = "#808080") }
-
-    return word to tags
-}
