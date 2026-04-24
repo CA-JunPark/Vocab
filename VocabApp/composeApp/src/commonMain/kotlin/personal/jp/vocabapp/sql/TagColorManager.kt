@@ -34,7 +34,7 @@ class TagColorManager {
         }
     }
 
-    private fun colorToHexString(color: Color): String {
+    fun colorToHexString(color: Color): String {
         val a = (color.alpha * 255).toInt().coerceIn(0, 255)
         val r = (color.red * 255).toInt().coerceIn(0, 255)
         val g = (color.green * 255).toInt().coerceIn(0, 255)
@@ -45,5 +45,19 @@ class TagColorManager {
                 r.toString(16).padStart(2, '0').uppercase() +
                 g.toString(16).padStart(2, '0').uppercase() +
                 b.toString(16).padStart(2, '0').uppercase()
+    }
+}
+
+// for readability
+fun getContrastColor(hexColor: String): Color {
+    return try {
+        val r = hexColor.substring(1, 3).toInt(16)
+        val g = hexColor.substring(3, 5).toInt(16)
+        val b = hexColor.substring(5, 7).toInt(16)
+        // (YIQ equation)
+        val yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
+        if (yiq >= 128) Color.Black else Color.White
+    } catch (e: Exception) {
+        Color.White
     }
 }

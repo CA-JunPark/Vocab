@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -84,7 +85,7 @@ fun MainScreen(
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                VocabTopBar(user, {onSettingsClick() })
+                VocabTopBar(user) { onSettingsClick() }
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -115,7 +116,10 @@ fun MainScreen(
             contentPadding = PaddingValues(4.dp),
         ) {
             items(filteredList, key = { it.word.name }) { item ->
-                 WordCard(item.word.name, { onWordClick(item.word.name) })
+                 WordCard(item.word.name) { onWordClick(item.word.name) }
+            }
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
             }
         }
     }

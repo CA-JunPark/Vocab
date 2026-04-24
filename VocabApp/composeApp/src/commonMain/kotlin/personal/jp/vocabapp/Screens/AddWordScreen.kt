@@ -34,7 +34,9 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.enrichWordByGemini
+import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
+import personal.jp.vocabapp.sql.getContrastColor
 import personal.jp.vocabapp.viewmodels.WordWithTags
 
 // Data class for managing multiple definitions
@@ -62,6 +64,8 @@ fun AddWordScreen(
 
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    val tagManager = TagColorManager()
 
     LaunchedEffect(tagInputText) {
         if (tagInputText.isNotBlank()) {
@@ -235,7 +239,7 @@ fun AddWordScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     tagsList.forEach { tag ->
-                        TagChip(tag = tag, onDeleteClick = { tagsList = tagsList.filter { it != tag } })
+                        DeletableTagChip(tag = tag, tagManager, onDeleteClick = { tagsList = tagsList.filter { it != tag } })
                     }
                 }
 
@@ -475,11 +479,14 @@ fun AIFillButton(
 }
 
 @Composable
-fun TagChip(tag: String, onDeleteClick: () -> Unit) {
+fun DeletableTagChip(tag: String, tagManager: TagColorManager, onDeleteClick: () -> Unit) {
+    val bgColor = tagManager.getTagColor(tag)
+    val bgColorHex = tagManager.colorToHexString(bgColor)
+    val textColor = getContrastColor(bgColorHex)
     Surface(
-        color = Color(0xFF2D65FF).copy(alpha = 0.1f),
+        color = bgColor,
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color(0xFF2D65FF).copy(alpha = 0.2f))
+        border = BorderStroke(1.dp, bgColor)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -487,7 +494,7 @@ fun TagChip(tag: String, onDeleteClick: () -> Unit) {
         ) {
             Text(
                 text = tag.uppercase(),
-                color = Color(0xFF2D65FF),
+                color = textColor,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -495,7 +502,7 @@ fun TagChip(tag: String, onDeleteClick: () -> Unit) {
             Icon(
                 Icons.Default.Close,
                 contentDescription = null,
-                tint = Color(0xFF2D65FF),
+                tint = textColor,
                 modifier = Modifier.size(14.dp).clickable { onDeleteClick() }
             )
         }

@@ -2,6 +2,7 @@ package personal.jp.vocabapp.viewmodels
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,8 +42,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import db.Tag
+import personal.jp.vocabapp.sql.getContrastColor
 import personal.jp.vocabapp.theme.VocabTheme
 
 data class WordWithTags(
@@ -113,6 +117,9 @@ fun WordCard(word: String, onClick: () -> Unit) {
 
 @Composable
 fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
+    val firstMeaning = remember(data.word.meaningKr) {
+        data.word.meaningKr.split("\n").firstOrNull() ?: ""
+    }
     Box(modifier = modifier.fillMaxWidth().padding(16.dp)) {
         Column {
             Text(
@@ -129,7 +136,7 @@ fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = data.word.meaningKr,
+                    text = firstMeaning,
                     color = Color(0xFF9BA1B0),
                     fontSize = 15.sp
                 )
@@ -150,13 +157,16 @@ fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(8.dp))
 
             if (data.tags.isNotEmpty()) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     data.tags.forEach { tag ->
                         TagChip(tag = tag)
                     }
                 }
             } else {
-                // Invisible placeholder to maintain the exact same card height
                 Spacer(modifier = Modifier.height(26.dp))
             }
         }
@@ -178,28 +188,15 @@ fun TagChip(tag: Tag) {
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
             .background(color = bgColor)
-            .clickable { /* TODO 태그 검색 로직 */ }
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = tag.tagName,
             color = textColor,
             fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            softWrap = false
         )
-    }
-}
-
-// for readability
-fun getContrastColor(hexColor: String): Color {
-    return try {
-        val r = hexColor.substring(1, 3).toInt(16)
-        val g = hexColor.substring(3, 5).toInt(16)
-        val b = hexColor.substring(5, 7).toInt(16)
-        // (YIQ equation)
-        val yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
-        if (yiq >= 128) Color.Black else Color.White
-    } catch (e: Exception) {
-        Color.White
     }
 }
