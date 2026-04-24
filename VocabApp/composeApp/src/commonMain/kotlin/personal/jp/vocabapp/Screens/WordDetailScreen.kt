@@ -175,11 +175,15 @@ fun NotesView(word: Word, tags: List<Tag>) {
             }
         }
 
-        // TAGS 섹션
         Column {
             Text("TAGS", color = Color(0xFF626978), fontWeight = FontWeight.Bold, fontSize = 12.sp)
             Spacer(modifier = Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 tags.forEach { tag ->
                     DetailTagChip(tag)
                 }

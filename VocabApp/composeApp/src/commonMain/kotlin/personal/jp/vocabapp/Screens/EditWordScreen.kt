@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Save
@@ -30,6 +31,7 @@ import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun EditWordScreen(
@@ -46,12 +48,26 @@ fun EditWordScreen(
     var tagsList by remember { mutableStateOf(emptyList<String>()) }
     var isLoading by remember { mutableStateOf(false) }
 
+    var tagInputText by remember { mutableStateOf("") }
+    var tagSuggestions by remember { mutableStateOf(emptyList<Tag>()) }
+    var showSuggestions by remember { mutableStateOf(false) }
+    val tagManager = TagColorManager()
+
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    val tagManager = TagColorManager()
-
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(tagInputText) {
+        if (tagInputText.isNotBlank()) {
+            delay(300)
+            tagSuggestions = wordService.searchTags(tagInputText)
+            showSuggestions = tagSuggestions.isNotEmpty()
+        } else {
+            tagSuggestions = emptyList()
+            showSuggestions = false
+        }
+    }
 
     LaunchedEffect(wordName) {
         val existingWord = wordService.getActiveWordOrNull(wordName)
@@ -194,6 +210,61 @@ fun EditWordScreen(
                         }
                     }
                 )
+            }
+
+            Column {
+                Text("TAGS", color = Color(0xFFA1A9BD), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tagsList.forEach { tag ->
+                        DeletableTagChip(
+                            tag = tag,
+                            tagManager = tagManager,
+                            onDeleteClick = { tagsList = tagsList.filter { it != tag } }
+                        )
+                    }
+                }
+
+                if (tagsList.isNotEmpty()) Spacer(modifier = Modifier.height(12.dp))
+
+                Box {
+                    VocabTextField(
+                        value = tagInputText,
+                        onValueChange = { tagInputText = it },
+                        placeholder = "ADD TAG...",
+                        trailingIcon = {
+                            if (tagInputText.isNotBlank()) {
+                                IconButton(onClick = {
+                                    if (!tagsList.contains(tagInputText.trim())) {
+                                        tagsList = tagsList + tagInputText.trim()
+                                    }
+                                    tagInputText = ""
+                                    showSuggestions = false
+                                }) {
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                                }
+                            }
+                        }
+                    )
+
+                    if (showSuggestions) {
+                        TagSuggestionsMenu(
+                            suggestions = tagSuggestions,
+                            onSuggestionClick = { selectedTag ->
+                                if (!tagsList.contains(selectedTag.tagName)) {
+                                    tagsList = tagsList + selectedTag.tagName
+                                }
+                                tagInputText = ""
+                                showSuggestions = false
+                            }
+                        )
+                    }
+                }
             }
 
             Column {
