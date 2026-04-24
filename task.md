@@ -3,9 +3,8 @@
 ## 1. Project Setup & Core Architecture
 - [x] Configure KMP project with `androidApp` and `desktopApp` targets
 - [x] Setup Koin for dependency injection
-    - [ ] Koin ViewModels using androidx-lifecycle-viewmodel
 - [x] Setup SQLDelight for database
-- [ ] Setup Google OAuth2 for Android and Desktop
+- [x] Setup Google OAuth2 for Android and Desktop
     - [x] JVM 
         - [x] get access and refresh token
         - [x] save token to secure storage (DPAPI + DataStore)
@@ -17,12 +16,11 @@
         - [x] get ID token
         - [x] save ID token to secure storage
     - [x] load ID token on client Bearer Header
-    - [ ] Silent Sign in on App Start
 - [x] Setup Ktor for network requests and proxy server
 - [x] Setup Google Cloud Run for proxy server
     - [x] need to add Auth Header to requests 
         - [x] get tokens from secure storage
-    - [ ] need to check refreshing token works
+    - [x] need to check refreshing token works
 - [ ] Setup Turso for cloud storage
     - [x] pull words from remote DB
     - [x] push words to remote DB
@@ -34,13 +32,13 @@
         - [x] last write wins
         - [x] return names of words that are synced
 - [x] Setup Gemini
-- [ ] Connect Google Cloud Run to Turso and Gemini
+- [x] Connect Google Cloud Run to Turso and Gemini
     - [x] assign url
     - [x] turso
     - [x] gemini
     - [x] check id token for all connections
-    - [ ] need to check refreshing token works
-- [ ] Tag Management
+    - [x] need to check refreshing token works
+- [x] Tag Management
 - [ ] Setup Glance for Android widget
 
 ## 2. Data Layer
@@ -62,7 +60,7 @@
     - [x] Update all `LastSyncTime` if success
     - [x] Batch update local DB from remote
     - [x] Show sync results (deleted, updated, added)
-- [ ] Tag Management
+- [x] Tag Management
     - [x] `tag_name` and `color` field
     - [x] Add tag
     - [x] Delete tag
@@ -70,11 +68,11 @@
         - [x] cannot be empty
     - [x] Get similar tags
     - [x] Delete tags that are not used
-        - [ ] In setting add "Delete unused tags" button
+        - [x] In setting add "Delete unused tags" button
 
 ### API Services
 - [x] Implement `GoogleSignInService`
-- [ ] Implement `GeminiService`
+- [x] Implement `GeminiService`
     - [x] Prompt Engineering
     - [x] miss-spelling correction
     - [x] JSON response
@@ -86,7 +84,7 @@
 - [x] Define Theme of colors
 
 ### Screens
-- [ ] **Main List Screen**
+- [x] **Main List Screen**
     - [x] List of words with popular translation
     - [x] Search bar
         - [x] input field
