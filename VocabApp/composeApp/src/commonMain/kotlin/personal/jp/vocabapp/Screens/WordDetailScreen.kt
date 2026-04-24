@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.outlined.Block
@@ -38,11 +39,14 @@ fun WordDetailScreen(
     wordName: String,
     wordService: WordServiceImpl,
     onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     onClose: () -> Unit
 ) {
     var word by remember { mutableStateOf<Word?>(null) }
     var tags by remember { mutableStateOf(emptyList<Tag>()) }
     var currentTab by remember { mutableStateOf(DetailTab.DETAILS) }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // load data
     LaunchedEffect(wordName) {
@@ -50,9 +54,53 @@ fun WordDetailScreen(
         tags = wordService.getTagsForWord(wordName)
     }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color(0xFF1B202D),
+            title = {
+                Text(
+                    "Delete Word",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = buildAnnotatedString {
+                        append("Are you sure you want to delete \n")
+                        withStyle(
+                            style = SpanStyle(
+                                color = Color(0xFF2D65FF),
+                                fontWeight = FontWeight.Bold
+                            )
+                        ) {
+                            append(wordName)
+                        }
+                        append(" ?")
+                    },
+                    color = Color(0xFF9BA1B0)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                    onDeleteClick()
+                }) {
+                    Text("DELETE", color = Color(0xFFFF5252), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("CANCEL", color = Color.White)
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
-            WordDetailTopBar(onEditClick = onEditClick, onClose = onClose)
+            WordDetailTopBar(onEditClick = onEditClick, onDeleteClick = { showDeleteDialog = true }, onClose = onClose)
         },
         bottomBar = {
             WordDetailBottomNav(
@@ -239,7 +287,7 @@ fun WordDetailBottomNav(selectedTab: DetailTab, onTabSelected: (DetailTab) -> Un
 }
 
 @Composable
-fun WordDetailTopBar(onEditClick: () -> Unit, onClose: () -> Unit) {
+fun WordDetailTopBar(onEditClick: () -> Unit, onDeleteClick: () -> Unit, onClose: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().height(80.dp).padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -247,6 +295,22 @@ fun WordDetailTopBar(onEditClick: () -> Unit, onClose: () -> Unit) {
     ) {
         Text("Word Detail", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF5252).copy(alpha = 0.1f))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = "Delete",
+                    tint = Color(0xFFFF5252)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Button(
                 onClick = onEditClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),

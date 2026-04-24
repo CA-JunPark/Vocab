@@ -74,9 +74,12 @@ fun MyScreen() {
     val refreshWords = {
         scope.launch {
             val rawWords = service.getAllWords()
-            allWordsWithTags = rawWords.map { word ->
-                WordWithTags(word, service.getTagsForWord(word.name))
-            }
+            allWordsWithTags = rawWords
+                .filter { !it.isDeleted }
+                .map { word ->
+                    WordWithTags(word, service.getTagsForWord(word.name))
+                }
+
             checkPendingChanges()
         }
     }
@@ -128,6 +131,13 @@ fun MyScreen() {
                         wordService = service,
                         onEditClick = {
                             // TODO
+                        },
+                        onDeleteClick = {
+                            scope.launch {
+                                service.deleteWord(screen.wordName)
+                                refreshWords()
+                                currentScreen = Screen.Home
+                            }
                         },
                         onClose = {
                             currentScreen = Screen.Home

@@ -108,7 +108,6 @@ fun SettingsScreen(
             }
 
             // Dialogs
-
             if (isSyncing) {
                 SyncInProgressDialog()
             }

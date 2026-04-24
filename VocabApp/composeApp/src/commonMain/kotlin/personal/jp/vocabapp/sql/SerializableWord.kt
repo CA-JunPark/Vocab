@@ -18,8 +18,8 @@ import personal.jp.vocabapp.viewmodels.WordWithTags
 data class SerializableWord(
     val name: String,
     val meaningKr: String,
-    val example: String?,
-    val antonymEn: String?,
+    val example: String,
+    val antonymEn: String,
     val tags: String?,
     val createdTime: String,
     val modifiedTime: String,
@@ -32,8 +32,8 @@ fun toSerializable(word: Word, tags: List<Tag>): SerializableWord {
     return SerializableWord(
         name = word.name,
         meaningKr = word.meaningKr,
-        example = word.example,
-        antonymEn = word.antonymEn,
+        example = word.example ?: "",
+        antonymEn = word.antonymEn ?: "",
         createdTime = word.createdTime,
         modifiedTime = word.modifiedTime,
         isDeleted = word.isDeleted,
@@ -93,26 +93,22 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
             contentType(ContentType.Application.Json)
             setBody(SyncRequest(lastSyncTime = lastSyncedTime, localChanges = localChanges))
         }
-        Logger.d { "HTTP Status: ${response.status}" }
+        if (response.status.value == 200) {
+            val syncResult = response.body<SyncResponse>()
 
-        val responseText = response.bodyAsText()
-        println("RAW SERVER RESPONSE: $responseText")
-
-        val syncResult = response.body<SyncResponse>()
-
-        Logger.d {"Sync Count: ${syncResult.wordsToUpdate.size}"}
-        for (sWord in syncResult.wordsToUpdate) {
-            println("Updating word: ${sWord.name}")
-            val (word, tags) = fromSerializable(sWord)
-            // assign colors in upserWord
-            wordService.upsertWord(word, tags)
-            wordService.setSync(word.name)
+            for (sWord in syncResult.wordsToUpdate) {
+                val (word, tags) = fromSerializable(sWord)
+                wordService.upsertWord(word, tags)
+                wordService.setSync(word.name)
+            }
+            keyDataManager.saveLastSync(syncResult.serverTime)
+            Logger.d { "Sync Success: ${syncResult.wordsToUpdate.size} words updated" }
+        } else {
+            val errorText = response.bodyAsText()
+            Logger.e { "Sync Failed with status ${response.status}: $errorText" }
         }
-
-        Logger.d {"serverTime: ${syncResult.serverTime}"}
-        keyDataManager.saveLastSync(syncResult.serverTime)
     } catch (e: Exception) {
-        Logger.e { "Sync Failed: ${e.message}" }
+        Logger.e { "Sync Error: ${e.message}" }
         e.printStackTrace()
     }
 }
