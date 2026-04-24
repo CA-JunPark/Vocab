@@ -45,9 +45,20 @@ selectAllWordsInfo:
 SELECT *
 FROM Word;
 
+selectAllActiveWords:
+SELECT *
+FROM Word
+WHERE isDeleted = 0;
+
 selectWord:
 SELECT * FROM Word
 WHERE name = ?
+LIMIT 1;
+
+selectActiveWordByName:
+SELECT *
+FROM Word
+WHERE name = ? AND isDeleted = 0
 LIMIT 1;
 
 deletedWord:

@@ -9,7 +9,9 @@ import db.Word as Word
 
 interface WordService {
     suspend fun getWordOrNull(name: String): Word?
+    suspend fun getActiveWordOrNull(name: String): Word?
     suspend fun getAllWords(): List<Word>
+    suspend fun getActiveAllWords(): List<Word>
     suspend fun addWord(word: Word, tags: List<Tag>): Boolean
     suspend fun updateWord(word: Word, tags: List<Tag>): Boolean
     suspend fun upsertWord(word: Word, tags: List<Tag>): Boolean
@@ -34,8 +36,16 @@ class WordServiceImpl(
        return wordRepo.findWordOrNull(name)
     }
 
+    override suspend fun getActiveWordOrNull(name: String): Word? {
+        return wordRepo.findActiveWordOrNull(name)
+    }
+
     override suspend fun getAllWords(): List<Word> {
         return wordRepo.findAllWords()
+    }
+
+    override suspend fun getActiveAllWords(): List<Word> {
+        return wordRepo.findAllActiveWords()
     }
 
     override suspend fun addWord(word: Word, tags: List<Tag>): Boolean {

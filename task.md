@@ -98,8 +98,8 @@
     - [x] FAB to add
     - [x] Settings button
     - [x] Login Status Display
-- [ ] **Word Detail Screen** (Modal)
-    - [ ] Show translation, examples, opposites, tags
+- [x] **Word Detail Screen** (Modal)
+    - [x] Show translation, examples, opposites, tags
     - [ ] TTS button (Android only)
     - [ ] ESC to close (Desktop only)
 - [ ] **Add Screen** (Modal)
@@ -110,9 +110,9 @@
     - [x] tags field showing similar tags (suggestion)
     - [x] save button (FAB)
     - [ ] ESC to close (Desktop only)
-- [ ] **Edit Screen** (Modal)
-    - [ ] editable fields (word, meaningKr, example, oppositeEn, tags, note)
-    - [ ] save button (FAB)
+- [x] **Edit Screen** (Modal)
+    - [x] editable fields (word, meaningKr, example, oppositeEn, tags, note)
+    - [x] save button
     - [ ] ESC to close (Desktop only)
 - [ ] **Settings Screen**
     - [x] Google Login button
@@ -123,9 +123,6 @@
     - [ ] The Legal/Credits Button
     - [ ] Delete unused tags button
 - [ ] The Legal/Credits Screen
-
-### Loding / Skeleton UI
-- [ ] Add Skeleton UI for loading states
 
 ### Logic to UI
 - [ ] AndroidX Lifecycle ViewModel (share logics between Android and Desktop)
@@ -159,4 +156,4 @@
 - [x] load tokens to header after google login (right now the app needs to be restarted)
 - [ ] Sync Conflict UI: ask to choose which one to keep when conflict happens
 - [ ] App Icon
-- [ ] gemini response time out
+- [ ] Hard Delete isDeleted = 1 words in local and turso db

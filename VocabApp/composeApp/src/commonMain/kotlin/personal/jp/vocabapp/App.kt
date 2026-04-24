@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import db.Word
+import personal.jp.vocabapp.Screens.EditWordScreen
 import personal.jp.vocabapp.Screens.SettingsScreen
 import personal.jp.vocabapp.Screens.WordDetailScreen
 import personal.jp.vocabapp.sql.sync
@@ -73,7 +74,7 @@ fun MyScreen() {
     // refresh Words
     val refreshWords = {
         scope.launch {
-            val rawWords = service.getAllWords()
+            val rawWords = service.getActiveAllWords()
             allWordsWithTags = rawWords
                 .filter { !it.isDeleted }
                 .map { word ->
@@ -130,7 +131,7 @@ fun MyScreen() {
                         wordName = screen.wordName,
                         wordService = service,
                         onEditClick = {
-                            // TODO
+                            currentScreen = Screen.EditWord(screen.wordName)
                         },
                         onDeleteClick = {
                             scope.launch {
@@ -142,6 +143,29 @@ fun MyScreen() {
                         onClose = {
                             currentScreen = Screen.Home
                         }
+                    )
+                }
+
+                is Screen.EditWord -> {
+                    EditWordScreen(
+                        wordName = screen.wordName,
+                        wordService = service,
+                        onClose = {
+                            currentScreen = Screen.WordDetail(screen.wordName)
+                        },
+                        onUpdateSuccess = {
+                            scope.launch {
+                                refreshWords()
+                                currentScreen = Screen.WordDetail(screen.wordName)
+                            }
+                        },
+                        onDeleteClick = {
+                            scope.launch {
+                                service.deleteWord(screen.wordName)
+                                refreshWords()
+                                currentScreen = Screen.Home
+                            }
+                        },
                     )
                 }
 

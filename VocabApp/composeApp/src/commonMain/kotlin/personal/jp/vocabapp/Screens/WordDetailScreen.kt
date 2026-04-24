@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import db.Tag
 import db.Word
 import personal.jp.vocabapp.sql.WordServiceImpl
+import personal.jp.vocabapp.sql.getContrastColor
 
 enum class DetailTab { DETAILS, NOTES }
 
@@ -309,7 +310,7 @@ fun WordDetailTopBar(onEditClick: () -> Unit, onDeleteClick: () -> Unit, onClose
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Button(
                 onClick = onEditClick,
@@ -320,7 +321,7 @@ fun WordDetailTopBar(onEditClick: () -> Unit, onDeleteClick: () -> Unit, onClose
             ) {
                 Text("EDIT", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
             IconButton(
                 onClick = onClose,
                 modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFF1B202D))
@@ -365,6 +366,7 @@ fun DetailTagChip(tag: Tag) {
         }
     }
 
+    val textColor = getContrastColor(tag.color)
 
     Surface(
         color = tagColor,
@@ -373,7 +375,7 @@ fun DetailTagChip(tag: Tag) {
     ) {
         Text(
             text = tag.tagName,
-            color = Color.White,
+            color = textColor,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)

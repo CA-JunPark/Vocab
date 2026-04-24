@@ -5,4 +5,5 @@ sealed class Screen {
     object AddWord : Screen()
     object Settings : Screen()
     data class WordDetail(val wordName: String) : Screen()
+    data class EditWord(val wordName: String) : Screen()
 }

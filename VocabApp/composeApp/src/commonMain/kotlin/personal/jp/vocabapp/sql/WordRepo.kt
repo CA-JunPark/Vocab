@@ -12,7 +12,9 @@ import db.Word as Word
 
 interface WordRepo {
     suspend fun findWordOrNull(name: String): Word?
+    suspend fun findActiveWordOrNull(name: String): Word?
     suspend fun findAllWords(): List<Word>
+    suspend fun findAllActiveWords(): List<Word>
     suspend fun addWord(word: Word, tags: List<Tag>): Boolean
     suspend fun updateWord(word: Word, tags: List<Tag>): Boolean
     suspend fun upsertWord(word: Word, tags: List<Tag>): Boolean
@@ -41,9 +43,25 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
         }
     }
 
+    override suspend fun findActiveWordOrNull(name: String): Word? = withContext(Dispatchers.IO) {
+        try{
+            _queries.selectActiveWordByName(name).executeAsOneOrNull()
+        } catch (e: Exception){
+            null
+        }
+    }
+
     override suspend fun findAllWords(): List<Word> = withContext(Dispatchers.IO) {
         try{
             _queries.selectAllWordsInfo().executeAsList()
+        } catch (e: Exception){
+            emptyList()
+        }
+    }
+
+    override suspend fun findAllActiveWords(): List<Word> = withContext(Dispatchers.IO)  {
+        try{
+            _queries.selectAllActiveWords().executeAsList()
         } catch (e: Exception){
             emptyList()
         }
