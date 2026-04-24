@@ -122,20 +122,11 @@
     - [ ] Delete unused tags button
 - [ ] The Legal/Credits Screen
 
-### Logic to UI
-- [ ] AndroidX Lifecycle ViewModel (share logics between Android and Desktop)
-- [ ] Flow
-- [ ] Koin ViewModels
-
 ### Navigation
 - [x] Navigation Compose (Multiplatform)
 
-### Text and Fonts
-- [ ] Compose Resources (support multiple languages, fonts for both platforms)
-
 ### Desktop Specific Features
 - [ ] add hotkeys for desktop
-- [ ] hover effects
 - [ ] Tab Navigation
 - [ ] remember window size and position
 
@@ -149,9 +140,7 @@
 ## 5. Integration & Polish & Debugging
 - [x] createWord function that does not need all fields
 - [ ] convert UTC to local time when displaying created/modified time
-- [ ] Tag Management
 - [ ] Gemini Model Switching if Request Per Day is exceeded
 - [x] load tokens to header after google login (right now the app needs to be restarted)
-- [ ] Sync Conflict UI: ask to choose which one to keep when conflict happens
 - [ ] App Icon
 - [ ] Hard Delete isDeleted = 1 words in local and turso db
