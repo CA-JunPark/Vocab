@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.Screens
+package personal.jp.vocabapp.screens
 
 sealed class Screen {
     object Home : Screen()

@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.Screens
+package personal.jp.vocabapp.screens
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState

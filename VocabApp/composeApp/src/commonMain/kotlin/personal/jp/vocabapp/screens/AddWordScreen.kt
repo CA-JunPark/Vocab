@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.Screens
+package personal.jp.vocabapp.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -16,12 +16,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.AddCircleOutline
-import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,7 +35,6 @@ import personal.jp.vocabapp.google.enrichWordByGemini
 import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.sql.getContrastColor
-import personal.jp.vocabapp.viewmodels.WordWithTags
 
 // Data class for managing multiple definitions
 data class Definition(

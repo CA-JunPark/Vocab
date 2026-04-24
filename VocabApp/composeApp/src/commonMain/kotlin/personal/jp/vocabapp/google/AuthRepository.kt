@@ -20,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import personal.jp.vocabapp.Screens.UserProfile
+import personal.jp.vocabapp.screens.UserProfile
 import io.ktor.util.decodeBase64String
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

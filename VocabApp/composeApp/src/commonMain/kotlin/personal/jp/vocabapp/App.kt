@@ -15,9 +15,9 @@ import personal.jp.vocabapp.google.SecureStorage
 import kotlinx.serialization.Serializable
 import co.touchlab.kermit.Logger
 import io.ktor.client.statement.bodyAsText
-import personal.jp.vocabapp.Screens.AddWordScreen
-import personal.jp.vocabapp.Screens.MainScreen
-import personal.jp.vocabapp.Screens.Screen
+import personal.jp.vocabapp.screens.AddWordScreen
+import personal.jp.vocabapp.screens.MainScreen
+import personal.jp.vocabapp.screens.Screen
 import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.KeyDataManager
 import personal.jp.vocabapp.viewmodels.WordWithTags
@@ -26,10 +26,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import db.Word
-import personal.jp.vocabapp.Screens.EditWordScreen
-import personal.jp.vocabapp.Screens.SettingsScreen
-import personal.jp.vocabapp.Screens.WordDetailScreen
+import personal.jp.vocabapp.screens.EditWordScreen
+import personal.jp.vocabapp.screens.SettingsScreen
+import personal.jp.vocabapp.screens.WordDetailScreen
 import personal.jp.vocabapp.sql.sync
 
 @Composable

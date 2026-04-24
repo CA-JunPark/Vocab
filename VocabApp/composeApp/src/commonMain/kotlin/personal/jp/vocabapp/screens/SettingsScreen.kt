@@ -1,4 +1,4 @@
-package personal.jp.vocabapp.Screens
+package personal.jp.vocabapp.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
