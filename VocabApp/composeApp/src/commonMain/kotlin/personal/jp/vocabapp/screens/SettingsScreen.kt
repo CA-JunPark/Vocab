@@ -52,6 +52,8 @@ fun SettingsScreen(
     onLogoutClick: () -> Unit,
     onSyncClick: () -> Unit,
     onCancelLogin: () -> Unit,
+    syncErrorMessage: String?,
+    onDismissSyncError: () -> Unit,
     onDeleteTagsComplete: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -71,6 +73,19 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // sync dialog
+            if (isSyncing) {
+                SyncInProgressDialog()
+            }
+
+            // sync fail dialog
+            if (syncErrorMessage != null) {
+                SyncErrorDialog(
+                    message = syncErrorMessage,
+                    onDismiss = onDismissSyncError
+                )
+            }
+
             // --- ACCOUNT SECTION ---
             SettingsSection(title = "ACCOUNT") {
                 when {
@@ -91,6 +106,7 @@ fun SettingsScreen(
                 SyncDataCard(
                     isLoggedIn = userProfile != null,
                     hasPendingChanges = hasPendingChanges,
+                    isSyncing = isSyncing,
                     onSyncClick = onSyncClick
                 )
             }
@@ -338,6 +354,7 @@ fun LoggedOutAccountCard(onLoginClick: () -> Unit) {
 fun SyncDataCard(
     isLoggedIn: Boolean,
     hasPendingChanges: Boolean,
+    isSyncing: Boolean,
     onSyncClick: () -> Unit
 ) {
     Card(
@@ -375,8 +392,9 @@ fun SyncDataCard(
                 Text(
                     text = when {
                         !isLoggedIn -> "Please login to sync your data"
+                        isSyncing -> "Synchronizing..."
                         hasPendingChanges -> "Pending changes detected"
-                        else -> "All data is up to date"
+                        else -> "Check for cloud updates"
                     },
                     color = Color(0xFF9BA1B0),
                     fontSize = 13.sp
@@ -385,14 +403,14 @@ fun SyncDataCard(
 
             TextButton(
                 onClick = onSyncClick,
-                enabled = isLoggedIn && hasPendingChanges,
+                enabled = isLoggedIn && !isSyncing,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = Color(0xFF2D65FF),
                     disabledContentColor = Color(0xFF626978)
                 )
             ) {
                 Text(
-                    text = "Sync Now",
+                    text = if (hasPendingChanges) "Sync Now" else "Check Updates",
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -456,7 +474,6 @@ fun DeleteUnusedTagsDialog(
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                // 태그 칩 리스트
                 FlowRow(
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -530,6 +547,61 @@ fun SyncInProgressDialog() {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+    )
+}
+
+@Composable
+fun SyncErrorDialog(
+    message: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF5252).copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CloudOff,
+                    contentDescription = null,
+                    tint = Color(0xFFFF5252),
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        },
+        title = {
+            Text(
+                text = "Sync Failed",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                color = Color(0xFF9BA1B0),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("OK", color = Color(0xFF2D65FF), fontWeight = FontWeight.Bold)
+            }
         }
     )
 }

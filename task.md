@@ -144,3 +144,4 @@
 - [x] load tokens to header after google login (right now the app needs to be restarted)
 - [ ] App Icon
 - [ ] Hard Delete isDeleted = 1 words in local and turso db
+- [ ] Back to close (Ansroid only)

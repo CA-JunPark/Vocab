@@ -69,6 +69,7 @@ fun MyScreen() {
     val userProfile by authRepository.currentUser.collectAsState()
     val isLoginInProgress by authRepository.isLoginInProgress.collectAsState()
     var isSyncing by remember { mutableStateOf(false) }
+    var syncErrorMessage by remember { mutableStateOf<String?>(null) }
 
     // refresh Words
     val refreshWords = {
@@ -189,9 +190,13 @@ fun MyScreen() {
                         onSyncClick = {
                             scope.launch {
                                 isSyncing = true
+                                syncErrorMessage = null
+
                                 try {
                                     sync(client, service, keyDataManager)
                                     refreshWords()
+                                } catch (e: Exception) {
+                                    syncErrorMessage = e.message ?: "Sync failed"
                                 } finally {
                                     isSyncing = false
                                 }
@@ -200,6 +205,8 @@ fun MyScreen() {
                         onCancelLogin = {
                             scope.launch { authRepository.cancelLogin() }
                         },
+                        syncErrorMessage = syncErrorMessage,
+                        onDismissSyncError = {},
                         onDeleteTagsComplete = {
                             refreshWords()
                         }
