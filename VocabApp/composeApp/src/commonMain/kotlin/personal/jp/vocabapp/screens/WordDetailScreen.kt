@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Block
@@ -210,7 +211,7 @@ fun DefinitionDetailCard(index: Int, meaning: String, example: String, antonym: 
             if (example.isNotBlank()) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Row {
-                    Icon(Icons.Outlined.Notes, contentDescription = null, tint = Color(0xFF626978), modifier = Modifier.size(16.dp))
+                    Icon(Icons.AutoMirrored.Outlined.Notes, contentDescription = null, tint = Color(0xFF626978), modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("EXAMPLE", color = Color(0xFF626978), fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 }

@@ -64,9 +64,13 @@ actual class SecureStorage actual constructor(
 }
 
 actual fun createDataStorage(context: Any?): DataStore<Preferences> = createDataStore(
-    // Portable .exe application Expected
     producePath = {
-        val portableDir = System.getProperty("user.dir")
-        File(portableDir, "data/vocab.preferences_pb").absolutePath
+        val appDataDir = File(System.getProperty("user.home"), ".vocabapp")
+
+        if (!appDataDir.exists()) {
+            appDataDir.mkdirs()
+        }
+
+        File(appDataDir, "vocab.preferences_pb").absolutePath
     }
 )
