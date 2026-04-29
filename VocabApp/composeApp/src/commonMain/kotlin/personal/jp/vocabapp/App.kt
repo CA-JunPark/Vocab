@@ -207,6 +207,11 @@ fun MyScreen() {
                         },
                         syncErrorMessage = syncErrorMessage,
                         onDismissSyncError = {},
+                        onResetSyncClick = {
+                            scope.launch {
+                                keyDataManager.resetSyncTime()
+                            }
+                        },
                         onDeleteTagsComplete = {
                             refreshWords()
                         }

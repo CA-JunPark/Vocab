@@ -2,8 +2,10 @@ package personal.jp.vocabapp.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -54,11 +56,13 @@ fun SettingsScreen(
     onCancelLogin: () -> Unit,
     syncErrorMessage: String?,
     onDismissSyncError: () -> Unit,
+    onResetSyncClick: () -> Unit,
     onDeleteTagsComplete: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var showDeleteTagsDialog by remember { mutableStateOf(false) }
     var unusedTags by remember { mutableStateOf(emptyList<Tag>()) }
+    var showResetSyncDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -70,7 +74,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // sync dialog
@@ -123,6 +128,13 @@ fun SettingsScreen(
                 )
             }
 
+            // --- SYNC TIME MANAGEMENT SECTION 추가 ---
+            SettingsSection(title = "SYNC TIME MANAGEMENT") {
+                ResetSyncTimeCard(
+                    onResetClick = { showResetSyncDialog = true }
+                )
+            }
+
             // Dialogs
             if (isSyncing) {
                 SyncInProgressDialog()
@@ -137,6 +149,16 @@ fun SettingsScreen(
                             wordService.deleteUnusedTags()
                             showDeleteTagsDialog = false
                         }
+                    }
+                )
+            }
+
+            if (showResetSyncDialog) {
+                ResetSyncConfirmDialog(
+                    onDismiss = { showResetSyncDialog = false },
+                    onConfirm = {
+                        showResetSyncDialog = false
+                        onResetSyncClick()
                     }
                 )
             }
@@ -601,6 +623,78 @@ fun SyncErrorDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("OK", color = Color(0xFF2D65FF), fontWeight = FontWeight.Bold)
+            }
+        }
+    )
+}
+
+@Composable
+fun ResetSyncTimeCard(onResetClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1B202D))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Reset Sync Time",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Reset local sync timestamp.",
+                    color = Color(0xFF9BA1B0),
+                    fontSize = 13.sp
+                )
+            }
+            IconButton(
+                onClick = onResetClick,
+                colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFF2B313E))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Sync,
+                    contentDescription = null,
+                    tint = Color(0xFF2D65FF)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ResetSyncConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        title = {
+            Text("Reset Sync Time?", color = Color.White, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Text(
+                "Reset local sync timestamp to 1970-01-01 00:00:00",
+                color = Color(0xFF9BA1B0),
+                fontSize = 14.sp
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Confirm Reset", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Text("Cancel", color = Color(0xFF9BA1B0))
             }
         }
     )

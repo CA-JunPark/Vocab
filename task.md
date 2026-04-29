@@ -120,6 +120,7 @@
     - [ ] ESC to close (Desktop only)
     - [ ] The Legal/Credits Button
     - [ ] Delete unused tags button
+    - [ ] Reset Sync Time button
 - [ ] The Legal/Credits Screen
 
 ### Navigation
@@ -145,3 +146,4 @@
 - [ ] App Icon
 - [ ] Hard Delete isDeleted = 1 words in local and turso db
 - [ ] Back to close (Ansroid only)
+
