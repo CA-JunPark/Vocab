@@ -105,6 +105,8 @@ FROM Word
 ORDER BY modifiedTime DESC
 LIMIT 1;
 
+deletePermanently:
+DELETE FROM Word WHERE isDeleted = 1;
 
 --------------- For Tags ----------------
 

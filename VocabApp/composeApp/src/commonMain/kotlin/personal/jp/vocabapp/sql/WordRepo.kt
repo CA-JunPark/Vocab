@@ -21,6 +21,7 @@ interface WordRepo {
     suspend fun deleteWord(name: String): Boolean
     suspend fun countWords(): Int
     suspend fun deleteAllWords(): Boolean
+    suspend fun deletePermanently(): Boolean
     suspend fun setSync(name: String): Boolean
     suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word>
     suspend fun getTagsForWord(wordName: String): List<Tag>
@@ -160,6 +161,15 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
             _queries.deleteAllWords()
             true
         } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun deletePermanently(): Boolean = withContext(Dispatchers.IO) {
+        try{
+            _queries.deletePermanently()
+            true
+        }catch (e: Exception) {
             false
         }
     }

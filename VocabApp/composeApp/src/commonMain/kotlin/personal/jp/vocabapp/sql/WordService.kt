@@ -18,6 +18,7 @@ interface WordService {
     suspend fun deleteWord(name: String): Boolean
     suspend fun countWords(): Int
     suspend fun deleteAllWords(): Boolean
+    suspend fun deletePermanently(): Boolean
     suspend fun setSync(name: String): Boolean
     suspend fun getUnsyncedWords(lastSyncedTime: String): List<Word>
     suspend fun getTagsForWord(wordName: String): List<Tag>
@@ -79,6 +80,10 @@ class WordServiceImpl(
 
     override suspend fun deleteAllWords(): Boolean {
         return wordRepo.deleteAllWords()
+    }
+
+    override suspend fun deletePermanently(): Boolean {
+        return wordRepo.deletePermanently()
     }
 
     override suspend fun setSync(name: String): Boolean {

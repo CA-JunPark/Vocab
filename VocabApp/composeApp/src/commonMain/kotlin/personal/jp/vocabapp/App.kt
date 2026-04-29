@@ -29,6 +29,7 @@ import androidx.compose.animation.togetherWith
 import personal.jp.vocabapp.screens.EditWordScreen
 import personal.jp.vocabapp.screens.SettingsScreen
 import personal.jp.vocabapp.screens.WordDetailScreen
+import personal.jp.vocabapp.sql.requestCloudPurge
 import personal.jp.vocabapp.sql.sync
 
 @Composable
@@ -214,7 +215,25 @@ fun MyScreen() {
                         },
                         onDeleteTagsComplete = {
                             refreshWords()
-                        }
+                        },
+                        onPurgeDeletedClick = {
+                            scope.launch {
+                                isSyncing = true
+                                syncErrorMessage = null
+
+                                try {
+                                    requestCloudPurge(client)
+
+                                    service.deletePermanently()
+                                    refreshWords()
+                                    Logger.i { "Data purge completed successfully." }
+                                } catch (e: Exception) {
+                                    syncErrorMessage = "Purge failed: ${e.message}"
+                                } finally {
+                                    isSyncing = false
+                                }
+                            }
+                        },
                     )
                 }
             }

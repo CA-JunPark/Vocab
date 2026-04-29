@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import personal.jp.vocabapp.Secrets
 import co.touchlab.kermit.Logger
 import db.Tag
+import io.ktor.client.request.delete
 import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.viewmodels.WordWithTags
 
@@ -115,6 +116,18 @@ suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: K
         }
     } catch (e: Exception) {
         Logger.e { "Sync Error: ${e.message}" }
+        e.printStackTrace()
+    }
+}
+
+suspend fun requestCloudPurge(client: HttpClient) {
+    try{
+        val response = client.delete("${Secrets.BACKEND_API}/sync/purge")
+        if (response.status.value != 200) {
+            throw Exception("Cloud purge failed")
+        }
+    } catch (e: Exception) {
+        Logger.e { "Purge Error: ${e.message}" }
         e.printStackTrace()
     }
 }

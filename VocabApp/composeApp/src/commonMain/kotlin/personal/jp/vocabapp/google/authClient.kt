@@ -33,14 +33,14 @@ private val refreshClient = HttpClient(CIO) {
 
 fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO) {
-        install(Logging) {
-            logger = object : io.ktor.client.plugins.logging.Logger {
-                override fun log(message: String) {
-                    Logger.d { "HTTP Client: $message" }
-                }
-            }
-            level = LogLevel.ALL
-        }
+//        install(Logging) {
+//            logger = object : io.ktor.client.plugins.logging.Logger {
+//                override fun log(message: String) {
+//                    Logger.d { "HTTP Client: $message" }
+//                }
+//            }
+//            level = LogLevel.ALL
+//        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
