@@ -15,35 +15,52 @@ import com.google.crypto.tink.aead.AeadConfig
 import java.security.GeneralSecurityException
 import com.google.crypto.tink.RegistryConfiguration
 import java.io.IOException
+import java.security.KeyStore
 
 actual class SecureStorage actual constructor(
     private val dataStore: DataStore<Preferences>,
     private val context: Any?
 ) {
     private val androidContext = context as Context
-    private val aead: Aead
 
-    init {
+    private val KEYSET_NAME = "vocab_keyset"
+    private val PREFS_FILE_NAME = "vocab_tink_prefs"
+    private val MASTER_KEY_URI = "android-keystore://master_key"
+
+    private var aead: Aead = try {
+        initTink()
+    } catch (e: Exception) {
+        nukeTinkData()
+        initTink()
+    }
+
+    private fun initTink(): Aead {
+        AeadConfig.register()
+
+        return AndroidKeysetManager.Builder()
+            .withSharedPref(androidContext, KEYSET_NAME, PREFS_FILE_NAME)
+            .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
+            .withMasterKeyUri(MASTER_KEY_URI)
+            .build()
+            .keysetHandle
+            .getPrimitive(Aead::class.java)
+    }
+
+    private fun nukeTinkData() {
         try {
-            AeadConfig.register()
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            keyStore.deleteEntry("master_key")
 
-            val masterKeyUri = "android-keystore://master_key"
-            val keysetManager = AndroidKeysetManager.Builder()
-                .withSharedPref(androidContext, "vocab_keyset", "vocab_tink_prefs")
-                .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
-                .withMasterKeyUri(masterKeyUri)
-                .build()
-
-            aead = keysetManager.keysetHandle.getPrimitive(
-                RegistryConfiguration.get(),
-                Aead::class.java
-            )
-        } catch (e: GeneralSecurityException) {
-            throw RuntimeException("Failed to initialize Tink", e)
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to read/write keyset", e)
+            androidContext.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
+
     actual suspend fun saveToken(key: String, token: String) {
         try {
             // Encrypt with Tink (Master key is in Keystore)

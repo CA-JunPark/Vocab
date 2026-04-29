@@ -139,4 +139,5 @@
 - [ ] App Icon
 - [x] Hard Delete isDeleted = 1 words in local and turso db
 - [x] Back to close (Ansroid only)
+- [ ] Android Safe Area
 

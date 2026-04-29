@@ -133,6 +133,9 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
                     example = word.example,
                     antonymEn = word.antonymEn,
                     isDeleted = word.isDeleted,
+                    createdTime = word.createdTime,
+                    modifiedTime = word.modifiedTime,
+                    syncedTime = word.syncedTime,
                     note = word.note
                 )
 

@@ -2,7 +2,7 @@ package personal.jp.vocabapp.sql
 
 // Logic for Service
 // It only cares what to do with the data
-// ex) validate the format of the data
+// ex validate the format of the data
 
 import db.Tag
 import db.Word as Word

@@ -63,8 +63,8 @@ kotlin {
             implementation(libs.kermit) //logger
                 // Logger.d { "This is a debug log" }
                 // Logger.e(throwable) { "Something went wrong" }
-            implementation("io.github.sunildhiman90:kmauth-google:0.3.3")
-            implementation("io.github.sunildhiman90:kmauth-google-compose:0.3.3")
+            implementation("io.github.sunildhiman90:kmauth-google:0.3.4")
+            implementation("io.github.sunildhiman90:kmauth-google-compose:0.3.4")
             // DataStore library
             implementation(libs.androidx.datastore)
             // The Preferences DataStore library
