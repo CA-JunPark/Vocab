@@ -25,13 +25,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -124,6 +127,8 @@ fun MyScreen(onExit: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .safeDrawingPadding()
                 .desktopBackHandler(onBack = handleBack)
         ) {
             if (showExitDialog) {
@@ -285,138 +290,6 @@ fun MyScreen(onExit: () -> Unit) {
                 }
             }
         }
-//        var showContent by remember { mutableStateOf(false) }
-//        Column(
-//            modifier = Modifier
-//                .background(MaterialTheme.colorScheme.background)
-//                .safeContentPadding()
-//                .fillMaxSize(),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//        ) {
-//            Button(onClick = { scope.launch{
-//                authRepository.startLogin()
-//            } }) {
-//                Text("Login with Google.")
-//            }
-//            Button(onClick = { showContent = !showContent }) {
-//                Text("Click meee!")
-//            }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//            Button(onClick = {scope.launch {
-//                val token = secureStorage.getToken(ID_TOKEN)
-//                Logger.d { "ID Token is: $token" }
-//            }}){
-//                Text("Check Tokens")
-//            }
-//            Button(onClick = {scope.launch {
-//                secureStorage.deleteToken(ID_TOKEN)
-//                Logger.d { "ID Token deleted" }
-//            }}){
-//                Text("Clear ID Tokens")
-//            }
-//            Button(onClick = {scope.launch {
-//                Logger.d { "DB Pull" }
-//                Logger.d { "${backendPull(client)}" }
-//            }}){
-//                Text("DB pull")
-//            }
-//            Button(onClick = {scope.launch {
-//                service.deleteAllWords()
-//                Logger.d { "Add word" }
-//                Logger.d { "Count: ${service.countWords()}" }
-//                try{
-//                    val (testWord, testTags) =
-//                        prepareWordData(
-//                            name = "computer",
-//                            meaning = "컴퓨터",
-//                            example = "I fixed computer",
-//                            tagNames = listOf("IT", "electronics")
-//                        )
-//
-//                    service.addWord(testWord, testTags)
-//                } catch (e: Exception){
-//                    Logger.e { "Error: ${e.message}" }
-//                }
-//                Logger.d { "Count: ${service.countWords()}" }
-//            }}){
-//                Text("Add Word")
-//            }
-//            Button(onClick = {scope.launch {
-//                Logger.d { "Sync" }
-//                sync(client, service, keyDataManager)
-//                Logger.d { "Local Words Count: ${service.countWords()}" }
-//            }}){
-//                Text("Sync")
-//            }
-//            Button(onClick = {scope.launch {
-//                keyDataManager.saveLastSync()
-//                Logger.d { keyDataManager.getLastSync() }
-//            }}){
-//                Text("saveLastSync")
-//            }
-//            Button(onClick = {scope.launch {
-//                keyDataManager.resetSyncTime()
-//                Logger.d { keyDataManager.getLastSync() }
-//            }}){
-//                Text("resetSyncTime")
-//            }
-//            Button(onClick = {scope.launch {
-//                val gemini : GeminiResponse? = enrichWordByGemini(client, "paper")
-//                println(gemini?.antonymEn)
-//            }}){
-//                Text("Gemini paper")
-//            }
-//            Button(onClick = {scope.launch {
-//                val gemini : GeminiResponse? = enrichWordByGemini(client, "computer")
-//                println(gemini?.antonymEn)
-//            }}){
-//                Text("Gemini com")
-//            }
-//            allWordsWithTags.forEach {
-//                WordScreen(it.word.name)
-//            }
-//        }
-    }
-}
-
-suspend fun backend(client: HttpClient, api:String = ""): String{
-    return try {
-        val response: Data = client.get("${Secrets.LOCAL}/" + api).body()
-        response.message
-    } catch (e: Exception) {
-        e.printStackTrace()
-        "Error: ${e.message}"
-    }
-}
-
-@Serializable
-data class Data(
-    val message:String = "No"
-)
-
-suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<SerializableWord>? {
-    return try {
-        val response = client.get("${Secrets.BACKEND_API}/$api")
-
-        Logger.d { "Server Status: ${response.status}" }
-
-        val responseText = response.bodyAsText()
-        Logger.d { "Server Response: $responseText" }
-
-        return response.body<List<SerializableWord>>()
-    } catch (e: Exception) {
-        Logger.e { "API Error: ${e.message}" }
-        e.printStackTrace()
-        null
     }
 }
 

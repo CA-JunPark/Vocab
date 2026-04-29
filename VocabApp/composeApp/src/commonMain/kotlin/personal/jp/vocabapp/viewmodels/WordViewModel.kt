@@ -136,18 +136,6 @@ fun VocabularyCard(data: WordWithTags,tagManager: TagColorManager, modifier: Mod
                     color = Color(0xFF9BA1B0),
                     fontSize = 15.sp
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                Button(onClick = {
-                    println("Sound Click")
-                    // TODO Add Sound
-                }){
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                        contentDescription = "Pronounce",
-                        tint = Color(0xFF9BA1B0),
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
