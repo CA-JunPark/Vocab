@@ -23,6 +23,7 @@ import io.ktor.http.Parameters
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import personal.jp.vocabapp.Secrets
+import personal.jp.vocabapp.getPlatform
 
 private val refreshClient = HttpClient(CIO) {
     install(ContentNegotiation) {
@@ -32,14 +33,14 @@ private val refreshClient = HttpClient(CIO) {
 
 fun authClient(secureStorage: SecureStorage): HttpClient {
     return HttpClient(CIO) {
-//        install(Logging) {
-//            logger = object : io.ktor.client.plugins.logging.Logger {
-//                override fun log(message: String) {
-//                    Logger.d { "HTTP Client: $message" }
-//                }
-//            }
-//            level = LogLevel.HEADERS
-//        }
+        install(Logging) {
+            logger = object : io.ktor.client.plugins.logging.Logger {
+                override fun log(message: String) {
+                    Logger.d { "HTTP Client: $message" }
+                }
+            }
+            level = LogLevel.ALL
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -60,20 +61,25 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                 }
 
                 refreshTokens {
-                    Logger.i { "401 Unauthorized detected. Attempting to refresh ID Token..." }
+                    Logger.d { "401 Unauthorized detected. Attempting to refresh ID Token..." }
+                    val isJvm = getPlatform().name.contains("JVM")
+                    Logger.d { "is JVM ${getPlatform().name}" }
+                    val clientId = if (isJvm) Secrets.WEB_CLIENT_ID else Secrets.ANDROID_CLIENT_ID
                     try {
                         val response = refreshClient.post("https://oauth2.googleapis.com/token") {
                             setBody(FormDataContent(Parameters.build {
                                 append("grant_type", "refresh_token")
                                 append("refresh_token", oldTokens?.refreshToken ?: "")
-                                append("client_id", Secrets.WEB_CLIENT_ID)
-                                append("client_secret", Secrets.WEB_CLIENT_SECRET)
+                                append("client_id", clientId)
+
+                                if (isJvm) {
+                                    append("client_secret", Secrets.WEB_CLIENT_SECRET)
+                                }
                             }))
                         }
 
                         if (response.status.value == 200) {
                             val tokenData: TokenResponse = response.body()
-
                             val newIdToken = tokenData.idToken ?: ""
                             val newRefreshToken = tokenData.refreshToken ?: oldTokens?.refreshToken ?: ""
 
@@ -81,8 +87,6 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
                                 secureStorage.saveToken(ID_TOKEN, newIdToken)
                                 Logger.i { "ID Token refreshed successfully." }
                             }
-
-                            // Ktor에게 새 토큰을 전달하여 재시도하게 합니다
                             BearerTokens(newIdToken, newRefreshToken)
                         } else {
                             Logger.e { "Refresh failed: ${response.status}" }

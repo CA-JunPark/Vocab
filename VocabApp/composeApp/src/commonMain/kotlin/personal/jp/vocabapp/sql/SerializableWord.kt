@@ -80,7 +80,9 @@ data class SyncResponse(
 
 suspend fun sync(client: HttpClient, wordService: WordService, keyDataManager: KeyDataManager) {
     try {
-        val lastSyncedTime = keyDataManager.getLastSync() ?: "1970-01-01 00:00:00"
+        val rawLastSync = keyDataManager.getLastSync()
+        val lastSyncedTime = rawLastSync.ifBlank { "1970-01-01 00:00:00" }
+//        val lastSyncedTime = "1970-01-01 00:00:00"
         Logger.d {"lastSyncedTime: $lastSyncedTime"}
         val unsyncedWordsRaw = wordService.getUnsyncedWords(lastSyncedTime)
 
