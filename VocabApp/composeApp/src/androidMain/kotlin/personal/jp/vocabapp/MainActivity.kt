@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            App()
+            App(onExit = { finish() })
         }
         handleIntent(intent)
     }
@@ -75,10 +75,4 @@ class MainActivity : ComponentActivity() {
             code?.let { authFlowManager.onCodeReceived(it) }
         }
     }
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
 }

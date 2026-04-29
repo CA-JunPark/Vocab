@@ -26,20 +26,37 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import personal.jp.vocabapp.screens.EditWordScreen
 import personal.jp.vocabapp.screens.SettingsScreen
 import personal.jp.vocabapp.screens.WordDetailScreen
 import personal.jp.vocabapp.sql.requestCloudPurge
 import personal.jp.vocabapp.sql.sync
+import androidx.compose.ui.graphics.Color
+import personal.jp.vocabapp.screens.PlatformBackHandler
+import personal.jp.vocabapp.screens.desktopBackHandler
 
 @Composable
-@Preview
-fun App() {
-    MyScreen()
+fun App(onExit: () -> Unit) {
+    MyScreen(onExit = onExit)
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MyScreen() {
+fun MyScreen(onExit: () -> Unit) {
     val authRepository: AuthRepository = koinInject()
     val secureStorage: SecureStorage = koinInject()
     val scope = rememberCoroutineScope()
@@ -85,160 +102,190 @@ fun MyScreen() {
             checkPendingChanges()
         }
     }
+
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    val handleBack = {
+        when (val screen = currentScreen) {
+            is Screen.Home -> showExitDialog = true
+            is Screen.AddWord -> currentScreen = Screen.Home
+            is Screen.WordDetail -> currentScreen = Screen.Home
+            is Screen.EditWord -> currentScreen = Screen.WordDetail(screen.wordName)
+            is Screen.Settings -> currentScreen = Screen.Home
+        }
+    }
+
+    PlatformBackHandler(onBack = handleBack)
+
     LaunchedEffect(Unit) {
         refreshWords()
     }
 
     VocabTheme {
-        AnimatedContent(
-            targetState = currentScreen,
-            transitionSpec = {
-                if (targetState is Screen.AddWord) {
-                    (slideInVertically { it } + fadeIn()).togetherWith(fadeOut())
-                } else {
-                    fadeIn().togetherWith(slideOutVertically { it } + fadeOut())
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .desktopBackHandler(onBack = handleBack)
+        ) {
+            if (showExitDialog) {
+                ExitConfirmDialog(
+                    onDismiss = { showExitDialog = false },
+                    onConfirm = {
+                        showExitDialog = false
+                        onExit()
+                    }
+                )
             }
-        ){ screen ->
-            when (screen) {
-                is Screen.Home -> {
-                    MainScreen(
-                        userProfile,
-                        wordsList = allWordsWithTags,
-                        onAddClick = { currentScreen = Screen.AddWord },
-                        onSettingsClick = { currentScreen = Screen.Settings },
-                        onWordClick = { name ->
-                            currentScreen = Screen.WordDetail(name)
-                        }
-                    )
-                }
 
-                is Screen.AddWord -> {
-                    AddWordScreen(
-                        service,
-                        client,
-                        onClose = { currentScreen = Screen.Home },
-                        onSaveSuccess = {
-                            scope.launch{
-                                refreshWords()
+            AnimatedContent(
+                targetState = currentScreen,
+                transitionSpec = {
+                    if (targetState is Screen.AddWord) {
+                        (slideInVertically { it } + fadeIn()).togetherWith(fadeOut())
+                    } else {
+                        fadeIn().togetherWith(slideOutVertically { it } + fadeOut())
+                    }
+                }
+            ) { screen ->
+                when (screen) {
+                    is Screen.Home -> {
+                        MainScreen(
+                            userProfile,
+                            wordsList = allWordsWithTags,
+                            onAddClick = { currentScreen = Screen.AddWord },
+                            onSettingsClick = { currentScreen = Screen.Settings },
+                            onWordClick = { name ->
+                                currentScreen = Screen.WordDetail(name)
+                            }
+                        )
+                    }
+
+                    is Screen.AddWord -> {
+                        AddWordScreen(
+                            service,
+                            client,
+                            onClose = { currentScreen = Screen.Home },
+                            onSaveSuccess = {
+                                scope.launch {
+                                    refreshWords()
+                                    currentScreen = Screen.Home
+                                }
+                            }
+                        )
+                    }
+
+                    is Screen.WordDetail -> {
+                        WordDetailScreen(
+                            wordName = screen.wordName,
+                            wordService = service,
+                            onEditClick = {
+                                currentScreen = Screen.EditWord(screen.wordName)
+                            },
+                            onDeleteClick = {
+                                scope.launch {
+                                    service.deleteWord(screen.wordName)
+                                    refreshWords()
+                                    currentScreen = Screen.Home
+                                }
+                            },
+                            onClose = {
                                 currentScreen = Screen.Home
                             }
-                        }
-                    )
-                }
+                        )
+                    }
 
-                is Screen.WordDetail -> {
-                    WordDetailScreen(
-                        wordName = screen.wordName,
-                        wordService = service,
-                        onEditClick = {
-                            currentScreen = Screen.EditWord(screen.wordName)
-                        },
-                        onDeleteClick = {
-                            scope.launch {
-                                service.deleteWord(screen.wordName)
-                                refreshWords()
-                                currentScreen = Screen.Home
-                            }
-                        },
-                        onClose = {
-                            currentScreen = Screen.Home
-                        }
-                    )
-                }
-
-                is Screen.EditWord -> {
-                    EditWordScreen(
-                        wordName = screen.wordName,
-                        wordService = service,
-                        onClose = {
-                            currentScreen = Screen.WordDetail(screen.wordName)
-                        },
-                        onUpdateSuccess = {
-                            scope.launch {
-                                refreshWords()
+                    is Screen.EditWord -> {
+                        EditWordScreen(
+                            wordName = screen.wordName,
+                            wordService = service,
+                            onClose = {
                                 currentScreen = Screen.WordDetail(screen.wordName)
-                            }
-                        },
-                        onDeleteClick = {
-                            scope.launch {
-                                service.deleteWord(screen.wordName)
+                            },
+                            onUpdateSuccess = {
+                                scope.launch {
+                                    refreshWords()
+                                    currentScreen = Screen.WordDetail(screen.wordName)
+                                }
+                            },
+                            onDeleteClick = {
+                                scope.launch {
+                                    service.deleteWord(screen.wordName)
+                                    refreshWords()
+                                    currentScreen = Screen.Home
+                                }
+                            },
+                        )
+                    }
+
+                    is Screen.Settings -> {
+                        SettingsScreen(
+                            userProfile = userProfile,
+                            isLoginInProgress = isLoginInProgress,
+                            hasPendingChanges = hasPendingChanges,
+                            isSyncing = isSyncing,
+                            wordService = service,
+                            onBackClick = { currentScreen = Screen.Home },
+                            onLoginClick = {
+                                scope.launch {
+                                    authRepository.startLogin()
+                                }
+                            },
+                            onLogoutClick = {
+                                scope.launch {
+                                    authRepository.logout()
+                                }
+                            },
+                            onSyncClick = {
+                                scope.launch {
+                                    isSyncing = true
+                                    syncErrorMessage = null
+
+                                    try {
+                                        sync(client, service, keyDataManager)
+                                        refreshWords()
+                                    } catch (e: Exception) {
+                                        syncErrorMessage = e.message ?: "Sync failed"
+                                    } finally {
+                                        isSyncing = false
+                                    }
+                                }
+                            },
+                            onCancelLogin = {
+                                scope.launch { authRepository.cancelLogin() }
+                            },
+                            syncErrorMessage = syncErrorMessage,
+                            onDismissSyncError = {},
+                            onResetSyncClick = {
+                                scope.launch {
+                                    keyDataManager.resetSyncTime()
+                                }
+                            },
+                            onDeleteTagsComplete = {
                                 refreshWords()
-                                currentScreen = Screen.Home
-                            }
-                        },
-                    )
-                }
+                            },
+                            onPurgeDeletedClick = {
+                                scope.launch {
+                                    isSyncing = true
+                                    syncErrorMessage = null
 
-                is Screen.Settings -> {
-                    SettingsScreen(
-                        userProfile = userProfile,
-                        isLoginInProgress = isLoginInProgress,
-                        hasPendingChanges = hasPendingChanges,
-                        isSyncing = isSyncing,
-                        wordService = service,
-                        onBackClick = { currentScreen = Screen.Home },
-                        onLoginClick = {
-                            scope.launch {
-                                authRepository.startLogin()
-                            }
-                        },
-                        onLogoutClick = {
-                            scope.launch {
-                                authRepository.logout()
-                            }
-                        },
-                        onSyncClick = {
-                            scope.launch {
-                                isSyncing = true
-                                syncErrorMessage = null
+                                    try {
+                                        requestCloudPurge(client)
 
-                                try {
-                                    sync(client, service, keyDataManager)
-                                    refreshWords()
-                                } catch (e: Exception) {
-                                    syncErrorMessage = e.message ?: "Sync failed"
-                                } finally {
-                                    isSyncing = false
+                                        service.deletePermanently()
+                                        refreshWords()
+                                        Logger.i { "Data purge completed successfully." }
+                                    } catch (e: Exception) {
+                                        syncErrorMessage = "Purge failed: ${e.message}"
+                                    } finally {
+                                        isSyncing = false
+                                    }
                                 }
-                            }
-                        },
-                        onCancelLogin = {
-                            scope.launch { authRepository.cancelLogin() }
-                        },
-                        syncErrorMessage = syncErrorMessage,
-                        onDismissSyncError = {},
-                        onResetSyncClick = {
-                            scope.launch {
-                                keyDataManager.resetSyncTime()
-                            }
-                        },
-                        onDeleteTagsComplete = {
-                            refreshWords()
-                        },
-                        onPurgeDeletedClick = {
-                            scope.launch {
-                                isSyncing = true
-                                syncErrorMessage = null
-
-                                try {
-                                    requestCloudPurge(client)
-
-                                    service.deletePermanently()
-                                    refreshWords()
-                                    Logger.i { "Data purge completed successfully." }
-                                } catch (e: Exception) {
-                                    syncErrorMessage = "Purge failed: ${e.message}"
-                                } finally {
-                                    isSyncing = false
-                                }
-                            }
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
             }
         }
-
 //        var showContent by remember { mutableStateOf(false) }
 //        Column(
 //            modifier = Modifier
@@ -374,3 +421,41 @@ suspend fun backendPull(client: HttpClient, api: String = "sync/pullAll"): List<
     }
 }
 
+@Composable
+fun ExitConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1B202D),
+        shape = RoundedCornerShape(28.dp),
+        title = {
+            Text(
+                text = "Exit App",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to close the application?",
+                color = Color(0xFF9BA1B0),
+                fontSize = 14.sp
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D65FF)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("EXIT", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL", color = Color.White)
+            }
+        }
+    )
+}

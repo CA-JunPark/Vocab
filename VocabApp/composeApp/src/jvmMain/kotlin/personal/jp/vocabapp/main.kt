@@ -27,6 +27,7 @@ import personal.jp.vocabapp.di.wordModule
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.authClient
 import personal.jp.vocabapp.sql.getDriverFactory
+import kotlin.system.exitProcess
 import kotlin.text.append
 
 // JVM
@@ -49,6 +50,6 @@ fun main() = application {
         title = "VocabApp",
         resizable = true
     ) {
-        App()
+        App(onExit = { exitProcess(0) })
     }
 }
