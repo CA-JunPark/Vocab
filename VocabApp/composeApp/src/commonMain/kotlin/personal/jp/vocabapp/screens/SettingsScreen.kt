@@ -118,6 +118,7 @@ fun SettingsScreen(
                 )
 
                 PurgeDeletedDataCard(
+                    isLoggedIn = userProfile != null,
                     onPurgeClick = { showPurgeConfirmDialog = true }
                 )
             }
@@ -717,7 +718,9 @@ fun ResetSyncConfirmDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
 }
 
 @Composable
-fun PurgeDeletedDataCard(onPurgeClick: () -> Unit) {
+fun PurgeDeletedDataCard(
+    isLoggedIn: Boolean, onPurgeClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -729,10 +732,16 @@ fun PurgeDeletedDataCard(onPurgeClick: () -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Purge Deleted Data", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("Permanently remove words marked as deleted from local and cloud.", color = Color(0xFF9BA1B0), fontSize = 13.sp)
+                Text(
+                    text = if (isLoggedIn) "Permanently remove words marked as deleted."
+                    else "Please login to purge deleted data",
+                    color = Color(0xFF9BA1B0),
+                    fontSize = 13.sp
+                )
             }
             IconButton(
                 onClick = onPurgeClick,
+                enabled = isLoggedIn,
                 colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFF2B313E))
             ) {
                 Icon(imageVector = Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFFFF5252))
