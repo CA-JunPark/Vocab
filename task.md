@@ -21,10 +21,10 @@
     - [x] need to add Auth Header to requests 
         - [x] get tokens from secure storage
     - [x] need to check refreshing token works
-- [ ] Setup Turso for cloud storage
+- [x] Setup Turso for cloud storage
     - [x] pull words from remote DB
     - [x] push words to remote DB
-    - [ ] Sync words to remote DB 
+    - [x] Sync words to remote DB 
         - [x]check internet is available 
         - [x] push from front
         - [x] pull from back
@@ -99,7 +99,7 @@
 - [x] **Word Detail Screen** (Modal)
     - [x] Show translation, examples, opposites, tags
     - [ ] TTS button (Android only)
-- [ ] **Add Screen** (Modal)
+- [x] **Add Screen** (Modal)
     - [x] Input field for word
     - [x] gemini button to generate fields
         - [x] show error if not Google Sign-in
