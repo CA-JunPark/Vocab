@@ -131,11 +131,11 @@ class WordRepoImpl(db: WordDatabase): WordRepo {
                     meaningKr = word.meaningKr,
                     example = word.example,
                     antonymEn = word.antonymEn,
+                    isDeleted = word.isDeleted,
                     note = word.note
                 )
-                // delete previous tags
+
                 _queries.deleteWordTagsByWord(word.name)
-                // add new tags
                 tags.forEach { tag ->
                     _queries.insertTag(tag.tagName, tag.color)
                     _queries.insertWordTag(word.name, tag.tagName)

@@ -75,16 +75,15 @@ WHERE name = ?;
 upsertWord:
 INSERT INTO Word(
     name, meaningKr, example, antonymEn,
-    isDeleted, createdTime, modifiedTime, syncedTime, note
+    isDeleted, createdTime, note
 )
-VALUES(?, ?, ?,?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, ?)
+VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
 ON CONFLICT(name) DO UPDATE SET
     meaningKr = excluded.meaningKr,
     example = excluded.example,
     antonymEn = excluded.antonymEn,
     isDeleted = excluded.isDeleted,
     modifiedTime = CURRENT_TIMESTAMP,
-    syncedTime = NULL,
     note = excluded.note;
 
 countWords:
