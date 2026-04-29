@@ -65,6 +65,7 @@ fun EditWordScreen(
     var definitions by remember { mutableStateOf(listOf(Definition())) }
     var note by remember { mutableStateOf("") }
     var tagsList by remember { mutableStateOf(emptyList<String>()) }
+    var tagToDelete by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
     var tagInputText by remember { mutableStateOf("") }
@@ -86,6 +87,36 @@ fun EditWordScreen(
             tagSuggestions = emptyList()
             showSuggestions = false
         }
+    }
+
+    // Tag delete dialog
+    if (tagToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { tagToDelete = null },
+            containerColor = Color(0xFF1B202D),
+            title = {
+                Text("Remove Tag", color = Color.White, fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text(
+                    "Are you sure you want to remove the tag '${tagToDelete}'?",
+                    color = Color(0xFF9BA1B0)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    tagsList = tagsList.filter { it != tagToDelete }
+                    tagToDelete = null
+                }) {
+                    Text("REMOVE", color = Color(0xFFFF5252), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { tagToDelete = null }) {
+                    Text("CANCEL", color = Color.White)
+                }
+            }
+        )
     }
 
     LaunchedEffect(wordName) {
@@ -243,7 +274,7 @@ fun EditWordScreen(
                         DeletableTagChip(
                             tag = tag,
                             tagManager = tagManager,
-                            onDeleteClick = { tagsList = tagsList.filter { it != tag } }
+                            onDeleteClick = { tagToDelete = tag }
                         )
                     }
                 }

@@ -53,6 +53,7 @@ fun AddWordScreen(
     var targetWord by remember { mutableStateOf("") }
     var definitions by remember { mutableStateOf(listOf(Definition())) }
     var tagsList by remember { mutableStateOf(emptyList<String>()) }
+    var tagToDelete by remember { mutableStateOf<String?>(null) }
     var tagInputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -115,6 +116,29 @@ fun AddWordScreen(
                 Logger.e("Failed to save word: $targetWord")
             }
         }
+    }
+
+    // Tag delete dialog
+    if (tagToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { tagToDelete = null },
+            containerColor = Color(0xFF1B202D),
+            title = { Text("Remove Tag", color = Color.White, fontWeight = FontWeight.Bold) },
+            text = { Text("Remove '${tagToDelete}' from this word?", color = Color(0xFF9BA1B0)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    tagsList = tagsList.filter { it != tagToDelete }
+                    tagToDelete = null
+                }) {
+                    Text("REMOVE", color = Color(0xFFFF5252), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { tagToDelete = null }) {
+                    Text("CANCEL", color = Color.White)
+                }
+            }
+        )
     }
 
 
@@ -236,7 +260,7 @@ fun AddWordScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     tagsList.forEach { tag ->
-                        DeletableTagChip(tag = tag, tagManager, onDeleteClick = { tagsList = tagsList.filter { it != tag } })
+                        DeletableTagChip(tag = tag, tagManager, onDeleteClick = { tagToDelete = tag })
                     }
                 }
 
@@ -490,7 +514,7 @@ fun DeletableTagChip(tag: String, tagManager: TagColorManager, onDeleteClick: ()
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = tag.uppercase(),
+                text = tag,
                 color = textColor,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
