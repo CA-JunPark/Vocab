@@ -45,6 +45,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import db.Tag
+import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.getContrastColor
 import personal.jp.vocabapp.theme.VocabTheme
 
@@ -80,7 +81,7 @@ class WordViewModel(private val wordService: WordService) : ViewModel() {
 }
 
 @Composable
-fun WordCard(word: String, onClick: () -> Unit) {
+fun WordCard(word: String, tagManager: TagColorManager, onClick: () -> Unit) {
     val viewModel: WordViewModel = koinViewModel(key = word)
     val state = viewModel.uiState.collectAsState().value
     LaunchedEffect(word) {
@@ -106,7 +107,7 @@ fun WordCard(word: String, onClick: () -> Unit) {
             when (state) {
                 is WordUiState.Loading -> CircularProgressIndicator()
                 is WordUiState.Success -> {
-                    VocabularyCard(state.data)
+                    VocabularyCard(state.data, tagManager)
                 }
                 is WordUiState.Error -> Text("Error: ${state.message}", color = Color.Red)
                 else -> Text("No Data")
@@ -116,7 +117,7 @@ fun WordCard(word: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
+fun VocabularyCard(data: WordWithTags,tagManager: TagColorManager, modifier: Modifier = Modifier) {
     val firstMeaning = remember(data.word.meaningKr) {
         data.word.meaningKr.split("\n").firstOrNull() ?: ""
     }
@@ -163,7 +164,7 @@ fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     data.tags.forEach { tag ->
-                        TagChip(tag = tag)
+                        TagChip(tag = tag, tagManager)
                     }
                 }
             } else {
@@ -174,15 +175,10 @@ fun VocabularyCard(data: WordWithTags, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TagChip(tag: Tag) {
-    // Hex String (#FFFFFF)to Compose Color
-    val bgColor = try {
-        Color(tag.color.removePrefix("#").toLong(16) or 0xFF000000)
-    } catch (e: Exception) {
-        Color(0xFF222C47) // Default color if fail
-    }
-
-    val textColor = getContrastColor(tag.color)
+fun TagChip(tag: Tag, tagManager: TagColorManager) {
+    val bgColor = tagManager.getTagColor(tag.tagName)
+    val bgColorHex = tagManager.colorToHexString(bgColor)
+    val textColor = getContrastColor(bgColorHex)
 
     Box(
         modifier = Modifier
@@ -193,8 +189,8 @@ fun TagChip(tag: Tag) {
         Text(
             text = tag.tagName,
             color = textColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             softWrap = false
         )

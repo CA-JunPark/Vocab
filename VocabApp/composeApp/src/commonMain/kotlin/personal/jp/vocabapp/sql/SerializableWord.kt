@@ -56,15 +56,19 @@ fun fromSerializable(sWord: SerializableWord): Pair<Word, List<db.Tag>> {
         syncedTime = sWord.syncedTime,
         note = sWord.note
     )
-    // put default color for tags
+
+    val tagColorManager = TagColorManager()
+
     val tags = sWord.tags?.split(",")
         ?.map { it.trim() }
         ?.filter { it.isNotBlank() }
-        ?.map { Tag(it, "#808080") } // give default color
-        ?: emptyList()
+        ?.map { tagName ->
+            val color = tagColorManager.getTagColor(tagName)
+            Tag(tagName, tagColorManager.colorToHexString(color))
+        } ?: emptyList()
+
     return Pair(word, tags)
 }
-
 @Serializable
 data class SyncRequest(
     val lastSyncTime: String,

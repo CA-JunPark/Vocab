@@ -1,5 +1,6 @@
 package personal.jp.vocabapp.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import db.Tag
 import db.Word
+import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.sql.getContrastColor
 
@@ -44,6 +46,7 @@ fun WordDetailScreen(
 ) {
     var word by remember { mutableStateOf<Word?>(null) }
     var tags by remember { mutableStateOf(emptyList<Tag>()) }
+    val tagManager = TagColorManager()
     var currentTab by remember { mutableStateOf(DetailTab.DETAILS) }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -123,8 +126,8 @@ fun WordDetailScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 when (currentTab) {
-                    DetailTab.DETAILS -> DetailsView(currentWord)
-                    DetailTab.NOTES -> NotesView(currentWord, tags)
+                    DetailTab.DETAILS -> DetailsView(currentWord, tags, tagManager)
+                    DetailTab.NOTES -> NotesView(currentWord,)
                 }
             }
         }
@@ -132,7 +135,7 @@ fun WordDetailScreen(
 }
 
 @Composable
-fun DetailsView(word: Word) {
+fun DetailsView(word: Word, tags: List<Tag>, tagManager: TagColorManager) {
     val meanings = word.meaningKr.split("\n")
     val examples = word.example?.split("\n") ?: emptyList()
     val antonyms = word.antonymEn?.split("\n") ?: emptyList()
@@ -151,10 +154,25 @@ fun DetailsView(word: Word) {
         }
         Spacer(modifier = Modifier.height(20.dp))
     }
+    Column {
+        Text("TAGS", color = Color(0xFF626978), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            tags.forEach { tag ->
+                DetailTagChip(tag, tagManager)
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+    }
 }
 
 @Composable
-fun NotesView(word: Word, tags: List<Tag>) {
+fun NotesView(word: Word) {
     Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Column {
             Text("PERSONAL NOTES", color = Color(0xFF626978), fontWeight = FontWeight.Bold, fontSize = 12.sp)
@@ -171,21 +189,6 @@ fun NotesView(word: Word, tags: List<Tag>) {
                     lineHeight = 24.sp,
                     modifier = Modifier.padding(20.dp)
                 )
-            }
-        }
-
-        Column {
-            Text("TAGS", color = Color(0xFF626978), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                tags.forEach { tag ->
-                    DetailTagChip(tag)
-                }
             }
         }
     }
@@ -360,21 +363,15 @@ fun WordDetailHeader(wordName: String) {
 }
 
 @Composable
-fun DetailTagChip(tag: Tag) {
-    val tagColor = remember(tag.color) {
-        try {
-            Color(tag.color.removePrefix("#").toLong(16) or 0xFF000000)
-        } catch (e: Exception) {
-            Color(0xFF2B313E)
-        }
-    }
-
-    val textColor = getContrastColor(tag.color)
+fun DetailTagChip(tag: Tag, tagManager: TagColorManager) {
+    val bgColor = tagManager.getTagColor(tag.tagName)
+    val bgColorHex = tagManager.colorToHexString(bgColor)
+    val textColor = getContrastColor(bgColorHex)
 
     Surface(
-        color = tagColor,
+        color = bgColor,
         shape = RoundedCornerShape(8.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, tagColor)
+        border = BorderStroke(1.dp, bgColor)
     ) {
         Text(
             text = tag.tagName,

@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import personal.jp.vocabapp.viewmodels.WordWithTags
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.viewmodels.WordCard
 
 @Composable
@@ -64,6 +65,7 @@ fun MainScreen(
 ){
     var searchQuery by remember { mutableStateOf("") }
     var selectedMode by remember { mutableStateOf(SearchMode.Content) }
+    val tagManager = TagColorManager()
     val filteredList = remember(searchQuery, wordsList, selectedMode) {
         if (searchQuery.isBlank()) wordsList
         else {
@@ -116,7 +118,7 @@ fun MainScreen(
             contentPadding = PaddingValues(4.dp),
         ) {
             items(filteredList, key = { it.word.name }) { item ->
-                 WordCard(item.word.name) { onWordClick(item.word.name) }
+                 WordCard(item.word.name, tagManager) { onWordClick(item.word.name) }
             }
             item {
                 Spacer(modifier = Modifier.height(100.dp))
@@ -227,7 +229,7 @@ fun FilterSection(
                 // Moving Box
                 Box(
                     modifier = Modifier
-                        .offset(x = indicatorOffset) // 애니메이션 좌표 적용
+                        .offset(x = indicatorOffset)
                         .size(width = tabWidth, height = 36.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color(0xFF2D65FF))
