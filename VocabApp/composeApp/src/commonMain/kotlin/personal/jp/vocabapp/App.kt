@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import personal.jp.vocabapp.sql.WordServiceImpl
 import kotlinx.coroutines.launch

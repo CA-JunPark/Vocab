@@ -99,7 +99,6 @@
 - [x] **Word Detail Screen** (Modal)
     - [x] Show translation, examples, opposites, tags
     - [ ] TTS button (Android only)
-    - [ ] ESC to close (Desktop only)
 - [ ] **Add Screen** (Modal)
     - [x] Input field for word
     - [x] gemini button to generate fields
@@ -107,29 +106,24 @@
     - [x] other editable fields (meaningKr, example, oppositeEn, tags, note)
     - [x] tags field showing similar tags (suggestion)
     - [x] save button (FAB)
-    - [ ] ESC to close (Desktop only)
 - [x] **Edit Screen** (Modal)
     - [x] editable fields (word, meaningKr, example, oppositeEn, tags, note)
     - [x] save button
-    - [ ] ESC to close (Desktop only)
 - [ ] **Settings Screen**
     - [x] Google Login button
     - [x] Account info display
     - [x] Manual Sync button
     - [x] Tag list
-    - [ ] ESC to close (Desktop only)
     - [ ] The Legal/Credits Button
-    - [ ] Delete unused tags button
-    - [ ] Reset Sync Time button
+    - [x] Delete unused tags button
+    - [x] Reset Sync Time button
 - [ ] The Legal/Credits Screen
 
 ### Navigation
 - [x] Navigation Compose (Multiplatform)
 
 ### Desktop Specific Features
-- [ ] add hotkeys for desktop
-- [ ] Tab Navigation
-- [ ] remember window size and position
+- [x] remember window size and position
 
 ## 4. Android Specific Features
 - [ ] **Widget (Glance)**
@@ -140,10 +134,9 @@
 
 ## 5. Integration & Polish & Debugging
 - [x] createWord function that does not need all fields
-- [ ] convert UTC to local time when displaying created/modified time
 - [ ] Gemini Model Switching if Request Per Day is exceeded
 - [x] load tokens to header after google login (right now the app needs to be restarted)
 - [ ] App Icon
-- [ ] Hard Delete isDeleted = 1 words in local and turso db
-- [ ] Back to close (Ansroid only)
+- [x] Hard Delete isDeleted = 1 words in local and turso db
+- [x] Back to close (Ansroid only)
 

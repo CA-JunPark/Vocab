@@ -1,55 +1,64 @@
 package personal.jp.vocabapp
 
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import com.sunildhiman90.kmauth.core.KMAuthConfig
-import com.sunildhiman90.kmauth.core.KMAuthInitializer
-import com.sunildhiman90.kmauth.google.KMAuthGoogle
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.headers
-import io.ktor.client.statement.bodyAsText
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import org.koin.compose.koinInject
+import androidx.compose.ui.window.*
 import org.koin.core.context.startKoin
 import personal.jp.vocabapp.di.apiModule
 import personal.jp.vocabapp.di.authModule
 import personal.jp.vocabapp.di.platformModule
 import personal.jp.vocabapp.di.wordModule
-import personal.jp.vocabapp.google.AuthRepository
-import personal.jp.vocabapp.google.authClient
 import personal.jp.vocabapp.sql.getDriverFactory
+import java.util.prefs.Preferences
 import kotlin.system.exitProcess
-import kotlin.text.append
 
-// JVM
 fun main() = application {
+    // load window state
+    val prefs = Preferences.userRoot().node("personal/jp/vocabapp")
+    val width = prefs.getDouble("window_width", 450.0).dp
+    val height = prefs.getDouble("window_height", 900.0).dp
+    val x = prefs.getDouble("window_x", 100.0).dp
+    val y = prefs.getDouble("window_y", 100.0).dp
 
     val windowState = rememberWindowState(
-        width = 450.dp,
-        height = 900.dp
+        position = WindowPosition(x, y),
+        size = DpSize(width, height)
     )
 
-    startKoin{
-        modules(wordModule(getDriverFactory()), apiModule(),
-            platformModule, authModule
+    // save window state
+    val saveWindowState = {
+        val pos = windowState.position
+        val size = windowState.size
+
+        if (pos is WindowPosition.Absolute) {
+            prefs.putDouble("window_x", pos.x.value.toDouble())
+            prefs.putDouble("window_y", pos.y.value.toDouble())
+        }
+        prefs.putDouble("window_width", size.width.value.toDouble())
+        prefs.putDouble("window_height", size.height.value.toDouble())
+    }
+
+    startKoin {
+        modules(
+            wordModule(getDriverFactory()),
+            apiModule(),
+            platformModule,
+            authModule
         )
     }
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = {
+            saveWindowState()
+            exitApplication()
+        },
         state = windowState,
         title = "VocabApp",
         resizable = true
     ) {
-        App(onExit = { exitProcess(0) })
+        App(onExit = {
+            saveWindowState()
+            exitProcess(0)
+        })
     }
 }
