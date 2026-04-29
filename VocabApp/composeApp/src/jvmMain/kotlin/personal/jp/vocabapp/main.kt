@@ -11,6 +11,9 @@ import personal.jp.vocabapp.di.wordModule
 import personal.jp.vocabapp.sql.getDriverFactory
 import java.util.prefs.Preferences
 import kotlin.system.exitProcess
+import vocabapp.composeapp.generated.resources.Res
+import vocabapp.composeapp.generated.resources.vocab_icon
+import org.jetbrains.compose.resources.painterResource
 
 fun main() = application {
     // load window state
@@ -54,7 +57,8 @@ fun main() = application {
         },
         state = windowState,
         title = "VocabApp",
-        resizable = true
+        resizable = true,
+        icon = painterResource(Res.drawable.vocab_icon),
     ) {
         App(onExit = {
             saveWindowState()

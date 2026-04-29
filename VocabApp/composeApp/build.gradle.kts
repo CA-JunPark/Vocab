@@ -77,6 +77,7 @@ kotlin {
             implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
             implementation("io.ktor:ktor-client-logging:3.4.2")
             implementation("io.ktor:ktor-client-auth:3.4.2")
+            implementation(compose.components.resources)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -134,6 +135,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "personal.jp.vocabapp"
+            windows { iconFile.set(project.file("src/jvmMain/resources/vocab_icon.ico")) }
             packageVersion = "1.0.0"
         }
     }

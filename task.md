@@ -136,8 +136,8 @@
 - [x] createWord function that does not need all fields
 - [ ] Gemini Model Switching if Request Per Day is exceeded
 - [x] load tokens to header after google login (right now the app needs to be restarted)
-- [ ] App Icon
+- [x] App Icon
 - [x] Hard Delete isDeleted = 1 words in local and turso db
 - [x] Back to close (Ansroid only)
-- [ ] Android Safe Area
+- [x] Android Safe Area
 
