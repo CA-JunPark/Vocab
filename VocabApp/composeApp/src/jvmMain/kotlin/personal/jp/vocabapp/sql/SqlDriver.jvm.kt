@@ -7,10 +7,15 @@ import java.io.File
 
 class JVMDriverFactory : DriverFactory {
     override fun createDriver(): SqlDriver {
-        val databaseFile = File("word.db")
-        val driver = JdbcSqliteDriver("jdbc:sqlite:word.db")
+        val appDataDir = File(System.getProperty("user.home"), ".vocabapp")
+        if (!appDataDir.exists()) {
+            appDataDir.mkdirs()
+        }
 
-        if (!databaseFile.exists()) {
+        val databaseFile = File(appDataDir, "word.db")
+        val driver = JdbcSqliteDriver("jdbc:sqlite:${databaseFile.absolutePath}")
+
+        if (!databaseFile.exists() || databaseFile.length() == 0L) {
             WordDatabase.Schema.create(driver)
         }
 

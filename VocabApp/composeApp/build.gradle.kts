@@ -133,9 +133,13 @@ compose.desktop {
         mainClass = "personal.jp.vocabapp.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "personal.jp.vocabapp"
-            windows { iconFile.set(project.file("src/jvmMain/resources/vocab_icon.ico")) }
+            modules("java.sql")
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            packageName = "Vocab"
+            windows {
+                iconFile.set(project.file("src/jvmMain/resources/vocab_icon.ico"))
+                menu = true
+            }
             packageVersion = "1.0.0"
         }
     }
