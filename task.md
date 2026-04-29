@@ -140,4 +140,5 @@
 - [x] Hard Delete isDeleted = 1 words in local and turso db
 - [x] Back to close (Ansroid only)
 - [x] Android Safe Area
+- [x] JVM build login issue
 

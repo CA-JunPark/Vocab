@@ -133,7 +133,14 @@ compose.desktop {
         mainClass = "personal.jp.vocabapp.MainKt"
 
         nativeDistributions {
-            modules("java.sql")
+            modules(
+                "java.sql",        // DB
+                "java.desktop",    // browser
+                "java.management", // Ktor server
+                "java.naming",     // Ktor server
+                "jdk.crypto.ec",   // HTTPS
+                "jdk.unsupported"  // JNA(DPAPI)
+            )
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "Vocab"
             windows {
