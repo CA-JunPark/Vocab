@@ -35,8 +35,6 @@ import personal.jp.vocabapp.sql.WordService
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import db.Word
 
 
 class AddWordActionCallback : ActionCallback {
@@ -195,7 +193,7 @@ class VocabWidget : GlanceAppWidget() {
                         text = "+",
                         modifier = GlanceModifier.padding(top = 1.dp),
                         style = TextStyle(
-                            color = ColorProvider(secondaryTextColor),
+                            color = ColorProvider(Color.White),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
@@ -218,7 +216,7 @@ class VocabWidget : GlanceAppWidget() {
                         text = "→",
                         modifier = GlanceModifier.padding(top = 1.dp),
                         style = TextStyle(
-                            color = ColorProvider(secondaryTextColor),
+                            color = ColorProvider(Color.White),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
