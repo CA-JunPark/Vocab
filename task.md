@@ -126,11 +126,11 @@
 - [x] remember window size and position
 
 ## 4. Android Specific Features
-- [ ] **Widget (Glance)**
-    - [ ] `VocabWidget` display logic (random subset)
-    - [ ] `VocabWidgetReceiver` for updates
-    - [ ] Click intents (Open App/Detail)
-    - [ ] FAB (+) to add new word to DB
+- [x] **Widget (Glance)**
+    - [x] `VocabWidget` display logic (random subset)
+    - [x] `VocabWidgetReceiver` for updates
+    - [x] Click intents (Open App/Detail)
+    - [x] (+) to add new word to DB
 
 ## 5. Integration & Polish & Debugging
 - [x] createWord function that does not need all fields
