@@ -2,6 +2,9 @@
 
 A modern, multiplatform vocabulary application designed for seamless word management and AI-assisted word knowledge generation. Built with **Kotlin Multiplatform** and **Compose Multiplatform**
 
+## Document 
+[Vocab DeepWiki](https://deepwiki.com/CA-JunPark/Vocab/8.2-platform-specific-di-modules)
+
 ## Target Platforms
 - Android
 - Windows
