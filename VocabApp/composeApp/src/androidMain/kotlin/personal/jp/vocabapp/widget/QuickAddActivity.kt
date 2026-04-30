@@ -137,7 +137,7 @@ class QuickAddActivity : ComponentActivity(), KoinComponent {
             )
 
             wordService.addWord(newWord, emptyList())
-            widgetSyncManager.syncWord(null)
+            widgetSyncManager.syncWord(newWord)
 
             Logger.d("New Word Added from Widget: $trimmedName")
             val constraints = androidx.work.Constraints.Builder()

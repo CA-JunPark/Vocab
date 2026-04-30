@@ -24,12 +24,15 @@ class AndroidWidgetSyncManager(private val context: Context) : WidgetSyncManager
                 updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { prefs ->
                     val mutablePrefs = prefs.toMutablePreferences()
                     if (word != null) {
-                        if (prefs[wordKey] == word.name) {
-                            val firstMeaning = word.meaningKr.split("\n")
-                                .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
-                            mutablePrefs[meaningKey] = firstMeaning
-                            mutablePrefs[lastUpdateKey] = System.currentTimeMillis()
-                        }
+                        mutablePrefs[wordKey] = word.name
+                        val firstMeaning = word.meaningKr.split("\n")
+                            .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
+                        mutablePrefs[meaningKey] = firstMeaning
+
+                        mutablePrefs[shuffledIdsKey] = ""
+                        mutablePrefs[currentIndexKey] = 0
+
+                        mutablePrefs[lastUpdateKey] = System.currentTimeMillis()
                     } else {
                         val activeWords = wordService.getActiveAllWords()
                         if (activeWords.isNotEmpty()) {
