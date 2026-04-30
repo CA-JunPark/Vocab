@@ -2,6 +2,7 @@ package personal.jp.vocabapp.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -33,12 +34,14 @@ import org.koin.core.component.inject
 import personal.jp.vocabapp.sql.WordService
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 
 
 class AddWordActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        // TODO: 단어 추가 화면을 열거나 로직 수행
+        val intent = Intent(context, QuickAddActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        context.startActivity(intent)
     }
 }
 

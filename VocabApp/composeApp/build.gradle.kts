@@ -41,6 +41,7 @@ kotlin {
             // widget
             implementation("androidx.glance:glance-appwidget:1.1.1")
             implementation("androidx.glance:glance-material3:1.1.1")
+            implementation("com.google.android.material:material:1.12.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

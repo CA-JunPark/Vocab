@@ -28,6 +28,8 @@ browser = "1.9.0"
 tinkAndroid = "1.20.0"
 runtime = "1.11.0"
 uiGraphics = "1.11.0"
+ui = "1.11.0"
+foundationLayout = "1.11.0"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
@@ -71,6 +73,8 @@ androidx-browser = { group = "androidx.browser", name = "browser", version.ref =
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroid" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
