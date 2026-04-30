@@ -13,7 +13,6 @@ import co.touchlab.kermit.Logger
 import db.Tag
 import io.ktor.client.request.delete
 import io.ktor.client.statement.bodyAsText
-import personal.jp.vocabapp.viewmodels.WordWithTags
 
 @Serializable
 data class SerializableWord(

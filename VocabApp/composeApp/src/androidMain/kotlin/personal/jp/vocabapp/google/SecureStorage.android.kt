@@ -1,20 +1,17 @@
 package personal.jp.vocabapp.google
 
 import android.content.Context
+import android.util.Base64
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.crypto.tink.Aead
+import com.google.crypto.tink.KeyTemplates
+import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import android.util.Base64
-import com.google.crypto.tink.KeyTemplates
-import com.google.crypto.tink.aead.AeadConfig
-import java.security.GeneralSecurityException
-import com.google.crypto.tink.RegistryConfiguration
-import java.io.IOException
 import java.security.KeyStore
 
 actual class SecureStorage actual constructor(

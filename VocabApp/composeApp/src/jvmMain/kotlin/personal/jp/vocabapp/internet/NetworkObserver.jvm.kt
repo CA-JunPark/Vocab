@@ -1,7 +1,7 @@
 package personal.jp.vocabapp.internet
+
 import java.net.InetSocketAddress
 import java.net.Socket
-
 
 actual fun isNetworkAvailable(context:Any?): Boolean {
     return try {
