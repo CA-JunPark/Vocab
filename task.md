@@ -39,6 +39,9 @@
     - [x] check id token for all connections
     - [x] need to check refreshing token works
 - [x] Tag Management
+- [ ] TTS
+    - [ ] Android
+    - [ ] Desktop
 - [x] Setup Glance for Android widget
 
 ## 2. Data Layer
@@ -98,7 +101,7 @@
     - [x] Login Status Display
 - [x] **Word Detail Screen** (Modal)
     - [x] Show translation, examples, opposites, tags
-    - [ ] TTS button (Android only)
+    - [ ] TTS button
 - [x] **Add Screen** (Modal)
     - [x] Input field for word
     - [x] gemini button to generate fields
@@ -114,10 +117,8 @@
     - [x] Account info display
     - [x] Manual Sync button
     - [x] Tag list
-    - [ ] The Legal/Credits Button
     - [x] Delete unused tags button
     - [x] Reset Sync Time button
-- [ ] The Legal/Credits Screen
 
 ### Navigation
 - [x] Navigation Compose (Multiplatform)
