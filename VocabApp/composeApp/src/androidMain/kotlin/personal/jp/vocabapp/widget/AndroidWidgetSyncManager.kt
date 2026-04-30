@@ -28,6 +28,7 @@ class AndroidWidgetSyncManager(private val context: Context) : WidgetSyncManager
                             val firstMeaning = word.meaningKr.split("\n")
                                 .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
                             mutablePrefs[meaningKey] = firstMeaning
+                            mutablePrefs[lastUpdateKey] = System.currentTimeMillis()
                         }
                     } else {
                         val activeWords = wordService.getActiveAllWords()
@@ -42,6 +43,7 @@ class AndroidWidgetSyncManager(private val context: Context) : WidgetSyncManager
                             mutablePrefs[wordKey] = "Tap '+'"
                             mutablePrefs[meaningKey] = "to start"
                         }
+                        mutablePrefs[lastUpdateKey] = System.currentTimeMillis()
                     }
                     mutablePrefs
                 }

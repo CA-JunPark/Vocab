@@ -29,6 +29,7 @@ import personal.jp.vocabapp.sql.getDriverFactory
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.PeriodicWorkRequestBuilder
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -40,6 +41,11 @@ import personal.jp.vocabapp.di.authModule
 import personal.jp.vocabapp.di.platformModule
 import personal.jp.vocabapp.google.AuthFlowManager
 import personal.jp.vocabapp.google.AuthRepository
+import personal.jp.vocabapp.widget.VocabUpdateWorker
+import java.util.concurrent.TimeUnit
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 
 // Android
 class MainActivity : ComponentActivity() {
@@ -57,11 +63,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        setupAutoUpdateTask()
+
         setContent {
             App(onExit = { finish() })
         }
         handleIntent(intent)
     }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)
@@ -74,5 +83,17 @@ class MainActivity : ComponentActivity() {
             val code = data.getQueryParameter("code")
             code?.let { authFlowManager.onCodeReceived(it) }
         }
+    }
+
+    private fun setupAutoUpdateTask() {
+        val workRequest = PeriodicWorkRequestBuilder<VocabUpdateWorker>(
+            1, TimeUnit.HOURS
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "VocabAutoUpdate",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 }

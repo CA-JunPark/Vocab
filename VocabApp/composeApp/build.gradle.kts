@@ -42,6 +42,7 @@ kotlin {
             implementation("androidx.glance:glance-appwidget:1.1.1")
             implementation("androidx.glance:glance-material3:1.1.1")
             implementation("com.google.android.material:material:1.12.0")
+            implementation("androidx.work:work-runtime-ktx:2.11.2")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

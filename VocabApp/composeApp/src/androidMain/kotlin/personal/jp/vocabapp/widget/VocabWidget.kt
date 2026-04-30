@@ -34,6 +34,7 @@ import org.koin.core.component.inject
 import personal.jp.vocabapp.sql.WordService
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import db.Word
 
@@ -53,6 +54,7 @@ val meaningKey = stringPreferencesKey("widget_meaning")
 val shuffledIdsKey = stringPreferencesKey("shuffled_word_names")
 val currentIndexKey = intPreferencesKey("current_shuffle_index")
 
+val lastUpdateKey = longPreferencesKey("last_update_time")
 
 class NextWordActionCallback : ActionCallback, KoinComponent {
     private val wordService: WordService by inject()
@@ -95,6 +97,7 @@ class NextWordActionCallback : ActionCallback, KoinComponent {
             mutablePrefs[meaningKey] = firstMeaning
             mutablePrefs[shuffledIdsKey] = targetShuffledNames.joinToString(",")
             mutablePrefs[currentIndexKey] = nextIndex + 1
+            mutablePrefs[lastUpdateKey] = System.currentTimeMillis()
 
             mutablePrefs
         }
