@@ -131,7 +131,7 @@
     - [x] `VocabWidgetReceiver` for updates
     - [x] Click intents (Open App/Detail)
     - [x] (+) to add new word to DB
-    - [ ] auto update displayed word when there was no update for an hour
+    - [x] auto update displayed word when there was no update for an hour
 
 ## 5. Integration & Polish & Debugging
 - [x] createWord function that does not need all fields
