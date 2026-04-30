@@ -35,6 +35,8 @@ import personal.jp.vocabapp.google.enrichWordByGemini
 import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.sql.getContrastColor
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 
 // Data class for managing multiple definitions
 data class Definition(
@@ -115,6 +117,17 @@ fun AddWordScreen(
             } else {
                 Logger.e("Failed to save word: $targetWord")
             }
+        }
+    }
+
+    val moveDefinition = { index: Int, up: Boolean ->
+        val newIndex = if (up) index - 1 else index + 1
+        if (newIndex in definitions.indices) {
+            val mutableList = definitions.toMutableList()
+            val temp = mutableList[index]
+            mutableList[index] = mutableList[newIndex]
+            mutableList[newIndex] = temp
+            definitions = mutableList
         }
     }
 
@@ -225,6 +238,8 @@ fun AddWordScreen(
                     definition = definition,
                     index = index,
                     enabled = !isLoading,
+                    isFirst = index == 0,
+                    isLast = index == definitions.size - 1,
                     onDefinitionChange = { updatedDef ->
                         definitions = definitions.mapIndexed { i, d -> if (i == index) updatedDef else d }
                     },
@@ -232,7 +247,9 @@ fun AddWordScreen(
                         if (definitions.size > 1) {
                             definitions = definitions.filterIndexed { i, _ -> i != index }
                         }
-                    }
+                    },
+                    onMoveUp = { moveDefinition(index, true) },
+                    onMoveDown = { moveDefinition(index, false) }
                 )
             }
 
@@ -337,8 +354,12 @@ fun DefinitionCard(
     definition: Definition,
     index: Int,
     enabled: Boolean,
+    isFirst: Boolean,
+    isLast: Boolean,
     onDefinitionChange: (Definition) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -353,8 +374,29 @@ fun DefinitionCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("DEFINITION ${index + 1}", color = Color(0xFF2D65FF), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
-                    Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFF626978))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (!isFirst) {
+                        IconButton(onClick = onMoveUp, modifier = Modifier.size(28.dp)) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowUp,
+                                contentDescription = "Move Up",
+                                tint = Color(0xFF9BA1B0)
+                            )
+                        }
+                    }
+                    if (!isLast) {
+                        IconButton(onClick = onMoveDown, modifier = Modifier.size(28.dp)) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Move Down",
+                                tint = Color(0xFF9BA1B0)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.DeleteOutline, contentDescription = null, tint = Color(0xFF626978))
+                    }
                 }
             }
 

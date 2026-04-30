@@ -202,6 +202,17 @@ fun EditWordScreen(
         }
     }
 
+    val moveDefinition = { index: Int, up: Boolean ->
+        val newIndex = if (up) index - 1 else index + 1
+        if (newIndex in definitions.indices) {
+            val mutableList = definitions.toMutableList()
+            val temp = mutableList[index]
+            mutableList[index] = mutableList[newIndex]
+            mutableList[newIndex] = temp
+            definitions = mutableList
+        }
+    }
+
     Scaffold(
         topBar = {
             EditWordTopBar(
@@ -250,6 +261,8 @@ fun EditWordScreen(
                     definition = definition,
                     index = index,
                     enabled = !isLoading,
+                    isFirst = index == 0,
+                    isLast = index == definitions.size - 1,
                     onDefinitionChange = { updatedDef ->
                         definitions = definitions.mapIndexed { i, d -> if (i == index) updatedDef else d }
                     },
@@ -257,7 +270,9 @@ fun EditWordScreen(
                         if (definitions.size > 1) {
                             definitions = definitions.filterIndexed { i, _ -> i != index }
                         }
-                    }
+                    },
+                    onMoveUp = { moveDefinition(index, true) },
+                    onMoveDown = { moveDefinition(index, false) }
                 )
             }
 

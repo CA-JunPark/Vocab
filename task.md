@@ -39,9 +39,9 @@
     - [x] check id token for all connections
     - [x] need to check refreshing token works
 - [x] Tag Management
-- [ ] TTS
-    - [ ] Android
-    - [ ] Desktop
+- [x] TTS
+    - [x] Android
+    - [x] Desktop
 - [x] Setup Glance for Android widget
 
 ## 2. Data Layer
@@ -136,11 +136,10 @@
 
 ## 5. Integration & Polish & Debugging
 - [x] createWord function that does not need all fields
-- [ ] Gemini Model Switching if Request Per Day is exceeded
 - [x] load tokens to header after google login (right now the app needs to be restarted)
 - [x] App Icon
 - [x] Hard Delete isDeleted = 1 words in local and turso db
 - [x] Back to close (Ansroid only)
 - [x] Android Safe Area
 - [x] JVM build login issue
-- [ ] definition order change
+- [x] definition order change
