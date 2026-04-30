@@ -111,7 +111,7 @@ class VocabWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val prefs = currentState<androidx.datastore.preferences.core.Preferences>()
-            val word = prefs[wordKey] ?: "Tap '+'"
+            val word = prefs[wordKey] ?: "Tap '→'"
             val meaning = prefs[meaningKey] ?: "to start"
             VocabWidgetContent(word, meaning)
         }

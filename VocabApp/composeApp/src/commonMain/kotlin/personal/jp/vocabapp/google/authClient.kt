@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -35,6 +36,11 @@ fun authClient(secureStorage: SecureStorage): HttpClient {
 //            }
 //            level = LogLevel.ALL
 //        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 90_000
+            connectTimeoutMillis = 30_000
+            socketTimeoutMillis = 90_000
+        }
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true

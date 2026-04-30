@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import co.touchlab.kermit.Logger
 import db.Word
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -122,20 +123,33 @@ class QuickAddActivity : ComponentActivity(), KoinComponent {
 
     private fun saveWord(name: String) {
         lifecycleScope.launch {
+            val trimmedName = name.trim()
             val newWord = Word(
-                name = name.trim(),
-                meaningKr = "!",
-            example = null,
-            antonymEn = "",
-            createdTime = "",
-            modifiedTime = "",
-            isDeleted = false,
-            syncedTime = "",
-            note = "",
+                name = trimmedName,
+                meaningKr = "AI is Filling...",
+                example = null,
+                antonymEn = "",
+                createdTime = "",
+                modifiedTime = "",
+                isDeleted = false,
+                syncedTime = "",
+                note = "",
             )
-            wordService.addWord(newWord, emptyList())
 
+            wordService.addWord(newWord, emptyList())
             widgetSyncManager.syncWord(null)
+
+            Logger.d("New Word Added from Widget: $trimmedName")
+            val constraints = androidx.work.Constraints.Builder()
+                .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                .build()
+
+            val aiWorkRequest = androidx.work.OneTimeWorkRequestBuilder<AiFillWorker>()
+                .setConstraints(constraints)
+                .setInputData(androidx.work.workDataOf("WORD_NAME" to trimmedName))
+                .build()
+
+            androidx.work.WorkManager.getInstance(this@QuickAddActivity).enqueue(aiWorkRequest)
 
             finish()
         }
