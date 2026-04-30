@@ -186,6 +186,7 @@ fun MyScreen(onExit: () -> Unit) {
                                 scope.launch {
                                     service.deleteWord(screen.wordName)
                                     refreshWords()
+                                    widgetSyncManager.syncWord(null)
                                     currentScreen = Screen.Home
                                 }
                             },
@@ -213,6 +214,7 @@ fun MyScreen(onExit: () -> Unit) {
                                 scope.launch {
                                     service.deleteWord(screen.wordName)
                                     refreshWords()
+                                    widgetSyncManager.syncWord(null)
                                     currentScreen = Screen.Home
                                 }
                             },

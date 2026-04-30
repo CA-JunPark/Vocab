@@ -226,23 +226,3 @@ class VocabWidget : GlanceAppWidget() {
         }
     }
 }
-
-suspend fun syncVocabWidget(context: Context, updatedWord: Word) {
-    val manager = GlanceAppWidgetManager(context)
-    val glanceIds = manager.getGlanceIds(VocabWidget::class.java)
-
-    // check if the edited word is current displayed word on the widget
-    glanceIds.forEach { id ->
-        updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { prefs ->
-            val mutablePrefs = prefs.toMutablePreferences()
-            if (prefs[wordKey] == updatedWord.name) {
-                val firstMeaning = updatedWord.meaningKr.split("\n")
-                    .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
-
-                mutablePrefs[meaningKey] = firstMeaning
-            }
-            mutablePrefs
-        }
-        VocabWidget().update(context, id)
-    }
-}
