@@ -26,6 +26,8 @@ roomCommonJvm = "2.8.4"
 roomCompiler = "2.8.4"
 browser = "1.9.0"
 tinkAndroid = "1.20.0"
+runtime = "1.11.0"
+uiGraphics = "1.11.0"
 
 [libraries]
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
@@ -67,6 +69,8 @@ androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", 
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroid" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

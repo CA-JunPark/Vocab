@@ -24,6 +24,17 @@
                 <data android:scheme="personal.jp.vocabapp" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".widget.VocabWidgetReceiver"
+            android:exported="true"
+            android:label="Vocab Word">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/vocab_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

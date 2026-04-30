@@ -38,6 +38,9 @@ kotlin {
             implementation("androidx.credentials:credentials:1.6.0-rc01")
             implementation("androidx.credentials:credentials-play-services-auth:1.6.0-rc01")
             implementation(libs.tink.android)
+            // widget
+            implementation("androidx.glance:glance-appwidget:1.1.1")
+            implementation("androidx.glance:glance-material3:1.1.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
