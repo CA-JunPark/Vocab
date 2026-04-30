@@ -1,6 +1,6 @@
-# Vocab 🎯
+# Vocab
 
-A modern, multiplatform vocabulary application designed for seamless word management and AI-assisted word knowledge generation. Built with **Kotlin Multiplatform** and **Compose Multiplatform**
+A multiplatform vocabulary application designed for seamless word management and AI-assisted word knowledge generation. Built with **Kotlin Multiplatform** and **Compose Multiplatform**
 
 ## Document 
 [Vocab DeepWiki](https://deepwiki.com/CA-JunPark/Vocab/8.2-platform-specific-di-modules)
@@ -44,6 +44,7 @@ A modern, multiplatform vocabulary application designed for seamless word manage
 -   **Android Encruption**: [Google Tink](https://github.com/tink-crypto/tink) 
 -   **Secure Storage**: [Jetpack DataStore](https://developer.android.com/jetpack/androidx/releases/datastore?hl=ko)
 -   **TTS (Text-to-Speech)**: Android Native TextToSpeech & Windows SAPI (via PowerShell System.Speech)
+-   **Backend**: [FastAPI](https://fastapi.tiangolo.com/) deploied on Google Cloud Run 
 
 ## External Resources
 
