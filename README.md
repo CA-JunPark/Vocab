@@ -16,17 +16,17 @@ A modern, multiplatform vocabulary application designed for seamless word manage
 -   **🎨 Material 3 Design**: A clean, modern interface with a custom theme based on the Lexend font.
 
 ## Screenshots
+| Main Screen | Add Word |
+| :---: | :---: |
+| <img src="screenshots/main.png" width="300" alt="Main Screen"> | <img src="screenshots/addword.png" width="300" alt="Add Screen"> |
 
-<img src="screenshots/main.png" width="225" alt="Main Screen">
-<img src="screenshots/addword.png" width="225" alt="Add Screen">
+| Detail 1 | Detail 2 | Detail 3 |
+| :---: | :---: | :---: |
+| <img src="screenshots/detail1.png" width="225" alt="Detail 1 Screen"> | <img src="screenshots/detail2.png" width="225" alt="Detail 2 Screen"> | <img src="screenshots/detail3.png" width="225" alt="Detail 3 Screen"> |
 
-<img src="screenshots/detail1.png" width="225" alt="Detail 1 Screen">
-<img src="screenshots/detail2.png" width="225" alt="Detail 2 Screen">
-<img src="screenshots/detail3.png" width="225" alt="Detail 3 Screen">
-
-<img src="screenshots/edit.png" width="225" alt="Edit Screen">
-<img src="screenshots/setting.png" width="225" alt="Settings Screen">
-<img src="screenshots/widget.jpg" width="225" alt="Widget">
+| Edit | Settings | Widget |
+| :---: | :---: | :---: |
+| <img src="screenshots/edit.png" width="225" alt="Edit Screen"> | <img src="screenshots/setting.png" width="225" alt="Settings Screen"> | <img src="screenshots/widget.jpg" width="225" alt="Widget"> |
 
 ## 🛠 Tech Stack
 
