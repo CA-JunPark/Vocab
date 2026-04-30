@@ -39,7 +39,7 @@
     - [x] check id token for all connections
     - [x] need to check refreshing token works
 - [x] Tag Management
-- [ ] Setup Glance for Android widget
+- [x] Setup Glance for Android widget
 
 ## 2. Data Layer
 ### Model
