@@ -126,7 +126,7 @@
 - [x] remember window size and position
 
 ## 4. Android Specific Features
-- [ ] **Widget (Glance)**
+- [x] **Widget (Glance)**
     - [x] `VocabWidget` display logic (random subset)
     - [x] `VocabWidgetReceiver` for updates
     - [x] Click intents (Open App/Detail)
