@@ -34,6 +34,8 @@ import org.koin.core.component.inject
 import personal.jp.vocabapp.sql.WordService
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import db.Word
 
 
 class AddWordActionCallback : ActionCallback {
@@ -152,14 +154,21 @@ class VocabWidget : GlanceAppWidget() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
-                    Text(
-                        text = meaning,
-                        style = TextStyle(
-                            color = ColorProvider(secondaryTextColor),
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center
+                    Box(
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                            .clickable(actionStartActivity<MainActivity>()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = meaning,
+                            style = TextStyle(
+                                color = ColorProvider(secondaryTextColor),
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            ),
                         )
-                    )
+                    }
                 }
             }
 
@@ -215,5 +224,25 @@ class VocabWidget : GlanceAppWidget() {
                 }
             }
         }
+    }
+}
+
+suspend fun syncVocabWidget(context: Context, updatedWord: Word) {
+    val manager = GlanceAppWidgetManager(context)
+    val glanceIds = manager.getGlanceIds(VocabWidget::class.java)
+
+    // check if the edited word is current displayed word on the widget
+    glanceIds.forEach { id ->
+        updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { prefs ->
+            val mutablePrefs = prefs.toMutablePreferences()
+            if (prefs[wordKey] == updatedWord.name) {
+                val firstMeaning = updatedWord.meaningKr.split("\n")
+                    .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
+
+                mutablePrefs[meaningKey] = firstMeaning
+            }
+            mutablePrefs
+        }
+        VocabWidget().update(context, id)
     }
 }

@@ -4,20 +4,15 @@ import androidx.compose.animation.AnimatedContent
 import personal.jp.vocabapp.theme.VocabTheme
 import androidx.compose.runtime.*
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 import org.koin.compose.koinInject
 import personal.jp.vocabapp.sql.WordServiceImpl
 import kotlinx.coroutines.launch
 import personal.jp.vocabapp.google.AuthRepository
 import personal.jp.vocabapp.google.SecureStorage
-import kotlinx.serialization.Serializable
 import co.touchlab.kermit.Logger
-import io.ktor.client.statement.bodyAsText
 import personal.jp.vocabapp.screens.AddWordScreen
 import personal.jp.vocabapp.screens.MainScreen
 import personal.jp.vocabapp.screens.Screen
-import personal.jp.vocabapp.sql.SerializableWord
 import personal.jp.vocabapp.sql.KeyDataManager
 import personal.jp.vocabapp.viewmodels.WordWithTags
 import androidx.compose.animation.fadeIn
@@ -50,6 +45,7 @@ import personal.jp.vocabapp.sql.sync
 import androidx.compose.ui.graphics.Color
 import personal.jp.vocabapp.screens.PlatformBackHandler
 import personal.jp.vocabapp.screens.desktopBackHandler
+import personal.jp.vocabapp.widget.WidgetSyncManager
 
 @Composable
 fun App(onExit: () -> Unit) {
@@ -66,6 +62,7 @@ fun MyScreen(onExit: () -> Unit) {
     val service: WordServiceImpl = koinInject()
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
+    val widgetSyncManager: WidgetSyncManager = koinInject()
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
@@ -208,6 +205,7 @@ fun MyScreen(onExit: () -> Unit) {
                             onUpdateSuccess = {
                                 scope.launch {
                                     refreshWords()
+                                    widgetSyncManager.syncWord(service.getActiveWordOrNull(screen.wordName))
                                     currentScreen = Screen.WordDetail(screen.wordName)
                                 }
                             },

@@ -98,6 +98,7 @@ class QuickAddActivity : ComponentActivity(), KoinComponent {
                 note = "",
             )
             wordService.addWord(newWord, emptyList())
+            syncVocabWidget(this@QuickAddActivity, newWord)
             finish()
         }
     }
