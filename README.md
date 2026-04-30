@@ -37,9 +37,10 @@ A modern, multiplatform vocabulary application designed for seamless word manage
 -   **AI**: [Google Gemini API](https://ai.google.dev/)
 -   **Widgets**: [Jetpack Glance](https://developer.android.com/jetpack/compose/glance)
 -   **Authentication**: Google Sign-In using [KMAuth](https://github.com/sunildhiman90/KotlinMultiplatformAuth)
--   **Windows Encryption**: [Data Protection API (DPAPI)] (via JNA Crypt32)
+-   **Windows Encryption**: Data Protection API (DPAPI) (via JNA Crypt32)
 -   **Android Encruption**: [Google Tink](https://github.com/tink-crypto/tink) 
 -   **Secure Storage**: [Jetpack DataStore](https://developer.android.com/jetpack/androidx/releases/datastore?hl=ko)
+-   **TTS (Text-to-Speech)**: Android Native TextToSpeech & Windows SAPI (via PowerShell System.Speech)
 
 ## External Resources
 
