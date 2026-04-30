@@ -45,6 +45,7 @@ import personal.jp.vocabapp.sql.sync
 import androidx.compose.ui.graphics.Color
 import personal.jp.vocabapp.screens.PlatformBackHandler
 import personal.jp.vocabapp.screens.desktopBackHandler
+import personal.jp.vocabapp.tts.TTSManager
 import personal.jp.vocabapp.widget.WidgetSyncManager
 
 @Composable
@@ -63,6 +64,7 @@ fun MyScreen(onExit: () -> Unit) {
     val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
     val widgetSyncManager: WidgetSyncManager = koinInject()
+    val ttsManager: TTSManager = koinInject()
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
@@ -179,6 +181,7 @@ fun MyScreen(onExit: () -> Unit) {
                         WordDetailScreen(
                             wordName = screen.wordName,
                             wordService = service,
+                            ttsManager = ttsManager,
                             onEditClick = {
                                 currentScreen = Screen.EditWord(screen.wordName)
                             },

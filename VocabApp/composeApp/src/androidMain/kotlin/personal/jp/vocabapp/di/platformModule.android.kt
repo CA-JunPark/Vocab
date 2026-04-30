@@ -7,6 +7,7 @@ import personal.jp.vocabapp.google.LoginHandler
 import personal.jp.vocabapp.google.SecureStorage
 import personal.jp.vocabapp.google.createDataStorage
 import personal.jp.vocabapp.internet.isNetworkAvailable
+import personal.jp.vocabapp.tts.TTSManager
 import personal.jp.vocabapp.widget.WidgetSyncManager
 import personal.jp.vocabapp.widget.AndroidWidgetSyncManager
 
@@ -16,4 +17,5 @@ actual val platformModule = module {
     single { SecureStorage(get(), androidContext()) }
     single { isNetworkAvailable(androidContext())}
     single<WidgetSyncManager> { AndroidWidgetSyncManager(androidContext()) }
+    single { TTSManager(androidContext()) }
 }

@@ -34,6 +34,7 @@ import db.Word
 import personal.jp.vocabapp.sql.TagColorManager
 import personal.jp.vocabapp.sql.WordServiceImpl
 import personal.jp.vocabapp.sql.getContrastColor
+import personal.jp.vocabapp.tts.TTSManager
 
 enum class DetailTab { DETAILS, NOTES }
 
@@ -41,6 +42,7 @@ enum class DetailTab { DETAILS, NOTES }
 fun WordDetailScreen(
     wordName: String,
     wordService: WordServiceImpl,
+    ttsManager: TTSManager,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onClose: () -> Unit
@@ -122,7 +124,7 @@ fun WordDetailScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp)
             ) {
-                WordDetailHeader(wordName = currentWord.name)
+                WordDetailHeader(wordName = currentWord.name, ttsManager)
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -340,7 +342,7 @@ fun WordDetailTopBar(onEditClick: () -> Unit, onDeleteClick: () -> Unit, onClose
 }
 
 @Composable
-fun WordDetailHeader(wordName: String) {
+fun WordDetailHeader(wordName: String, ttsManager: TTSManager) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -355,7 +357,7 @@ fun WordDetailHeader(wordName: String) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         IconButton(
-            onClick = { /* TODO */ },
+            onClick = { ttsManager.speak(wordName) },
             modifier = Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF1B202D))
         ) {
             Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Pronounce", tint = Color(0xFF2D65FF))
