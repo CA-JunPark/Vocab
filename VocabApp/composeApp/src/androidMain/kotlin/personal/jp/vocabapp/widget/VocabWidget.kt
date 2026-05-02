@@ -35,7 +35,7 @@ import personal.jp.vocabapp.sql.WordService
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-
+import kotlin.compareTo
 
 class AddWordActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
@@ -117,6 +117,7 @@ class VocabWidget : GlanceAppWidget() {
         }
     }
 
+
     @SuppressLint("RestrictedApi")
     @Composable
     private fun VocabWidgetContent(word: String, meaning: String) {
@@ -124,6 +125,14 @@ class VocabWidget : GlanceAppWidget() {
         val primaryTextColor = Color.White
         val buttonBackgroundColor = Color(0xFF2B313E)
         val secondaryTextColor = Color(0xFF9BA1B0)
+
+        val dynamicFontSize = when {
+            word.length > 17 -> 12.sp
+            word.length > 15 -> 16.sp
+            word.length > 12 -> 18.sp
+            word.length > 10 -> 20.sp
+            else -> 22.sp
+        }
 
         Column(
             modifier = GlanceModifier
@@ -141,7 +150,7 @@ class VocabWidget : GlanceAppWidget() {
                 maxLines = 1,
                 style = TextStyle(
                     color = ColorProvider(primaryTextColor),
-                    fontSize = 24.sp,
+                    fontSize = dynamicFontSize,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )

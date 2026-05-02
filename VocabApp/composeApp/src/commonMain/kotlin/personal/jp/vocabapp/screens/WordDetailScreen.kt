@@ -343,6 +343,13 @@ fun WordDetailTopBar(onEditClick: () -> Unit, onDeleteClick: () -> Unit, onClose
 
 @Composable
 fun WordDetailHeader(wordName: String, ttsManager: TTSManager) {
+    val dynamicFontSize = when {
+        wordName.length > 17 -> 20.sp
+        wordName.length > 15 -> 22.sp
+        wordName.length > 12 -> 24.sp
+        wordName.length > 10 -> 26.sp
+        else -> 28.sp
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -351,7 +358,7 @@ fun WordDetailHeader(wordName: String, ttsManager: TTSManager) {
         Text(
             text = wordName,
             color = Color.White,
-            fontSize = 48.sp,
+            fontSize = dynamicFontSize,
             fontWeight = FontWeight.Black,
             textAlign = TextAlign.Center
         )
