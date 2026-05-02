@@ -104,6 +104,19 @@ android {
     namespace = "personal.jp.vocabapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+
+            val appName = "Vocab"
+            val versionName = variant.versionName
+
+            val newName = "${appName}_v${versionName}.apk"
+            output.outputFileName = newName
+        }
+    }
+
     defaultConfig {
         applicationId = "personal.jp.vocabapp"
         minSdk = libs.versions.android.minSdk.get().toInt()

@@ -44,3 +44,6 @@ Secrets.kt
 tokens
 
 vocab.preferences_pb
+
+VocabApp/composeApp/release/
+vocab_keystore.jks
