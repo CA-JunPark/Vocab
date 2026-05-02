@@ -5,6 +5,7 @@ package personal.jp.vocabapp.sql
 // ex validate the format of the data
 
 import db.Tag
+import kotlin.time.Clock
 import db.Word as Word
 
 interface WordService {
@@ -65,9 +66,10 @@ class WordServiceImpl(
     }
 
     override suspend fun upsertWord(word: Word, tags: List<Tag>): Boolean {
+        val wordWithTime = word.copy(modifiedTime = Clock.System.now().toString())
         val optimizedTags = tagColorManager.assignColors(tags)
         val cleanTags = optimizedTags.distinctBy { it.tagName.trim().lowercase() }
-        return wordRepo.upsertWord(word, cleanTags)
+        return wordRepo.upsertWord(wordWithTime, cleanTags)
     }
 
     override suspend fun deleteWord(name: String): Boolean {

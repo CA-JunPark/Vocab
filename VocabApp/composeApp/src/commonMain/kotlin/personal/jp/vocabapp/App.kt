@@ -43,6 +43,9 @@ import personal.jp.vocabapp.screens.WordDetailScreen
 import personal.jp.vocabapp.sql.requestCloudPurge
 import personal.jp.vocabapp.sql.sync
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import personal.jp.vocabapp.screens.PlatformBackHandler
 import personal.jp.vocabapp.screens.desktopBackHandler
 import personal.jp.vocabapp.tts.TTSManager
@@ -113,6 +116,21 @@ fun MyScreen(onExit: () -> Unit) {
             is Screen.WordDetail -> currentScreen = Screen.Home
             is Screen.EditWord -> currentScreen = Screen.WordDetail(screen.wordName)
             is Screen.Settings -> currentScreen = Screen.Home
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // When the app started check db again.
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshWords()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
