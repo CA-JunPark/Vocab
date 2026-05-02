@@ -67,22 +67,23 @@ fun MainScreen(
     var selectedMode by remember { mutableStateOf(SearchMode.Content) }
     val tagManager = TagColorManager()
     val filteredList = remember(searchQuery, wordsList, selectedMode) {
-        if (searchQuery.isBlank()) wordsList
-        else {
+        val list = if (searchQuery.isBlank()) {
+            wordsList
+        } else {
             wordsList.filter { item ->
                 when (selectedMode) {
-                    // Content Mode
                     SearchMode.Content -> {
                         item.word.name.contains(searchQuery, ignoreCase = true) ||
                                 item.word.meaningKr.contains(searchQuery)
                     }
-                    // Tag Mode
                     SearchMode.Tags -> {
                         item.tags.any { tag -> tag.tagName.contains(searchQuery, ignoreCase = true) }
                     }
                 }
             }
         }
+        // sort
+        list.sortedBy { it.word.name }
     }
     Scaffold(
         topBar = {
