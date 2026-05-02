@@ -1,5 +1,9 @@
 package personal.jp.vocabapp
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -14,6 +18,7 @@ import kotlin.system.exitProcess
 import vocabapp.composeapp.generated.resources.Res
 import vocabapp.composeapp.generated.resources.vocab_icon
 import org.jetbrains.compose.resources.painterResource
+import personal.jp.vocabapp.screens.Screen
 
 fun main() = application {
     // load window state
@@ -60,9 +65,15 @@ fun main() = application {
         resizable = true,
         icon = painterResource(Res.drawable.vocab_icon),
     ) {
-        App(onExit = {
-            saveWindowState()
-            exitProcess(0)
-        })
+        var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+
+        App(
+            currentScreen = currentScreen,
+            onScreenChange = { currentScreen = it },
+            onExit = {
+                saveWindowState()
+                exitProcess(0)
+            }
+        )
     }
 }

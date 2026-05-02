@@ -7,35 +7,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.layout.*
-import androidx.glance.text.Text
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.action.ActionParameters
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
+import androidx.glance.currentState
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
+import androidx.glance.layout.padding
+import androidx.glance.layout.size
+import androidx.glance.layout.width
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
+import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import personal.jp.vocabapp.MainActivity
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.currentState
-import androidx.glance.state.PreferencesGlanceStateDefinition
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import personal.jp.vocabapp.MainActivity
 import personal.jp.vocabapp.sql.WordService
-import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import kotlin.compareTo
 
 class AddWordActionCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
@@ -87,7 +96,7 @@ class NextWordActionCallback : ActionCallback, KoinComponent {
             val targetName = targetShuffledNames[nextIndex]
             val randomWord = activeWords.find { it.name == targetName } ?: activeWords.random()
 
-            val fullMeaning = randomWord.meaningKr ?: ""
+            val fullMeaning = randomWord.meaningKr
             val firstMeaning = fullMeaning.split(Regex("\n"))
                 .firstOrNull { it.isNotBlank() }?.trim() ?: "뜻 없음"
 
@@ -113,14 +122,14 @@ class VocabWidget : GlanceAppWidget() {
             val prefs = currentState<androidx.datastore.preferences.core.Preferences>()
             val word = prefs[wordKey] ?: "Tap '→'"
             val meaning = prefs[meaningKey] ?: "to start"
-            VocabWidgetContent(word, meaning)
+            VocabWidgetContent(context, word, meaning)
         }
     }
 
 
     @SuppressLint("RestrictedApi")
     @Composable
-    private fun VocabWidgetContent(word: String, meaning: String) {
+    private fun VocabWidgetContent(context: Context, word: String, meaning: String) {
         val backgroundColor = Color(0xFF1B202D)
         val primaryTextColor = Color.White
         val buttonBackgroundColor = Color(0xFF2B313E)
@@ -134,12 +143,18 @@ class VocabWidget : GlanceAppWidget() {
             else -> 22.sp
         }
 
+        val detailIntent = Intent(context, MainActivity::class.java).apply {
+            action = "ACTION_OPEN_WORD_DETAIL"
+            putExtra("WORD_NAME", word)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(backgroundColor)
                 .padding(8.dp)
-                .clickable(actionStartActivity<MainActivity>()),
+                .clickable(actionStartActivity(detailIntent)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // word
@@ -167,7 +182,7 @@ class VocabWidget : GlanceAppWidget() {
                     Box(
                         modifier = GlanceModifier
                             .fillMaxWidth()
-                            .clickable(actionStartActivity<MainActivity>()),
+                            .clickable(actionStartActivity(detailIntent)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

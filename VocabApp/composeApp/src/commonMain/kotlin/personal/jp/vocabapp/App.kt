@@ -1,20 +1,6 @@
 package personal.jp.vocabapp
 
 import androidx.compose.animation.AnimatedContent
-import personal.jp.vocabapp.theme.VocabTheme
-import androidx.compose.runtime.*
-import io.ktor.client.HttpClient
-import org.koin.compose.koinInject
-import personal.jp.vocabapp.sql.WordServiceImpl
-import kotlinx.coroutines.launch
-import personal.jp.vocabapp.google.AuthRepository
-import personal.jp.vocabapp.google.SecureStorage
-import co.touchlab.kermit.Logger
-import personal.jp.vocabapp.screens.AddWordScreen
-import personal.jp.vocabapp.screens.MainScreen
-import personal.jp.vocabapp.screens.Screen
-import personal.jp.vocabapp.sql.KeyDataManager
-import personal.jp.vocabapp.viewmodels.WordWithTags
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -32,44 +18,73 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import personal.jp.vocabapp.screens.EditWordScreen
-import personal.jp.vocabapp.screens.SettingsScreen
-import personal.jp.vocabapp.screens.WordDetailScreen
-import personal.jp.vocabapp.sql.requestCloudPurge
-import personal.jp.vocabapp.sql.sync
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import co.touchlab.kermit.Logger
+import io.ktor.client.HttpClient
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import personal.jp.vocabapp.google.AuthRepository
+import personal.jp.vocabapp.screens.AddWordScreen
+import personal.jp.vocabapp.screens.EditWordScreen
+import personal.jp.vocabapp.screens.MainScreen
 import personal.jp.vocabapp.screens.PlatformBackHandler
+import personal.jp.vocabapp.screens.Screen
+import personal.jp.vocabapp.screens.SettingsScreen
+import personal.jp.vocabapp.screens.WordDetailScreen
 import personal.jp.vocabapp.screens.desktopBackHandler
+import personal.jp.vocabapp.sql.KeyDataManager
+import personal.jp.vocabapp.sql.WordServiceImpl
+import personal.jp.vocabapp.sql.requestCloudPurge
+import personal.jp.vocabapp.sql.sync
+import personal.jp.vocabapp.theme.VocabTheme
 import personal.jp.vocabapp.tts.TTSManager
+import personal.jp.vocabapp.viewmodels.WordWithTags
 import personal.jp.vocabapp.widget.WidgetSyncManager
 
 @Composable
-fun App(onExit: () -> Unit) {
-    MyScreen(onExit = onExit)
+fun App(
+    currentScreen: Screen,
+    onScreenChange: (Screen) -> Unit,
+    onExit: () -> Unit
+) {
+    MyScreen(
+        currentScreen = currentScreen,
+        onScreenChange = onScreenChange,
+        onExit = onExit
+    )
 }
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MyScreen(onExit: () -> Unit) {
+fun MyScreen(currentScreen: Screen,
+             onScreenChange: (Screen) -> Unit,
+             onExit: () -> Unit)
+{
     val authRepository: AuthRepository = koinInject()
-    val secureStorage: SecureStorage = koinInject()
+//    val secureStorage: SecureStorage = koinInject()
     val scope = rememberCoroutineScope()
     val client: HttpClient = koinInject()
     val service: WordServiceImpl = koinInject()
-    val isNetworkAvailable: Boolean = koinInject()
+//    val isNetworkAvailable: Boolean = koinInject()
     val keyDataManager : KeyDataManager = koinInject()
     val widgetSyncManager: WidgetSyncManager = koinInject()
     val ttsManager: TTSManager = koinInject()
-
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
     var allWordsWithTags by remember { mutableStateOf<List<WordWithTags>>(emptyList()) }
 
@@ -77,7 +92,7 @@ fun MyScreen(onExit: () -> Unit) {
 
     val checkPendingChanges = {
         scope.launch {
-            val lastSync = keyDataManager.getLastSync() ?: "1970-01-01 00:00:00"
+            val lastSync = keyDataManager.getLastSync()
             val latestLocal = service.getLatestModifiedTime()
 
             hasPendingChanges = if (latestLocal != null) {
@@ -110,12 +125,12 @@ fun MyScreen(onExit: () -> Unit) {
     var showExitDialog by remember { mutableStateOf(false) }
 
     val handleBack = {
-        when (val screen = currentScreen) {
+        when (currentScreen) {
             is Screen.Home -> showExitDialog = true
-            is Screen.AddWord -> currentScreen = Screen.Home
-            is Screen.WordDetail -> currentScreen = Screen.Home
-            is Screen.EditWord -> currentScreen = Screen.WordDetail(screen.wordName)
-            is Screen.Settings -> currentScreen = Screen.Home
+            is Screen.AddWord -> onScreenChange(Screen.Home)
+            is Screen.WordDetail -> onScreenChange(Screen.Home)
+            is Screen.EditWord -> onScreenChange(Screen.WordDetail(currentScreen.wordName))
+            is Screen.Settings -> onScreenChange(Screen.Home)
         }
     }
 
@@ -173,10 +188,10 @@ fun MyScreen(onExit: () -> Unit) {
                         MainScreen(
                             userProfile,
                             wordsList = allWordsWithTags,
-                            onAddClick = { currentScreen = Screen.AddWord },
-                            onSettingsClick = { currentScreen = Screen.Settings },
+                            onAddClick = { onScreenChange(Screen.AddWord) },
+                            onSettingsClick = { onScreenChange(Screen.Settings) },
                             onWordClick = { name ->
-                                currentScreen = Screen.WordDetail(name)
+                                onScreenChange(Screen.WordDetail(name))
                             }
                         )
                     }
@@ -185,11 +200,11 @@ fun MyScreen(onExit: () -> Unit) {
                         AddWordScreen(
                             service,
                             client,
-                            onClose = { currentScreen = Screen.Home },
+                            onClose = { onScreenChange(Screen.Home) },
                             onSaveSuccess = {
                                 scope.launch {
                                     refreshWords()
-                                    currentScreen = Screen.Home
+                                    onScreenChange(Screen.Home)
                                 }
                             }
                         )
@@ -201,18 +216,18 @@ fun MyScreen(onExit: () -> Unit) {
                             wordService = service,
                             ttsManager = ttsManager,
                             onEditClick = {
-                                currentScreen = Screen.EditWord(screen.wordName)
+                                onScreenChange(Screen.EditWord(screen.wordName))
                             },
                             onDeleteClick = {
                                 scope.launch {
                                     service.deleteWord(screen.wordName)
                                     refreshWords()
                                     widgetSyncManager.syncWord(null)
-                                    currentScreen = Screen.Home
+                                    onScreenChange(Screen.Home)
                                 }
                             },
                             onClose = {
-                                currentScreen = Screen.Home
+                                onScreenChange(Screen.Home)
                             }
                         )
                     }
@@ -222,13 +237,13 @@ fun MyScreen(onExit: () -> Unit) {
                             wordName = screen.wordName,
                             wordService = service,
                             onClose = {
-                                currentScreen = Screen.WordDetail(screen.wordName)
+                                onScreenChange(Screen.WordDetail(screen.wordName))
                             },
                             onUpdateSuccess = {
                                 scope.launch {
                                     refreshWords()
                                     widgetSyncManager.syncWord(service.getActiveWordOrNull(screen.wordName))
-                                    currentScreen = Screen.WordDetail(screen.wordName)
+                                    onScreenChange(Screen.WordDetail(screen.wordName))
                                 }
                             },
                             onDeleteClick = {
@@ -236,7 +251,7 @@ fun MyScreen(onExit: () -> Unit) {
                                     service.deleteWord(screen.wordName)
                                     refreshWords()
                                     widgetSyncManager.syncWord(null)
-                                    currentScreen = Screen.Home
+                                    onScreenChange(Screen.Home)
                                 }
                             },
                         )
@@ -249,7 +264,7 @@ fun MyScreen(onExit: () -> Unit) {
                             hasPendingChanges = hasPendingChanges,
                             isSyncing = isSyncing,
                             wordService = service,
-                            onBackClick = { currentScreen = Screen.Home },
+                            onBackClick = { onScreenChange(Screen.Home) },
                             onLoginClick = {
                                 scope.launch {
                                     authRepository.startLogin()
